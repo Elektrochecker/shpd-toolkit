@@ -565,9 +565,11 @@ public class SeedFinder {
 		}
 	}
 
-	private void logSeedItems(String seed, int floors) {
+	public String[] logSeedItems(String seed, int floors) {
 		PrintWriter out = null;
 		OutputStream out_fd = System.out;
+
+		String[] log = new String[floors];
 
 		try {
 			if (Options.ouputFile != "stdout")
@@ -594,6 +596,7 @@ public class SeedFinder {
 			seedinfotext += format.format(new Date(SPDSettings.lastDaily()));
 
 			out.printf("Items for daily run %s (%d):\n\n", seedinfotext, Dungeon.seed);
+			//log[0] += ("Items for daily run " + seedinfotext + " " + Dungeon.seed + ":\n\n");
 		} else {
 			Dungeon.daily = false;
 			SPDSettings.customSeed(seed);
@@ -603,6 +606,7 @@ public class SeedFinder {
 			seedinfotext += DungeonSeed.convertToCode(Dungeon.seed);
 
 			out.printf("Items for seed %s (%d):\n\n", seedinfotext, Dungeon.seed);
+			//log[0] += ("Items for seed" + seedinfotext + " " + Dungeon.seed + ":\n\n");
 		}
 
 		if (!Options.ignoreBlacklist) {
@@ -614,6 +618,7 @@ public class SeedFinder {
 		}
 
 		for (int i = 0; i < floors; i++) {
+			log[i] = "";
 
 			Level l = Dungeon.newLevel();
 			ArrayList<Heap> heaps = new ArrayList<>(l.heaps.valueList());
@@ -627,6 +632,7 @@ public class SeedFinder {
 			ArrayList<HeapItem> others = new ArrayList<>();
 
 			out.printf("--- floor %d: ", Dungeon.depth);
+			log[i] += ("floor " + Dungeon.depth + " (");
 
 			String feeling = l.feeling.toString();
 
@@ -680,17 +686,21 @@ public class SeedFinder {
 			}
 
 			out.printf(feeling + "\n\n");
+			log[i] += (feeling + "):\n\n");
 
 			// list all rooms of level
 			if (Dungeon.depth % 5 != 0 && Dungeon.depth < 26 && Options.useRooms) {
 				ArrayList<String> rooms = getRooms();
 				out.printf("Rooms: \n");
+				log[i] += ("Rooms: \n");
 
 				for (int k = 0; k < rooms.size(); k++) {
 					out.printf("- " + rooms.get(k) + "\n");
+					log[i] += ("- " + rooms.get(k) + "\n");
 				}
 
 				out.printf("\n");
+				log[i] += ("\n");
 			}
 
 			// list quest rewards
@@ -799,10 +809,12 @@ public class SeedFinder {
 				addTextItems("Other", others, builder, "\n");
 
 			out.print(builder.toString());
+			log[i] += (builder.toString());
 
 			Dungeon.depth++;
 		}
 
 		out.close();
+		return log;
 	}
 }

@@ -21,6 +21,7 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.scenes;
 
+import com.shatteredpixel.shatteredpixeldungeon.SeedFinder;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Chrome;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
@@ -40,8 +41,14 @@ import com.shatteredpixel.shatteredpixeldungeon.ui.ExitButton;
 import com.shatteredpixel.shatteredpixeldungeon.ui.Icons;
 import com.shatteredpixel.shatteredpixeldungeon.ui.StyledButton;
 import com.shatteredpixel.shatteredpixeldungeon.ui.Window;
+import com.shatteredpixel.shatteredpixeldungeon.ui.changelist.WndChangesTabbed;
+import com.shatteredpixel.shatteredpixeldungeon.utils.DungeonSeed;
+import com.shatteredpixel.shatteredpixeldungeon.windows.WndMessage;
 import com.shatteredpixel.shatteredpixeldungeon.windows.WndOptions;
+import com.shatteredpixel.shatteredpixeldungeon.windows.WndSeedfinderLog;
+import com.shatteredpixel.shatteredpixeldungeon.windows.WndSeedfinderSeedinput;
 import com.shatteredpixel.shatteredpixeldungeon.windows.WndSettings;
+import com.shatteredpixel.shatteredpixeldungeon.windows.WndTextInput;
 import com.watabou.glwrap.Blending;
 import com.watabou.noosa.BitmapText;
 import com.watabou.noosa.Camera;
@@ -108,32 +115,39 @@ public class TitleScene extends PixelScene {
 
 		final Chrome.Type GREY_TR = Chrome.Type.GREY_BUTTON_TR;
 		
-		StyledButton btnPlay = new StyledButton(GREY_TR, Messages.get(this, "enter")){
+		StyledButton btnScout = new StyledButton(GREY_TR, "seed scouting"){
 			@Override
 			protected void onClick() {
-				if (GamesInProgress.checkAll().size() == 0){
-					GamesInProgress.selectedClass = null;
-					GamesInProgress.curSlot = 1;
-					ShatteredPixelDungeon.switchScene(HeroSelectScene.class);
-				} else {
-					ShatteredPixelDungeon.switchNoFade( StartScene.class );
-				}
+				ShatteredPixelDungeon.scene()
+						.addToFront(new WndTextInput(Messages.get(HeroSelectScene.class, "custom_seed_title"),
+								Messages.get(HeroSelectScene.class, "custom_seed_desc"),
+								SPDSettings.customSeed(),
+								20,
+								false,
+								Messages.get(HeroSelectScene.class, "custom_seed_set"),
+								Messages.get(HeroSelectScene.class, "custom_seed_clear")) {
+							@Override
+							public void onSelect(boolean positive, String text) {
+								text = DungeonSeed.formatText(text);
+								long seed = DungeonSeed.convertFromText(text);
+								String seedString = DungeonSeed.convertToCode(seed);
+
+								String[] args = { "25", seedString};
+								String[] seedfinderOutputLog = new SeedFinder(args).logSeedItems(seedString, 14);
+
+								ShatteredPixelDungeon.scene().addToFront(
+										new WndSeedfinderLog(null, DungeonSeed.convertToCode(Dungeon.seed), seedfinderOutputLog));
+							}
+						});
 			}
 			
 			@Override
 			protected boolean onLongClick() {
-				//making it easier to start runs quickly while debugging
-				if (DeviceCompat.isDebug()) {
-					GamesInProgress.selectedClass = null;
-					GamesInProgress.curSlot = 1;
-					ShatteredPixelDungeon.switchScene(HeroSelectScene.class);
-					return true;
-				}
 				return super.onLongClick();
 			}
 		};
-		btnPlay.icon(Icons.get(Icons.ENTER));
-		add(btnPlay);
+		btnScout.icon(Icons.get(Icons.ENTER));
+		add(btnScout);
 
 		StyledButton btnSupport = new SupportButton(GREY_TR, Messages.get(this, "support"));
 		add(btnSupport);
@@ -183,20 +197,20 @@ public class TitleScene extends PixelScene {
 		GAP = Math.max(GAP, 2);
 
 		if (landscape()) {
-			btnPlay.setRect(title.x-50, topRegion+GAP, ((title.width()+100)/2)-1, BTN_HEIGHT);
-			align(btnPlay);
-			btnSupport.setRect(btnPlay.right()+2, btnPlay.top(), btnPlay.width(), BTN_HEIGHT);
-			btnRankings.setRect(btnPlay.left(), btnPlay.bottom()+ GAP, (btnPlay.width()*.67f)-1, BTN_HEIGHT);
+			btnScout.setRect(title.x-50, topRegion+GAP, ((title.width()+100)/2)-1, BTN_HEIGHT);
+			align(btnScout);
+			btnSupport.setRect(btnScout.right()+2, btnScout.top(), btnScout.width(), BTN_HEIGHT);
+			btnRankings.setRect(btnScout.left(), btnScout.bottom()+ GAP, (btnScout.width()*.67f)-1, BTN_HEIGHT);
 			btnBadges.setRect(btnRankings.left(), btnRankings.bottom()+GAP, btnRankings.width(), BTN_HEIGHT);
 			btnNews.setRect(btnRankings.right()+2, btnRankings.top(), btnRankings.width(), BTN_HEIGHT);
 			btnChanges.setRect(btnNews.left(), btnNews.bottom() + GAP, btnRankings.width(), BTN_HEIGHT);
 			btnSettings.setRect(btnNews.right()+2, btnNews.top(), btnRankings.width(), BTN_HEIGHT);
 			btnAbout.setRect(btnSettings.left(), btnSettings.bottom() + GAP, btnRankings.width(), BTN_HEIGHT);
 		} else {
-			btnPlay.setRect(title.x, topRegion+GAP, title.width(), BTN_HEIGHT);
-			align(btnPlay);
-			btnSupport.setRect(btnPlay.left(), btnPlay.bottom()+ GAP, btnPlay.width(), BTN_HEIGHT);
-			btnRankings.setRect(btnPlay.left(), btnSupport.bottom()+ GAP, (btnPlay.width()/2)-1, BTN_HEIGHT);
+			btnScout.setRect(title.x, topRegion+GAP, title.width(), BTN_HEIGHT);
+			align(btnScout);
+			btnSupport.setRect(btnScout.left(), btnScout.bottom()+ GAP, btnScout.width(), BTN_HEIGHT);
+			btnRankings.setRect(btnScout.left(), btnSupport.bottom()+ GAP, (btnScout.width()/2)-1, BTN_HEIGHT);
 			btnBadges.setRect(btnRankings.right()+2, btnRankings.top(), btnRankings.width(), BTN_HEIGHT);
 			btnNews.setRect(btnRankings.left(), btnRankings.bottom()+ GAP, btnRankings.width(), BTN_HEIGHT);
 			btnChanges.setRect(btnNews.right()+2, btnNews.top(), btnNews.width(), BTN_HEIGHT);
