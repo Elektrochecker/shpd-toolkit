@@ -98,10 +98,6 @@ public enum Languages {
 	}
 
 	public static Languages matchCode(String code){
-		for (Languages lang : Languages.values()){
-			if (lang.code().equals(code))
-				return lang;
-		}
 		return ENGLISH;
 	}
 

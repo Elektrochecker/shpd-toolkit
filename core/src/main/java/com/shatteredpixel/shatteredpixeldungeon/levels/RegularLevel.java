@@ -89,6 +89,8 @@ public abstract class RegularLevel extends Level {
 	
 	protected Room roomEntrance;
 	protected Room roomExit;
+
+	public static ArrayList<Room> roomList;
 	
 	@Override
 	protected boolean build() {
@@ -96,6 +98,7 @@ public abstract class RegularLevel extends Level {
 		builder = builder();
 		
 		ArrayList<Room> initRooms = initRooms();
+		roomList = initRooms;
 		Random.shuffle(initRooms);
 		
 		do {
