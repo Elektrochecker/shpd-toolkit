@@ -68,6 +68,7 @@ public class WndSettings extends WndTabbed {
 	private DataTab     data;
 	private AudioTab    audio;
 	private LangsTab    langs;
+	private SeedfinderTab seedfinder;
 
 	public static int last_index = 0;
 
@@ -77,6 +78,20 @@ public class WndSettings extends WndTabbed {
 		float height;
 
 		int width = PixelScene.landscape() ? WIDTH_L : WIDTH_P;
+
+		seedfinder = new SeedfinderTab();
+		seedfinder.setSize(width, 0);
+		height = seedfinder.height();
+		add( seedfinder );
+
+		add( new IconTab(Icons.get(Icons.DISPLAY)){
+			@Override
+			protected void select(boolean value) {
+				super.select(value);
+				seedfinder.visible = seedfinder.active = value;
+				if (value) last_index = 0;
+			}
+		});
 
 		display = new DisplayTab();
 		display.setSize(width, 0);
@@ -213,6 +228,53 @@ public class WndSettings extends WndTabbed {
 				//do nothing
 			}
 		});
+	}
+
+	private static class SeedfinderTab extends Component {
+		RenderedTextBlock title;
+		ColorBlock sep1;
+		OptionSlider numFloors;
+
+		@Override
+		protected void createChildren() {
+			title = PixelScene.renderTextBlock(Messages.get(this, "title"), 9);
+			title.hardlight(TITLE_COLOR);
+			add(title);
+
+			sep1 = new ColorBlock(1, 1, 0xFF000000);
+			add(sep1);
+
+			numFloors = new OptionSlider(Messages.get(this, "floors_slider"),
+					"1", "24", 1, 24) {
+				@Override
+				protected void onChange() {
+					SPDSettings.seedfinderFloors(getSelectedValue());
+				}
+			};
+			numFloors.setSelectedValue(SPDSettings.seedfinderFloors());
+			add(numFloors);
+		}
+
+		@Override
+		protected void layout() {
+
+			float bottom = y;
+
+			title.setPos((width - title.width())/2, bottom + GAP);
+			sep1.size(width, 1);
+			sep1.y = title.bottom() + 3*GAP;
+
+			bottom = sep1.y + 1;
+
+			if (width > 200){
+				numFloors.setRect(0, bottom + GAP, width/2-GAP/2, SLIDER_HEIGHT);
+			} else {
+				numFloors.setRect(0, bottom + GAP, width, SLIDER_HEIGHT);
+			}
+
+			height = numFloors.bottom();
+		}
+
 	}
 
 	private static class DisplayTab extends Component {

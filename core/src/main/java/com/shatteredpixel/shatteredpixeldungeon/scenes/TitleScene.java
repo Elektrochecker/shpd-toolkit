@@ -120,23 +120,29 @@ public class TitleScene extends PixelScene {
 			protected void onClick() {
 				ShatteredPixelDungeon.scene()
 						.addToFront(new WndTextInput(Messages.get(HeroSelectScene.class, "custom_seed_title"),
-								Messages.get(HeroSelectScene.class, "custom_seed_desc"),
+								Messages.get(HeroSelectScene.class, "scout_info_text"),
 								SPDSettings.customSeed(),
 								20,
 								false,
-								Messages.get(HeroSelectScene.class, "custom_seed_set"),
-								Messages.get(HeroSelectScene.class, "custom_seed_clear")) {
+								Messages.get(HeroSelectScene.class, "scout_button_yes"),
+								Messages.get(HeroSelectScene.class, "scout_button_no")) {
 							@Override
 							public void onSelect(boolean positive, String text) {
-								text = DungeonSeed.formatText(text);
-								long seed = DungeonSeed.convertFromText(text);
-								String seedString = DungeonSeed.convertToCode(seed);
+								if (positive && text != null && !text.isEmpty()) {
+									text = DungeonSeed.formatText(text);
+									long seed = DungeonSeed.convertFromText(text);
+									String seedString = DungeonSeed.convertToCode(seed);
 
-								String[] args = { "25", seedString};
-								String[] seedfinderOutputLog = new SeedFinder(args).logSeedItems(seedString, 14);
+									String[] args = { "25", seedString };
+									String[] seedfinderOutputLog = new SeedFinder(args).logSeedItems();
 
-								ShatteredPixelDungeon.scene().addToFront(
-										new WndSeedfinderLog(null, DungeonSeed.convertToCode(Dungeon.seed), seedfinderOutputLog));
+									ShatteredPixelDungeon.scene().addToFront(
+											new WndSeedfinderLog(Icons.get(Icons.BACKPACK),
+													"Items for seed " + DungeonSeed.convertToCode(Dungeon.seed),
+													seedfinderOutputLog));
+								} else {
+									SPDSettings.customSeed("");
+								}
 							}
 						});
 			}

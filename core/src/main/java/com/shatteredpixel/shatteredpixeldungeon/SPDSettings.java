@@ -47,6 +47,19 @@ public class SPDSettings extends GameSettings {
 		return getInt( KEY_VERSION, 0 );
 	}
 	
+	//Seedfinder
+
+	public static final String KEY_FLOORS	= "number_of_floors";
+
+	public static void seedfinderFloors( int value ) {
+		put( KEY_FLOORS, value );
+		GameScene.updateFog();
+	}
+	
+	public static int seedfinderFloors() {
+		return getInt( KEY_FLOORS, 9, 1, 24 );
+	}
+
 	//Display
 	
 	public static final String KEY_FULLSCREEN	= "fullscreen";

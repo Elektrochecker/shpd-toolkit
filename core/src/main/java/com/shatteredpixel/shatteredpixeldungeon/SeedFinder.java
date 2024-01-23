@@ -139,82 +139,28 @@ public class SeedFinder {
 			Options.ouputFile = args[3];
 	}
 
-	private void parseConfig(String fileName) {
-		Properties cfg = new Properties();
-
-		try (FileInputStream stream = new FileInputStream(fileName)) {
-			cfg.load(stream);
-		} catch (FileNotFoundException ex) {
-			try (OutputStream output = new FileOutputStream(fileName)) {
-				Properties prop = new Properties();
-
-				// if no config is present, restore these values
-				prop.setProperty("useChallenges", "true");
-				prop.setProperty("ignoreBlacklist", "false");
-				prop.setProperty("trueRandomMode", "false");
-				prop.setProperty("sequentialMode", "false");
-				prop.setProperty("useRooms", "false");
-				prop.setProperty("logPotions", "true");
-				prop.setProperty("logScrolls", "true");
-				prop.setProperty("logEquipment", "true");
-				prop.setProperty("logRings", "true");
-				prop.setProperty("logWands", "true");
-				prop.setProperty("logArtifacts", "true");
-				prop.setProperty("logOther", "true");
-
-				prop.setProperty("startingSeed", "0");
-				prop.setProperty("infoSpacing", "33");
-				prop.setProperty("spacingChar", "33");
-
-				prop.setProperty("chal.hostileChampions", "false");
-				prop.setProperty("chal.badderBosses", "false");
-				prop.setProperty("chal.onDiet", "false");
-				prop.setProperty("chal.faithIsMyArmor", "false");
-				prop.setProperty("chal.pharmacophobia", "false");
-				prop.setProperty("chal.barrenLand", "false");
-				prop.setProperty("chal.swarmIntelligence", "false");
-				prop.setProperty("chal.intoDarkness", "false");
-				prop.setProperty("chal.forbiddenRunes", "false");
-
-				prop.store(output, null);
-
-				System.out.printf("\nERROR: no config file found. created " + fileName + "\n\n");
-			} catch (IOException io) {
-			}
-		} catch (IOException ex) {
-		}
+	private void loadConfig(String fileName) {
 
 		// pull options from config
-		Options.useChallenges = cfg.getProperty("useChallenges").equals("true");
-		Options.useRooms = cfg.getProperty("useRooms").equals("true");
-		Options.logPotions = cfg.getProperty("logPotions").equals("true");
-		Options.logScrolls = cfg.getProperty("logScrolls").equals("true");
-		Options.logEquipment = cfg.getProperty("logEquipment").equals("true");
-		Options.logRings = cfg.getProperty("logRings").equals("true");
-		Options.logWands = cfg.getProperty("logWands").equals("true");
-		Options.logArtifacts = cfg.getProperty("logArtifacts").equals("true");
-		Options.logOther = cfg.getProperty("logOther").equals("true");
-		Options.ignoreBlacklist = cfg.getProperty("ignoreBlacklist").equals("true");
-		Options.trueRandom = cfg.getProperty("trueRandomMode").equals("true");
-		Options.sequentialMode = cfg.getProperty("sequentialMode").equals("true");
-		Options.startingSeed = DungeonSeed.convertFromText(cfg.getProperty("startingSeed"));
-		Options.infoSpacing = Integer.valueOf(cfg.getProperty("infoSpacing"));
-		Options.spacingChar = cfg.getProperty("spacingChar");
+		Options.useChallenges = true;
+		Options.useRooms = false;
+		Options.logPotions = true;
+		Options.logScrolls = true;
+		Options.logEquipment = true;
+		Options.logRings = true;
+		Options.logWands = true;
+		Options.logArtifacts = true;
+		Options.logOther = true;
+		Options.ignoreBlacklist = false;
+		Options.trueRandom = false;
+		Options.sequentialMode = false;
+		Options.startingSeed = DungeonSeed.convertFromText("AAA-AAA-AAA");
+		Options.infoSpacing = 33;
+		Options.spacingChar = " ";
 		if (Options.spacingChar.length() != 1) Options.spacingChar = " ";
 
-		// build challenge code from config
+		// build challenge code
 		Options.challenges = 0;
-		if (Options.useChallenges) {
-			Options.challenges += cfg.getProperty("chal.hostileChampions").equals("true") ? Challenges.CHAMPION_ENEMIES : 0;
-			Options.challenges += cfg.getProperty("chal.badderBosses").equals("true") ? Challenges.STRONGER_BOSSES : 0;
-			Options.challenges += cfg.getProperty("chal.onDiet").equals("true") ? Challenges.NO_FOOD : 0;
-			Options.challenges += cfg.getProperty("chal.faithIsMyArmor").equals("true") ? Challenges.NO_ARMOR : 0;
-			Options.challenges += cfg.getProperty("chal.pharmacophobia").equals("true") ? Challenges.NO_HEALING : 0;
-			Options.challenges += cfg.getProperty("chal.barrenLand").equals("true") ? Challenges.NO_HERBALISM : 0;
-			Options.challenges += cfg.getProperty("chal.swarmIntelligence").equals("true") ? Challenges.SWARM_INTELLIGENCE : 0;
-			Options.challenges += cfg.getProperty("chal.intoDarkness").equals("true") ? Challenges.DARKNESS : 0;
-			Options.challenges += cfg.getProperty("chal.forbiddenRunes").equals("true") ? Challenges.NO_SCROLLS : 0;
-		}
 	}
 
 	private ArrayList<String> getItemList() {
@@ -317,7 +263,7 @@ public class SeedFinder {
 	public SeedFinder(String[] args) {
 		System.out.print("Elektrocheckers seed finder for SHPD v" + Game.version + "\n");
 
-		parseConfig("seedfinder.cfg");
+		loadConfig("seedfinder.cfg");
 		parseArgs(args);
 
 		if (args.length == 2) {
@@ -327,13 +273,6 @@ public class SeedFinder {
 		}
 
 		itemList = getItemList();
-
-		try {
-			Writer outputFile = new FileWriter(Options.ouputFile);
-			outputFile.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 
 		// only generate natural seeds
 		if (Options.trueRandom) {
@@ -816,5 +755,10 @@ public class SeedFinder {
 
 		out.close();
 		return log;
+	}
+
+	//logging without arguments uses SHPDSettings
+	public String[] logSeedItems() {
+		return logSeedItems(Long.toString(Options.seed), SPDSettings.seedfinderFloors());
 	}
 }
