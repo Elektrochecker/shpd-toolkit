@@ -141,28 +141,28 @@ public class SeedFinder {
 
 	private void loadConfig() {
 
-		// pull options from config
+		// pull options from SPDSettings
+		Options.useRooms = SPDSettings.useRooms();
+		
+		Options.logEquipment = SPDSettings.logEquipment() && !SPDSettings.useRooms();
+		Options.logScrolls = SPDSettings.logScrolls() && !SPDSettings.useRooms();
+		Options.logPotions = SPDSettings.logPotions() && !SPDSettings.useRooms();
+		Options.logRings = SPDSettings.logRings() && !SPDSettings.useRooms();
+		Options.logWands = SPDSettings.logWands() && !SPDSettings.useRooms();
+		Options.logArtifacts = SPDSettings.logArtifacts() && !SPDSettings.useRooms();
+		Options.logOther = SPDSettings.logMisc() && !SPDSettings.useRooms();
+		
+		Options.ignoreBlacklist = SPDSettings.ignoreBlacklist();
+		Options.challenges = SPDSettings.challenges();
+		
+		//defaults, only adjustable in CLI seedfinder
 		Options.useChallenges = true;
-		Options.useRooms = false;
-
-		Options.logEquipment = SPDSettings.logEquipment();
-		Options.logScrolls = SPDSettings.logScrolls();
-		Options.logPotions = SPDSettings.logPotions();
-		Options.logRings = SPDSettings.logRings();
-		Options.logWands = SPDSettings.logWands();
-		Options.logArtifacts = SPDSettings.logArtifacts();
-		Options.logOther = SPDSettings.logMisc();
-
-		Options.ignoreBlacklist = false;
 		Options.trueRandom = false;
 		Options.sequentialMode = false;
-		Options.startingSeed = DungeonSeed.convertFromText("AAA-AAA-AAA");
+		Options.startingSeed = 0;
 		Options.infoSpacing = 33;
 		Options.spacingChar = " ";
 		if (Options.spacingChar.length() != 1) Options.spacingChar = " ";
-
-		// build challenge code
-		Options.challenges = 0;
 	}
 
 	private ArrayList<String> getItemList() {

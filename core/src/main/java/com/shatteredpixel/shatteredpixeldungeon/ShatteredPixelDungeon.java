@@ -45,7 +45,7 @@ public class ShatteredPixelDungeon extends Game {
 	public static final int v2_3_0 = 765;
 	
 	public ShatteredPixelDungeon( PlatformSupport platform ) {
-		super( sceneClass == null ? WelcomeScene.class : sceneClass, platform );
+		super( sceneClass == null ? TitleScene.class : sceneClass, platform );
 
 		//pre-v2.3.0
 		com.watabou.utils.Bundle.addAlias(

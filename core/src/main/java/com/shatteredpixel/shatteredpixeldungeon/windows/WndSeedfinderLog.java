@@ -43,12 +43,8 @@ public class WndSeedfinderLog extends WndTabbed {
 
 		int width = WIDTH_MIN;
 
-		PointerArea blocker = new PointerArea(0, 0, PixelScene.uiCamera.width, PixelScene.uiCamera.height) {
-			@Override
-			protected void onClick(PointerEvent event) {
-				onBackPressed();
-			}
-		};
+		PointerArea blocker = new PointerArea(0, 0, PixelScene.uiCamera.width, PixelScene.uiCamera.height);
+		//do not go back on screen click
 		blocker.camera = PixelScene.uiCamera;
 		add(blocker);
 

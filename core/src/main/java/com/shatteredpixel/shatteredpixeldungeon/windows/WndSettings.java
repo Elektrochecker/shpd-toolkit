@@ -84,7 +84,7 @@ public class WndSettings extends WndTabbed {
 		height = seedfinder.height();
 		add( seedfinder );
 
-		add( new IconTab(Icons.get(Icons.DISPLAY)){
+		add( new IconTab(Icons.get(Icons.PREFS)){
 			@Override
 			protected void select(boolean value) {
 				super.select(value);
@@ -269,6 +269,11 @@ public class WndSettings extends WndTabbed {
 						CheckBox chkArtifacts;
 						CheckBox chkMisc;
 
+						ColorBlock sep2;
+						CheckBox chkRooms;
+						CheckBox chkBlacklist;
+						RedButton btnChallenges;
+
 						{
 							barDesc = PixelScene.renderTextBlock(Messages.get(WndSettings.SeedfinderTab.this, "logging_options"), 6);
 							add(barDesc);
@@ -343,6 +348,41 @@ public class WndSettings extends WndTabbed {
 							chkMisc.checked(SPDSettings.logMisc());
 							add(chkMisc);
 
+							sep2 = new ColorBlock(1, 1, 0xFF000000);
+							add(sep2);
+
+							chkRooms = new CheckBox(Messages.get(WndSettings.SeedfinderTab.this, "use_rooms")){
+								@Override
+								protected void onClick() {
+									super.onClick();
+									SPDSettings.useRooms(checked());
+								}
+							};
+							chkRooms.checked(SPDSettings.useRooms());
+							add(chkRooms);
+				
+							chkBlacklist = new CheckBox(Messages.get(WndSettings.SeedfinderTab.this, "blacklist")){
+								@Override
+								protected void onClick() {
+									super.onClick();
+									SPDSettings.ignoreBlacklist(checked());
+								}
+							};
+							chkBlacklist.checked(SPDSettings.ignoreBlacklist());
+							add(chkBlacklist);
+
+							btnChallenges = new RedButton(Messages.get(WndSettings.SeedfinderTab.this, "challenges")){
+								@Override
+								protected void onClick() {
+									ShatteredPixelDungeon.scene().addToFront(new WndChallenges(SPDSettings.challenges(), true) {
+										public void onBackPressed() {
+											super.onBackPressed();
+										}
+									});
+								}
+							};
+							add(btnChallenges);
+
 							//layout
 							resize(WIDTH_P, 0);
 
@@ -357,7 +397,14 @@ public class WndSettings extends WndTabbed {
 							chkArtifacts.setRect(0, chkWands.bottom() + GAP, width, BTN_HEIGHT);
 							chkMisc.setRect(0, chkArtifacts.bottom() + GAP, width, BTN_HEIGHT);
 
-							resize(WIDTH_P, (int)chkMisc.bottom());
+							sep2.size(width, 1);
+							sep2.y = chkMisc.bottom() + GAP;
+
+							chkRooms.setRect(0, sep2.y + 1 + GAP, width, BTN_HEIGHT);
+							chkBlacklist.setRect(0, chkRooms.bottom() + GAP, width, BTN_HEIGHT);
+							btnChallenges.setRect(0, chkBlacklist.bottom() + GAP, width, BTN_HEIGHT);
+
+							resize(WIDTH_P, (int)btnChallenges.bottom());
 
 						}
 					});

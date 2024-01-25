@@ -118,10 +118,11 @@ public class TitleScene extends PixelScene {
 		StyledButton btnScout = new StyledButton(GREY_TR, Messages.get(TitleScene.class, "scout_seed_button")){
 			@Override
 			protected void onClick() {
+				String existingSeedtext = SPDSettings.customSeed();
 				ShatteredPixelDungeon.scene()
 						.addToFront(new WndTextInput(Messages.get(TitleScene.class, "scout_custom_seed_title"),
 								Messages.get(TitleScene.class, "scout_info_text"),
-								SPDSettings.customSeed(),
+								existingSeedtext,
 								20,
 								false,
 								Messages.get(TitleScene.class, "scout_button_yes"),
@@ -140,6 +141,7 @@ public class TitleScene extends PixelScene {
 											new WndSeedfinderLog(Icons.get(Icons.BACKPACK),
 													"Items for seed " + DungeonSeed.convertToCode(Dungeon.seed),
 													seedfinderOutputLog));
+									SPDSettings.customSeed(text);
 								} else {
 									SPDSettings.customSeed("");
 								}

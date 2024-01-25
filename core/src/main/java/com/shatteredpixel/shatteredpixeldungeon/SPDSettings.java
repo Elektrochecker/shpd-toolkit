@@ -50,6 +50,9 @@ public class SPDSettings extends GameSettings {
 	//Seedfinder
 
 	public static final String KEY_FLOORS	= "number_of_floors";
+	public static final String KEY_USEROOMS	= "use_rooms";
+	public static final String KEY_IGNOREBLACKLIST	= "ignore_blacklist";
+
 	public static final String KEY_LOGEQUIPMENT	= "logging_option_equipment";
 	public static final String KEY_LOGSCROLLS	= "logging_option_scrolls";
 	public static final String KEY_LOGPOTIONS= "logging_option_potions";
@@ -64,6 +67,22 @@ public class SPDSettings extends GameSettings {
 	
 	public static int seedfinderFloors() {
 		return getInt( KEY_FLOORS, 9, 1, 24 );
+	}
+
+	public static void useRooms( boolean value ) {
+		put( KEY_USEROOMS, value );
+	}
+	
+	public static boolean useRooms() {
+		return getBoolean( KEY_USEROOMS, false );
+	}
+
+	public static void ignoreBlacklist( boolean value ) {
+		put( KEY_IGNOREBLACKLIST, value );
+	}
+	
+	public static boolean ignoreBlacklist() {
+		return getBoolean( KEY_IGNOREBLACKLIST, false );
 	}
 
 	public static void logEquipment( boolean value ) {
