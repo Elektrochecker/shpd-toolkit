@@ -234,18 +234,16 @@ public class WndSettings extends WndTabbed {
 		RenderedTextBlock title;
 		ColorBlock sep1;
 		OptionSlider numFloors;
+		RedButton btnLoggingSettings;
 
 		@Override
 		protected void createChildren() {
 			title = PixelScene.renderTextBlock(Messages.get(this, "title"), 9);
 			title.hardlight(TITLE_COLOR);
 			add(title);
-
-			sep1 = new ColorBlock(1, 1, 0xFF000000);
-			add(sep1);
-
+			
 			numFloors = new OptionSlider(Messages.get(this, "floors_slider"),
-					"1", "24", 1, 24) {
+			"1", "24", 1, 24) {
 				@Override
 				protected void onChange() {
 					SPDSettings.seedfinderFloors(getSelectedValue());
@@ -253,6 +251,119 @@ public class WndSettings extends WndTabbed {
 			};
 			numFloors.setSelectedValue(SPDSettings.seedfinderFloors());
 			add(numFloors);
+
+			sep1 = new ColorBlock(1, 1, 0xFF000000);
+			add(sep1);
+
+			btnLoggingSettings = new RedButton(Messages.get(this, "logoptions_button"), 9) {
+				@Override
+				protected void onClick() {
+					ShatteredPixelDungeon.scene().addToFront(new Window() {
+						RenderedTextBlock barDesc;
+
+						CheckBox chkEquipment;
+						CheckBox chkScrolls;
+						CheckBox chkPotions;
+						CheckBox chkRings;
+						CheckBox chkWands;
+						CheckBox chkArtifacts;
+						CheckBox chkMisc;
+
+						{
+							barDesc = PixelScene.renderTextBlock(Messages.get(WndSettings.SeedfinderTab.this, "logging_options"), 6);
+							add(barDesc);
+
+							chkEquipment = new CheckBox(Messages.get(WndSettings.SeedfinderTab.this, "equipment")){
+								@Override
+								protected void onClick() {
+									super.onClick();
+									SPDSettings.logEquipment(checked());
+								}
+							};
+							chkEquipment.checked(SPDSettings.logEquipment());
+							add(chkEquipment);
+
+							chkScrolls = new CheckBox(Messages.get(WndSettings.SeedfinderTab.this, "scrolls")){
+								@Override
+								protected void onClick() {
+									super.onClick();
+									SPDSettings.logScrolls(checked());
+								}
+							};
+							chkScrolls.checked(SPDSettings.logScrolls());
+							add(chkScrolls);
+
+							chkPotions = new CheckBox(Messages.get(WndSettings.SeedfinderTab.this, "potions")){
+								@Override
+								protected void onClick() {
+									super.onClick();
+									SPDSettings.logPotions(checked());
+								}
+							};
+							chkPotions.checked(SPDSettings.logPotions());
+							add(chkPotions);
+
+							chkRings = new CheckBox(Messages.get(WndSettings.SeedfinderTab.this, "rings")){
+								@Override
+								protected void onClick() {
+									super.onClick();
+									SPDSettings.logRings(checked());
+								}
+							};
+							chkRings.checked(SPDSettings.logRings());
+							add(chkRings);
+
+							chkWands = new CheckBox(Messages.get(WndSettings.SeedfinderTab.this, "wands")){
+								@Override
+								protected void onClick() {
+									super.onClick();
+									SPDSettings.logWands(checked());
+								}
+							};
+							chkWands.checked(SPDSettings.logWands());
+							add(chkWands);
+
+							chkArtifacts = new CheckBox(Messages.get(WndSettings.SeedfinderTab.this, "artifacts")){
+								@Override
+								protected void onClick() {
+									super.onClick();
+									SPDSettings.logArtifacts(checked());
+								}
+							};
+							chkArtifacts.checked(SPDSettings.logArtifacts());
+							add(chkArtifacts);
+
+							chkMisc = new CheckBox(Messages.get(WndSettings.SeedfinderTab.this, "misc")){
+								@Override
+								protected void onClick() {
+									super.onClick();
+									SPDSettings.logMisc(checked());
+								}
+							};
+							chkMisc.checked(SPDSettings.logMisc());
+							add(chkMisc);
+
+							//layout
+							resize(WIDTH_P, 0);
+
+							barDesc.setPos((width - barDesc.width()) / 2f, GAP);
+							PixelScene.align(barDesc);
+
+							chkEquipment.setRect(0, barDesc.bottom() + GAP, width, BTN_HEIGHT);
+							chkScrolls.setRect(0, chkEquipment.bottom() + GAP, width, BTN_HEIGHT);
+							chkPotions.setRect(0, chkScrolls.bottom() + GAP, width, BTN_HEIGHT);
+							chkRings.setRect(0, chkPotions.bottom() + GAP, width, BTN_HEIGHT);
+							chkWands.setRect(0, chkRings.bottom() + GAP, width, BTN_HEIGHT);
+							chkArtifacts.setRect(0, chkWands.bottom() + GAP, width, BTN_HEIGHT);
+							chkMisc.setRect(0, chkArtifacts.bottom() + GAP, width, BTN_HEIGHT);
+
+							resize(WIDTH_P, (int)chkMisc.bottom());
+
+						}
+					});
+				}
+			};
+			add(btnLoggingSettings);
 		}
 
 		@Override
@@ -266,13 +377,9 @@ public class WndSettings extends WndTabbed {
 
 			bottom = sep1.y + 1;
 
-			if (width > 200){
-				numFloors.setRect(0, bottom + GAP, width/2-GAP/2, SLIDER_HEIGHT);
-			} else {
-				numFloors.setRect(0, bottom + GAP, width, SLIDER_HEIGHT);
-			}
+			numFloors.setRect(0, bottom + GAP, width, SLIDER_HEIGHT);
 
-			height = numFloors.bottom();
+			btnLoggingSettings.setRect(0, numFloors.bottom() + GAP, width, BTN_HEIGHT);
 		}
 
 	}

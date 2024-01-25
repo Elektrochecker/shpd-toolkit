@@ -58,7 +58,7 @@ public class WndSeedfinderLog extends WndTabbed {
 
 		RenderedTextBlock largest = null;
 		for (int i = 0; i < messages.length; i++) {
-			RenderedTextBlock text = PixelScene.renderTextBlock(6);
+			RenderedTextBlock text = PixelScene.renderTextBlock(4);
 			text.text(messages[i], width);
 			text.setPos(titlebar.left(), titlebar.bottom() + 2 * GAP);
 			add(text);

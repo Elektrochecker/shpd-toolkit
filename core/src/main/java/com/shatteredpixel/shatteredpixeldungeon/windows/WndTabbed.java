@@ -219,7 +219,7 @@ public class WndTabbed extends Window {
 		protected void createChildren() {
 			super.createChildren();
 			
-			btLabel = PixelScene.renderTextBlock( 9 );
+			btLabel = PixelScene.renderTextBlock( 6 );
 			add( btLabel );
 		}
 		

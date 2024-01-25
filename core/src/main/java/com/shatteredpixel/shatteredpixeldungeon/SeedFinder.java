@@ -139,18 +139,20 @@ public class SeedFinder {
 			Options.ouputFile = args[3];
 	}
 
-	private void loadConfig(String fileName) {
+	private void loadConfig() {
 
 		// pull options from config
 		Options.useChallenges = true;
 		Options.useRooms = false;
-		Options.logPotions = true;
-		Options.logScrolls = true;
-		Options.logEquipment = true;
-		Options.logRings = true;
-		Options.logWands = true;
-		Options.logArtifacts = true;
-		Options.logOther = true;
+
+		Options.logEquipment = SPDSettings.logEquipment();
+		Options.logScrolls = SPDSettings.logScrolls();
+		Options.logPotions = SPDSettings.logPotions();
+		Options.logRings = SPDSettings.logRings();
+		Options.logWands = SPDSettings.logWands();
+		Options.logArtifacts = SPDSettings.logArtifacts();
+		Options.logOther = SPDSettings.logMisc();
+
 		Options.ignoreBlacklist = false;
 		Options.trueRandom = false;
 		Options.sequentialMode = false;
@@ -263,7 +265,7 @@ public class SeedFinder {
 	public SeedFinder(String[] args) {
 		System.out.print("Elektrocheckers seed finder for SHPD v" + Game.version + "\n");
 
-		loadConfig("seedfinder.cfg");
+		loadConfig();
 		parseArgs(args);
 
 		if (args.length == 2) {
@@ -759,6 +761,7 @@ public class SeedFinder {
 
 	//logging without arguments uses SHPDSettings
 	public String[] logSeedItems() {
+		loadConfig();
 		return logSeedItems(Long.toString(Options.seed), SPDSettings.seedfinderFloors());
 	}
 }

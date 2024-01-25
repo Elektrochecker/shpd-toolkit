@@ -115,17 +115,17 @@ public class TitleScene extends PixelScene {
 
 		final Chrome.Type GREY_TR = Chrome.Type.GREY_BUTTON_TR;
 		
-		StyledButton btnScout = new StyledButton(GREY_TR, "seed scouting"){
+		StyledButton btnScout = new StyledButton(GREY_TR, Messages.get(TitleScene.class, "scout_seed_button")){
 			@Override
 			protected void onClick() {
 				ShatteredPixelDungeon.scene()
-						.addToFront(new WndTextInput(Messages.get(HeroSelectScene.class, "custom_seed_title"),
-								Messages.get(HeroSelectScene.class, "scout_info_text"),
+						.addToFront(new WndTextInput(Messages.get(TitleScene.class, "scout_custom_seed_title"),
+								Messages.get(TitleScene.class, "scout_info_text"),
 								SPDSettings.customSeed(),
 								20,
 								false,
-								Messages.get(HeroSelectScene.class, "scout_button_yes"),
-								Messages.get(HeroSelectScene.class, "scout_button_no")) {
+								Messages.get(TitleScene.class, "scout_button_yes"),
+								Messages.get(TitleScene.class, "scout_button_no")) {
 							@Override
 							public void onSelect(boolean positive, String text) {
 								if (positive && text != null && !text.isEmpty()) {

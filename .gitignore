@@ -21,3 +21,6 @@ local.properties
 
 #git patch files
 *.patch
+
+#vscode settings
+.vscode/

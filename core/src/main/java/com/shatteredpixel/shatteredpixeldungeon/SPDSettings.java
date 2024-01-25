@@ -50,14 +50,71 @@ public class SPDSettings extends GameSettings {
 	//Seedfinder
 
 	public static final String KEY_FLOORS	= "number_of_floors";
+	public static final String KEY_LOGEQUIPMENT	= "logging_option_equipment";
+	public static final String KEY_LOGSCROLLS	= "logging_option_scrolls";
+	public static final String KEY_LOGPOTIONS= "logging_option_potions";
+	public static final String KEY_LOGRINGS	= "logging_option_rings";
+	public static final String KEY_LOGWANDS= "logging_option_wands";
+	public static final String KEY_LOGARTIFACTS	= "logging_option_artifacts";
+	public static final String KEY_LOGMISC= "logging_option_other";
 
 	public static void seedfinderFloors( int value ) {
 		put( KEY_FLOORS, value );
-		GameScene.updateFog();
 	}
 	
 	public static int seedfinderFloors() {
 		return getInt( KEY_FLOORS, 9, 1, 24 );
+	}
+
+	public static void logEquipment( boolean value ) {
+		put( KEY_LOGEQUIPMENT, value );
+	}
+	
+	public static boolean logEquipment() {
+		return getBoolean( KEY_LOGEQUIPMENT, true );
+	}
+
+	public static void logScrolls( boolean value ) {
+		put( KEY_LOGSCROLLS, value );
+	}
+	
+	public static boolean logScrolls() {
+		return getBoolean( KEY_LOGSCROLLS, true );
+	}
+	public static void logPotions( boolean value ) {
+		put( KEY_LOGPOTIONS, value );
+	}
+	
+	public static boolean logPotions() {
+		return getBoolean( KEY_LOGPOTIONS, true );
+	}
+	public static void logRings( boolean value ) {
+		put( KEY_LOGRINGS, value );
+	}
+	
+	public static boolean logRings() {
+		return getBoolean( KEY_LOGRINGS, true );
+	}
+	public static void logWands( boolean value ) {
+		put( KEY_LOGWANDS, value );
+	}
+	
+	public static boolean logWands() {
+		return getBoolean( KEY_LOGWANDS, true );
+	}
+	public static void logArtifacts( boolean value ) {
+		put( KEY_LOGARTIFACTS, value );
+	}
+	
+	public static boolean logArtifacts() {
+		return getBoolean( KEY_LOGARTIFACTS, true );
+	}
+	public static void logMisc( boolean value ) {
+		put( KEY_LOGMISC, value );
+	}
+	
+	public static boolean logMisc() {
+		return getBoolean( KEY_LOGMISC, true );
 	}
 
 	//Display
@@ -102,7 +159,7 @@ public class SPDSettings extends GameSettings {
 	}
 	
 	public static boolean powerSaver(){
-		return getBoolean( KEY_POWER_SAVER, false );
+		return getBoolean( KEY_POWER_SAVER, true );
 	}
 	
 	public static void zoom( int value ) {
@@ -230,7 +287,7 @@ public class SPDSettings extends GameSettings {
 	}
 	
 	public static boolean intro() {
-		return getBoolean( KEY_INTRO, true );
+		return false;
 	}
 	
 	public static void lastClass( int value ) {
@@ -309,7 +366,7 @@ public class SPDSettings extends GameSettings {
 	}
 	
 	public static boolean music() {
-		return getBoolean( KEY_MUSIC, true );
+		return getBoolean( KEY_MUSIC, false );
 	}
 	
 	public static void musicVol( int value ){
@@ -318,7 +375,7 @@ public class SPDSettings extends GameSettings {
 	}
 	
 	public static int musicVol(){
-		return getInt( KEY_MUSIC_VOL, 10, 0, 10 );
+		return getInt( KEY_MUSIC_VOL, 0, 0, 10 );
 	}
 	
 	public static void soundFx( boolean value ) {
@@ -336,7 +393,7 @@ public class SPDSettings extends GameSettings {
 	}
 	
 	public static int SFXVol() {
-		return getInt( KEY_SFX_VOL, 10, 0, 10 );
+		return getInt( KEY_SFX_VOL, 5, 0, 10 );
 	}
 
 	public static void ignoreSilentMode( boolean value ){
@@ -397,7 +454,7 @@ public class SPDSettings extends GameSettings {
 	}
 
 	public static boolean news(){
-		return getBoolean(KEY_NEWS, true);
+		return getBoolean(KEY_NEWS, false);
 	}
 
 	public static void updates(boolean value){
@@ -405,7 +462,7 @@ public class SPDSettings extends GameSettings {
 	}
 
 	public static boolean updates(){
-		return getBoolean(KEY_UPDATES, true);
+		return getBoolean(KEY_UPDATES, false);
 	}
 
 	public static void betas(boolean value){
