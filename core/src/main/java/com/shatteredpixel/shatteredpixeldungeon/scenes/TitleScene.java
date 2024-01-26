@@ -22,6 +22,7 @@
 package com.shatteredpixel.shatteredpixeldungeon.scenes;
 
 import com.shatteredpixel.shatteredpixeldungeon.SeedFinder;
+import com.shatteredpixel.shatteredpixeldungeon.SeedFinder.Options;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Chrome;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
@@ -58,7 +59,11 @@ import com.watabou.noosa.audio.Music;
 import com.watabou.utils.ColorMath;
 import com.watabou.utils.DeviceCompat;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 
 public class TitleScene extends PixelScene {
 	
@@ -115,7 +120,7 @@ public class TitleScene extends PixelScene {
 
 		final Chrome.Type GREY_TR = Chrome.Type.GREY_BUTTON_TR;
 		
-		StyledButton btnScout = new StyledButton(GREY_TR, Messages.get(TitleScene.class, "scout_seed_button")){
+		StyledButton btnScout = new StyledButton(GREY_TR, Messages.get(TitleScene.class, "scout_seed_button")) {
 			@Override
 			protected void onClick() {
 				String existingSeedtext = SPDSettings.customSeed();
@@ -132,10 +137,8 @@ public class TitleScene extends PixelScene {
 								if (positive && text != null && !text.isEmpty()) {
 									text = DungeonSeed.formatText(text);
 									long seed = DungeonSeed.convertFromText(text);
-									String seedString = DungeonSeed.convertToCode(seed);
 
-									String[] args = { "25", seedString };
-									String[] seedfinderOutputLog = new SeedFinder(args).logSeedItems();
+									String[] seedfinderOutputLog = new SeedFinder().logSeedItemsSeededRun(seed);
 
 									ShatteredPixelDungeon.scene().addToFront(
 											new WndSeedfinderLog(Icons.get(Icons.BACKPACK),
@@ -148,26 +151,39 @@ public class TitleScene extends PixelScene {
 							}
 						});
 			}
-			
-			@Override
-			protected boolean onLongClick() {
-				return super.onLongClick();
-			}
 		};
 		btnScout.icon(Icons.get(Icons.ENTER));
 		add(btnScout);
 
-		StyledButton btnSupport = new SupportButton(GREY_TR, Messages.get(this, "support"));
-		add(btnSupport);
-
-		StyledButton btnRankings = new StyledButton(GREY_TR,Messages.get(this, "rankings")){
+		StyledButton btnSeedfinder = new StyledButton(GREY_TR, Messages.get(this, "seedfinder")){
 			@Override
 			protected void onClick() {
-				ShatteredPixelDungeon.switchNoFade( RankingsScene.class );
+				//seedfinder
 			}
 		};
-		btnRankings.icon(Icons.get(Icons.RANKINGS));
-		add(btnRankings);
+		btnSeedfinder.icon(Icons.get(Icons.MAGNIFY));
+		add(btnSeedfinder);
+
+		StyledButton btnScoutDaily = new StyledButton(GREY_TR, Messages.get(this, "scout_daily")) {
+			@Override
+			protected void onClick() {
+				String[] seedfinderOutputLog = new SeedFinder().logSeedItemsDailyRunRun(0);
+
+			long DAY = 1000 * 60 * 60 * 24;
+			long currentDay = (long) Math.floor(Game.realTime / DAY) + Options.DailyOffset;
+			SPDSettings.lastDaily(DAY * currentDay);
+			DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ROOT);
+			format.setTimeZone(TimeZone.getTimeZone("UTC"));
+			String date = format.format(new Date(SPDSettings.lastDaily()));
+
+				ShatteredPixelDungeon.scene().addToFront(
+						new WndSeedfinderLog(Icons.get(Icons.BACKPACK),
+								"Items for daily run " + date,
+								seedfinderOutputLog));
+			}
+		};
+		btnScoutDaily.icon(Icons.get(Icons.ENTER));
+		add(btnScoutDaily);
 		Dungeon.daily = Dungeon.dailyReplay = false;
 
 		StyledButton btnBadges = new StyledButton(GREY_TR, Messages.get(this, "badges")){
@@ -179,9 +195,14 @@ public class TitleScene extends PixelScene {
 		btnBadges.icon(Icons.get(Icons.BADGES));
 		add(btnBadges);
 
-		StyledButton btnNews = new NewsButton(GREY_TR, Messages.get(this, "news"));
-		btnNews.icon(Icons.get(Icons.NEWS));
-		add(btnNews);
+		StyledButton btnSource = new StyledButton(GREY_TR, Messages.get(this, "source")) {
+			@Override
+			protected void onClick() {
+				ShatteredPixelDungeon.platform.openURI("https://github.com/Elektrochecker/shpd-toolkit");
+			}
+		};
+		btnSource.icon(Icons.get(Icons.NEWS));
+		add(btnSource);
 
 		StyledButton btnChanges = new ChangesButton(GREY_TR, Messages.get(this, "changes"));
 		btnChanges.icon(Icons.get(Icons.CHANGES));
@@ -207,22 +228,22 @@ public class TitleScene extends PixelScene {
 		if (landscape()) {
 			btnScout.setRect(title.x-50, topRegion+GAP, ((title.width()+100)/2)-1, BTN_HEIGHT);
 			align(btnScout);
-			btnSupport.setRect(btnScout.right()+2, btnScout.top(), btnScout.width(), BTN_HEIGHT);
-			btnRankings.setRect(btnScout.left(), btnScout.bottom()+ GAP, (btnScout.width()*.67f)-1, BTN_HEIGHT);
-			btnBadges.setRect(btnRankings.left(), btnRankings.bottom()+GAP, btnRankings.width(), BTN_HEIGHT);
-			btnNews.setRect(btnRankings.right()+2, btnRankings.top(), btnRankings.width(), BTN_HEIGHT);
-			btnChanges.setRect(btnNews.left(), btnNews.bottom() + GAP, btnRankings.width(), BTN_HEIGHT);
-			btnSettings.setRect(btnNews.right()+2, btnNews.top(), btnRankings.width(), BTN_HEIGHT);
-			btnAbout.setRect(btnSettings.left(), btnSettings.bottom() + GAP, btnRankings.width(), BTN_HEIGHT);
+			btnSeedfinder.setRect(btnScout.right()+2, btnScout.top(), btnScout.width(), BTN_HEIGHT);
+			btnScoutDaily.setRect(btnScout.left(), btnScout.bottom()+ GAP, (btnScout.width()*.67f)-1, BTN_HEIGHT);
+			btnBadges.setRect(btnScoutDaily.left(), btnScoutDaily.bottom()+GAP, btnScoutDaily.width(), BTN_HEIGHT);
+			btnSource.setRect(btnScoutDaily.right()+2, btnScoutDaily.top(), btnScoutDaily.width(), BTN_HEIGHT);
+			btnChanges.setRect(btnSource.left(), btnSource.bottom() + GAP, btnScoutDaily.width(), BTN_HEIGHT);
+			btnSettings.setRect(btnSource.right()+2, btnSource.top(), btnScoutDaily.width(), BTN_HEIGHT);
+			btnAbout.setRect(btnSettings.left(), btnSettings.bottom() + GAP, btnScoutDaily.width(), BTN_HEIGHT);
 		} else {
 			btnScout.setRect(title.x, topRegion+GAP, title.width(), BTN_HEIGHT);
 			align(btnScout);
-			btnSupport.setRect(btnScout.left(), btnScout.bottom()+ GAP, btnScout.width(), BTN_HEIGHT);
-			btnRankings.setRect(btnScout.left(), btnSupport.bottom()+ GAP, (btnScout.width()/2)-1, BTN_HEIGHT);
-			btnBadges.setRect(btnRankings.right()+2, btnRankings.top(), btnRankings.width(), BTN_HEIGHT);
-			btnNews.setRect(btnRankings.left(), btnRankings.bottom()+ GAP, btnRankings.width(), BTN_HEIGHT);
-			btnChanges.setRect(btnNews.right()+2, btnNews.top(), btnNews.width(), BTN_HEIGHT);
-			btnSettings.setRect(btnNews.left(), btnNews.bottom()+GAP, btnRankings.width(), BTN_HEIGHT);
+			btnSeedfinder.setRect(btnScout.left(), btnScout.bottom()+ GAP, btnScout.width(), BTN_HEIGHT);
+			btnScoutDaily.setRect(btnScout.left(), btnSeedfinder.bottom()+ GAP, (btnScout.width()/2)-1, BTN_HEIGHT);
+			btnBadges.setRect(btnScoutDaily.right()+2, btnScoutDaily.top(), btnScoutDaily.width(), BTN_HEIGHT);
+			btnSource.setRect(btnScoutDaily.left(), btnScoutDaily.bottom()+ GAP, btnScoutDaily.width(), BTN_HEIGHT);
+			btnChanges.setRect(btnSource.right()+2, btnSource.top(), btnSource.width(), BTN_HEIGHT);
+			btnSettings.setRect(btnSource.left(), btnSource.bottom()+GAP, btnScoutDaily.width(), BTN_HEIGHT);
 			btnAbout.setRect(btnSettings.right()+2, btnSettings.top(), btnSettings.width(), BTN_HEIGHT);
 		}
 
@@ -246,46 +267,6 @@ public class TitleScene extends PixelScene {
 		Fireball fb = new Fireball();
 		fb.setPos( x, y );
 		add( fb );
-	}
-
-	private static class NewsButton extends StyledButton {
-
-		public NewsButton(Chrome.Type type, String label ){
-			super(type, label);
-			if (SPDSettings.news()) News.checkForNews();
-		}
-
-		int unreadCount = -1;
-
-		@Override
-		public void update() {
-			super.update();
-
-			if (unreadCount == -1 && News.articlesAvailable()){
-				long lastRead = SPDSettings.newsLastRead();
-				if (lastRead == 0){
-					if (News.articles().get(0) != null) {
-						SPDSettings.newsLastRead(News.articles().get(0).date.getTime());
-					}
-				} else {
-					unreadCount = News.unreadArticles(new Date(SPDSettings.newsLastRead()));
-					if (unreadCount > 0) {
-						unreadCount = Math.min(unreadCount, 9);
-						text(text() + "(" + unreadCount + ")");
-					}
-				}
-			}
-
-			if (unreadCount > 0){
-				textColor(ColorMath.interpolate( 0xFFFFFF, Window.SHPX_COLOR, 0.5f + (float)Math.sin(Game.timeTotal*5)/2f));
-			}
-		}
-
-		@Override
-		protected void onClick() {
-			super.onClick();
-			ShatteredPixelDungeon.switchNoFade( NewsScene.class );
-		}
 	}
 
 	private static class ChangesButton extends StyledButton {
@@ -369,20 +350,6 @@ public class TitleScene extends PixelScene {
 				WndSettings.last_index = 4;
 			}
 			ShatteredPixelDungeon.scene().add(new WndSettings());
-		}
-	}
-
-	private static class SupportButton extends StyledButton{
-
-		public SupportButton( Chrome.Type type, String label ){
-			super(type, label);
-			icon(Icons.get(Icons.GOLD));
-			textColor(Window.TITLE_COLOR);
-		}
-
-		@Override
-		protected void onClick() {
-			ShatteredPixelDungeon.switchNoFade(SupporterScene.class);
 		}
 	}
 }

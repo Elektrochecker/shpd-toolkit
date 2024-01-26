@@ -121,41 +121,41 @@ public class WndSettings extends WndTabbed {
 			}
 		});
 
-		input = new InputTab();
-		input.setSize(width, 0);
-		height = Math.max(height, input.height());
+		// input = new InputTab();
+		// input.setSize(width, 0);
+		// height = Math.max(height, input.height());
 
-		if (DeviceCompat.hasHardKeyboard() || ControllerHandler.isControllerConnected()) {
-			add( input );
-			Image icon;
-			if (ControllerHandler.controllerActive || !DeviceCompat.hasHardKeyboard()){
-				icon = Icons.get(Icons.CONTROLLER);
-			} else {
-				icon = Icons.get(Icons.KEYBOARD);
-			}
-			add(new IconTab(icon) {
-				@Override
-				protected void select(boolean value) {
-					super.select(value);
-					input.visible = input.active = value;
-					if (value) last_index = 2;
-				}
-			});
-		}
+		// if (DeviceCompat.hasHardKeyboard() || ControllerHandler.isControllerConnected()) {
+		// 	add( input );
+		// 	Image icon;
+		// 	if (ControllerHandler.controllerActive || !DeviceCompat.hasHardKeyboard()){
+		// 		icon = Icons.get(Icons.CONTROLLER);
+		// 	} else {
+		// 		icon = Icons.get(Icons.KEYBOARD);
+		// 	}
+		// 	add(new IconTab(icon) {
+		// 		@Override
+		// 		protected void select(boolean value) {
+		// 			super.select(value);
+		// 			input.visible = input.active = value;
+		// 			if (value) last_index = 2;
+		// 		}
+		// 	});
+		// }
 
-		data = new DataTab();
-		data.setSize(width, 0);
-		height = Math.max(height, data.height());
-		add( data );
+		// data = new DataTab();
+		// data.setSize(width, 0);
+		// height = Math.max(height, data.height());
+		// add( data );
 
-		add( new IconTab(Icons.get(Icons.DATA)){
-			@Override
-			protected void select(boolean value) {
-				super.select(value);
-				data.visible = data.active = value;
-				if (value) last_index = 3;
-			}
-		});
+		// add( new IconTab(Icons.get(Icons.DATA)){
+		// 	@Override
+		// 	protected void select(boolean value) {
+		// 		super.select(value);
+		// 		data.visible = data.active = value;
+		// 		if (value) last_index = 3;
+		// 	}
+		// });
 
 		audio = new AudioTab();
 		audio.setSize(width, 0);

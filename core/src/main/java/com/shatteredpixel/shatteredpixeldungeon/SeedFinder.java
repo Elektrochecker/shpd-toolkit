@@ -262,6 +262,10 @@ public class SeedFinder {
 		}
 	}
 
+	public SeedFinder () {
+		
+	}
+
 	public SeedFinder(String[] args) {
 		System.out.print("Elektrocheckers seed finder for SHPD v" + Game.version + "\n");
 
@@ -507,21 +511,7 @@ public class SeedFinder {
 	}
 
 	public String[] logSeedItems(String seed, int floors) {
-		PrintWriter out = null;
-		OutputStream out_fd = System.out;
-
 		String[] log = new String[floors];
-
-		try {
-			if (Options.ouputFile != "stdout")
-				out_fd = new FileOutputStream(Options.ouputFile, true);
-
-			out = new PrintWriter(out_fd);
-		} catch (FileNotFoundException e) { // gotta love Java mandatory exceptions
-			e.printStackTrace();
-		}
-
-		String seedinfotext = "";
 
 		if (Options.searchForDaily) {
 			Dungeon.daily = true;
@@ -534,20 +524,12 @@ public class SeedFinder {
 
 			GamesInProgress.selectedClass = HeroClass.WARRIOR;
 			Dungeon.init();
-			seedinfotext += format.format(new Date(SPDSettings.lastDaily()));
-
-			out.printf("Items for daily run %s (%d):\n\n", seedinfotext, Dungeon.seed);
-			//log[0] += ("Items for daily run " + seedinfotext + " " + Dungeon.seed + ":\n\n");
 		} else {
 			Dungeon.daily = false;
 			SPDSettings.customSeed(seed);
 			SPDSettings.challenges(Options.challenges);
 			GamesInProgress.selectedClass = HeroClass.WARRIOR;
 			Dungeon.init();
-			seedinfotext += DungeonSeed.convertToCode(Dungeon.seed);
-
-			out.printf("Items for seed %s (%d):\n\n", seedinfotext, Dungeon.seed);
-			//log[0] += ("Items for seed" + seedinfotext + " " + Dungeon.seed + ":\n\n");
 		}
 
 		if (!Options.ignoreBlacklist) {
@@ -572,7 +554,6 @@ public class SeedFinder {
 			ArrayList<HeapItem> wands = new ArrayList<>();
 			ArrayList<HeapItem> others = new ArrayList<>();
 
-			out.printf("--- floor %d: ", Dungeon.depth);
 			log[i] += ("floor " + Dungeon.depth + " (");
 
 			String feeling = l.feeling.toString();
@@ -626,21 +607,17 @@ public class SeedFinder {
 					break;
 			}
 
-			out.printf(feeling + "\n\n");
 			log[i] += (feeling + "):\n\n");
 
 			// list all rooms of level
 			if (Dungeon.depth % 5 != 0 && Dungeon.depth < 26 && Options.useRooms) {
 				ArrayList<String> rooms = getRooms();
-				out.printf("Rooms: \n");
 				log[i] += ("Rooms: \n");
 
 				for (int k = 0; k < rooms.size(); k++) {
-					out.printf("- " + rooms.get(k) + "\n");
 					log[i] += ("- " + rooms.get(k) + "\n");
 				}
 
-				out.printf("\n");
 				log[i] += ("\n");
 			}
 
@@ -749,19 +726,25 @@ public class SeedFinder {
 			if (Options.logOther)
 				addTextItems("Other", others, builder, "\n");
 
-			out.print(builder.toString());
 			log[i] += (builder.toString());
 
 			Dungeon.depth++;
 		}
 
-		out.close();
 		return log;
 	}
 
 	//logging without arguments uses SHPDSettings
-	public String[] logSeedItems() {
+	public String[] logSeedItemsSeededRun(Long seed) {
 		loadConfig();
-		return logSeedItems(Long.toString(Options.seed), SPDSettings.seedfinderFloors());
+		Options.searchForDaily = false;
+		return logSeedItems(Long.toString(seed), SPDSettings.seedfinderFloors());
+	}
+
+	public String[] logSeedItemsDailyRunRun(int offset) {
+		loadConfig();
+		Options.searchForDaily = true;
+		Options.DailyOffset = offset;
+		return logSeedItems("0", SPDSettings.seedfinderFloors());
 	}
 }
