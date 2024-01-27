@@ -142,8 +142,11 @@ public class SeedFinder {
 	private void loadConfig() {
 
 		// pull options from SPDSettings
+		Options.floors = SPDSettings.seedfinderFloors();
+		Options.condition = Condition.ALL;
+
 		Options.useRooms = SPDSettings.useRooms();
-		
+
 		Options.logEquipment = SPDSettings.logEquipment() && !SPDSettings.useRooms();
 		Options.logScrolls = SPDSettings.logScrolls() && !SPDSettings.useRooms();
 		Options.logPotions = SPDSettings.logPotions() && !SPDSettings.useRooms();
@@ -151,35 +154,29 @@ public class SeedFinder {
 		Options.logWands = SPDSettings.logWands() && !SPDSettings.useRooms();
 		Options.logArtifacts = SPDSettings.logArtifacts() && !SPDSettings.useRooms();
 		Options.logOther = SPDSettings.logMisc() && !SPDSettings.useRooms();
-		
+
 		Options.ignoreBlacklist = SPDSettings.ignoreBlacklist();
 		Options.challenges = SPDSettings.challenges();
-		
-		//defaults, only adjustable in CLI seedfinder
+
+		// defaults, only adjustable in CLI seedfinder
 		Options.useChallenges = true;
 		Options.trueRandom = false;
 		Options.sequentialMode = false;
 		Options.startingSeed = 0;
 		Options.infoSpacing = 33;
 		Options.spacingChar = " ";
-		if (Options.spacingChar.length() != 1) Options.spacingChar = " ";
+		if (Options.spacingChar.length() != 1)
+			Options.spacingChar = " ";
 	}
 
-	private ArrayList<String> getItemList() {
+	private ArrayList<String> getItemList(String text) {
 		ArrayList<String> itemList = new ArrayList<>();
 
-		try {
-			Scanner scanner = new Scanner(new File(Options.itemListFile));
+		if (text.isEmpty())
+			return itemList;
 
-			while (scanner.hasNextLine()) {
-				itemList.add(scanner.nextLine());
-			}
-
-			scanner.close();
-
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
+		String[] itemList_s = text.split(System.lineSeparator());
+		itemList = new ArrayList<String>(Arrays.asList(itemList_s));
 
 		return itemList;
 	}
@@ -262,54 +259,41 @@ public class SeedFinder {
 		}
 	}
 
-	public SeedFinder () {
-		
+	public SeedFinder() {
+
 	}
 
-	public SeedFinder(String[] args) {
-		System.out.print("Elektrocheckers seed finder for SHPD v" + Game.version + "\n");
-
+	public String find_seed(String items) {
 		loadConfig();
-		parseArgs(args);
-
-		if (args.length == 2) {
-			logSeedItems(Long.toString(Options.seed), Options.floors);
-
-			return;
-		}
-
-		itemList = getItemList();
+		itemList = getItemList(items);
 
 		// only generate natural seeds
 		if (Options.trueRandom) {
 			for (int i = 0; i < DungeonSeed.TOTAL_SEEDS; i++) {
 				long seed = DungeonSeed.randomSeed();
 				if (testSeed(Long.toString(seed), Options.floors)) {
-					System.out.printf("Found valid seed %s (%d)\n", DungeonSeed.convertToCode(Dungeon.seed),
-							Dungeon.seed);
-					logSeedItems(Long.toString(seed), Options.floors);
+					return DungeonSeed.convertToCode(Dungeon.seed);
 				}
 			}
 
-		// sequential mode: start at 0
+			// sequential mode: start at 0
 		} else if (Options.sequentialMode) {
 			for (long i = Options.startingSeed; i < DungeonSeed.TOTAL_SEEDS; i++) {
 				if (testSeed(Long.toString(i), Options.floors)) {
-					System.out.printf("Found valid seed %s (%d)\n", DungeonSeed.convertToCode(Dungeon.seed),
-							Dungeon.seed);
-					logSeedItems(Long.toString(i), Options.floors);
+					return DungeonSeed.convertToCode(Dungeon.seed);
 				}
 			}
 
-		// default (random) mode
+			// default (random) mode
 		} else {
 			for (long i = Random.Long(DungeonSeed.TOTAL_SEEDS); i < DungeonSeed.TOTAL_SEEDS; i++) {
 				if (testSeed(Long.toString(i), Options.floors)) {
-					System.out.printf("Found valid seed %s (%d)\n", DungeonSeed.convertToCode(Dungeon.seed), Dungeon.seed);
-					logSeedItems(Long.toString(i), Options.floors);
+					return DungeonSeed.convertToCode(Dungeon.seed);
 				}
 			}
 		}
+
+		return "error: invalid finding mode";
 	}
 
 	private ArrayList<String> getRooms() {
@@ -406,10 +390,10 @@ public class SeedFinder {
 			Level l = Dungeon.newLevel();
 
 			// skip boss floors
-			//for some reason this fucks up quest item searching
+			// for some reason this fucks up quest item searching
 
 			// if (Dungeon.depth % 5 == 0) {
-			// 	continue;
+			// continue;
 			// }
 
 			ArrayList<Heap> heaps = new ArrayList<>(l.heaps.valueList());
@@ -734,7 +718,7 @@ public class SeedFinder {
 		return log;
 	}
 
-	//logging without arguments uses SHPDSettings
+	// logging without arguments uses SHPDSettings
 	public String[] logSeedItemsSeededRun(Long seed) {
 		loadConfig();
 		Options.searchForDaily = false;

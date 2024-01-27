@@ -155,10 +155,36 @@ public class TitleScene extends PixelScene {
 		btnScout.icon(Icons.get(Icons.ENTER));
 		add(btnScout);
 
-		StyledButton btnSeedfinder = new StyledButton(GREY_TR, Messages.get(this, "seedfinder")){
+		StyledButton btnSeedfinder = new StyledButton(GREY_TR, Messages.get(this, "seedfinder_button")){
 			@Override
 			protected void onClick() {
-				//seedfinder
+				ShatteredPixelDungeon.scene()
+						.addToFront(new WndTextInput(Messages.get(TitleScene.class, "seedfinder_title"),
+								Messages.get(TitleScene.class, "seedfinder_info_text"),
+								"",
+								100,
+								true,
+								Messages.get(TitleScene.class, "seedfinder_button_yes"),
+								Messages.get(TitleScene.class, "seedfinder_button_no")) {
+							@Override
+							public void onSelect(boolean positive, String text) {
+								if (positive) {
+									String foundSeed = new SeedFinder().find_seed(text);
+
+									long seed = DungeonSeed.convertFromText(foundSeed);
+
+									String[] seedfinderOutputLog = new SeedFinder().logSeedItemsSeededRun(seed);
+
+									ShatteredPixelDungeon.scene().addToFront(
+											new WndSeedfinderLog(Icons.get(Icons.BACKPACK),
+													"Found for seed " + DungeonSeed.convertToCode(Dungeon.seed),
+													seedfinderOutputLog));
+
+								} else {
+
+								}
+							}
+						});
 			}
 		};
 		btnSeedfinder.icon(Icons.get(Icons.MAGNIFY));
