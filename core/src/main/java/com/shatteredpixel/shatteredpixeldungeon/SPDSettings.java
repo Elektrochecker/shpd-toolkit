@@ -61,12 +61,22 @@ public class SPDSettings extends GameSettings {
 	public static final String KEY_LOGARTIFACTS	= "logging_option_artifacts";
 	public static final String KEY_LOGMISC= "logging_option_other";
 
+	public static final String KEY_SEEDITEMS_TEXT= "remember_seeditems_text";
+
 	public static void seedfinderFloors( int value ) {
 		put( KEY_FLOORS, value );
 	}
 	
 	public static int seedfinderFloors() {
 		return getInt( KEY_FLOORS, 9, 1, 24 );
+	}
+
+	public static void seeditemsText(String value) {
+		put(KEY_SEEDITEMS_TEXT, value);
+	}
+
+	public static String seeditemsText() {
+		return getString(KEY_SEEDITEMS_TEXT, "");
 	}
 
 	public static void useRooms( boolean value ) {

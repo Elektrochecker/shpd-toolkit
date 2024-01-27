@@ -23,6 +23,8 @@ package com.shatteredpixel.shatteredpixeldungeon.scenes;
 
 import com.shatteredpixel.shatteredpixeldungeon.SeedFinder;
 import com.shatteredpixel.shatteredpixeldungeon.SeedFinder.Options;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.utils.Clipboard;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Chrome;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
@@ -161,15 +163,23 @@ public class TitleScene extends PixelScene {
 				ShatteredPixelDungeon.scene()
 						.addToFront(new WndTextInput(Messages.get(TitleScene.class, "seedfinder_title"),
 								Messages.get(TitleScene.class, "seedfinder_info_text"),
-								"",
+								SPDSettings.seeditemsText(),
 								100,
 								true,
 								Messages.get(TitleScene.class, "seedfinder_button_yes"),
 								Messages.get(TitleScene.class, "seedfinder_button_no")) {
 							@Override
-							public void onSelect(boolean positive, String text) {
+							public void onSelect(boolean positive, String seeditems_userInput) {
 								if (positive) {
-									String foundSeed = new SeedFinder().find_seed(text);
+									SPDSettings.seeditemsText(seeditems_userInput);
+
+									//activate the seedfinder. this one takes a while
+									String foundSeed = new SeedFinder().find_seed(seeditems_userInput);
+
+									//copy seed to clipboard on success
+									Clipboard clipboard;
+									clipboard = Gdx.app.getClipboard();
+									clipboard.setContents(foundSeed);
 
 									long seed = DungeonSeed.convertFromText(foundSeed);
 
@@ -181,7 +191,7 @@ public class TitleScene extends PixelScene {
 													seedfinderOutputLog));
 
 								} else {
-
+									SPDSettings.seeditemsText("");
 								}
 							}
 						});
