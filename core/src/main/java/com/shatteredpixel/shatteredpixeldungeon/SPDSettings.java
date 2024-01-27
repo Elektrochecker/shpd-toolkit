@@ -133,7 +133,7 @@ public class SPDSettings extends GameSettings {
 	}
 	
 	public static boolean logMisc() {
-		return getBoolean( KEY_LOGMISC, true );
+		return getBoolean( KEY_LOGMISC, false );
 	}
 
 	//Display
