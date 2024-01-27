@@ -28,14 +28,12 @@ import com.badlogic.gdx.utils.Clipboard;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Chrome;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
-import com.shatteredpixel.shatteredpixeldungeon.GamesInProgress;
 import com.shatteredpixel.shatteredpixeldungeon.SPDSettings;
 import com.shatteredpixel.shatteredpixeldungeon.ShatteredPixelDungeon;
 import com.shatteredpixel.shatteredpixeldungeon.effects.BannerSprites;
 import com.shatteredpixel.shatteredpixeldungeon.effects.Fireball;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Languages;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
-import com.shatteredpixel.shatteredpixeldungeon.services.news.News;
 import com.shatteredpixel.shatteredpixeldungeon.services.updates.AvailableUpdateData;
 import com.shatteredpixel.shatteredpixeldungeon.services.updates.Updates;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.CharSprite;
@@ -44,14 +42,11 @@ import com.shatteredpixel.shatteredpixeldungeon.ui.ExitButton;
 import com.shatteredpixel.shatteredpixeldungeon.ui.Icons;
 import com.shatteredpixel.shatteredpixeldungeon.ui.StyledButton;
 import com.shatteredpixel.shatteredpixeldungeon.ui.Window;
-import com.shatteredpixel.shatteredpixeldungeon.ui.changelist.WndChangesTabbed;
 import com.shatteredpixel.shatteredpixeldungeon.utils.DungeonSeed;
-import com.shatteredpixel.shatteredpixeldungeon.windows.WndMessage;
 import com.shatteredpixel.shatteredpixeldungeon.windows.WndOptions;
 import com.shatteredpixel.shatteredpixeldungeon.windows.WndSeedfinderLog;
 import com.shatteredpixel.shatteredpixeldungeon.windows.WndSeedfinderSeedinput;
 import com.shatteredpixel.shatteredpixeldungeon.windows.WndSettings;
-import com.shatteredpixel.shatteredpixeldungeon.windows.WndTextInput;
 import com.watabou.glwrap.Blending;
 import com.watabou.noosa.BitmapText;
 import com.watabou.noosa.Camera;
@@ -125,11 +120,10 @@ public class TitleScene extends PixelScene {
 		StyledButton btnScout = new StyledButton(GREY_TR, Messages.get(TitleScene.class, "scout_seed_button")) {
 			@Override
 			protected void onClick() {
-				String existingSeedtext = SPDSettings.customSeed();
 				ShatteredPixelDungeon.scene()
-						.addToFront(new WndTextInput(Messages.get(TitleScene.class, "scout_custom_seed_title"),
+						.addToFront(new WndSeedfinderSeedinput(Messages.get(TitleScene.class, "scout_custom_seed_title"),
 								Messages.get(TitleScene.class, "scout_info_text"),
-								existingSeedtext,
+								SPDSettings.seedinputText(),
 								20,
 								false,
 								Messages.get(TitleScene.class, "scout_button_yes"),
@@ -137,6 +131,8 @@ public class TitleScene extends PixelScene {
 							@Override
 							public void onSelect(boolean positive, String text) {
 								if (positive && text != null && !text.isEmpty()) {
+									SPDSettings.seedinputText(text);
+
 									text = DungeonSeed.formatText(text);
 									long seed = DungeonSeed.convertFromText(text);
 
@@ -146,9 +142,8 @@ public class TitleScene extends PixelScene {
 											new WndSeedfinderLog(Icons.get(Icons.BACKPACK),
 													"Items for seed " + DungeonSeed.convertToCode(Dungeon.seed),
 													seedfinderOutputLog));
-									SPDSettings.customSeed(text);
 								} else {
-									SPDSettings.customSeed("");
+									SPDSettings.seedinputText("");
 								}
 							}
 						});
@@ -161,7 +156,7 @@ public class TitleScene extends PixelScene {
 			@Override
 			protected void onClick() {
 				ShatteredPixelDungeon.scene()
-						.addToFront(new WndTextInput(Messages.get(TitleScene.class, "seedfinder_title"),
+						.addToFront(new WndSeedfinderSeedinput(Messages.get(TitleScene.class, "seedfinder_title"),
 								Messages.get(TitleScene.class, "seedfinder_info_text"),
 								SPDSettings.seeditemsText(),
 								100,
@@ -177,8 +172,7 @@ public class TitleScene extends PixelScene {
 									String foundSeed = new SeedFinder().find_seed(seeditems_userInput);
 
 									//copy seed to clipboard on success
-									Clipboard clipboard;
-									clipboard = Gdx.app.getClipboard();
+									Clipboard clipboard = Gdx.app.getClipboard();
 									clipboard.setContents(foundSeed);
 
 									long seed = DungeonSeed.convertFromText(foundSeed);

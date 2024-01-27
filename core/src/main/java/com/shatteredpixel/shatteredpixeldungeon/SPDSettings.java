@@ -62,6 +62,8 @@ public class SPDSettings extends GameSettings {
 	public static final String KEY_LOGMISC= "logging_option_other";
 
 	public static final String KEY_SEEDITEMS_TEXT= "remember_seeditems_text";
+	public static final String KEY_SEEDINPUT_TEXT= "remember_seedinput_text";
+	public static final String KEY_CONDITION= "seedfinder_condition";
 
 	public static void seedfinderFloors( int value ) {
 		put( KEY_FLOORS, value );
@@ -77,6 +79,22 @@ public class SPDSettings extends GameSettings {
 
 	public static String seeditemsText() {
 		return getString(KEY_SEEDITEMS_TEXT, "");
+	}
+
+	public static void seedinputText(String value) {
+		put(KEY_SEEDINPUT_TEXT, value);
+	}
+
+	public static String seedinputText() {
+		return getString(KEY_SEEDINPUT_TEXT, "");
+	}
+
+	public static void seedfinderConditionANY(boolean value) {
+		put(KEY_CONDITION, value);
+	}
+
+	public static boolean seedfinderConditionANY() {
+		return getBoolean(KEY_CONDITION, false);
 	}
 
 	public static void useRooms( boolean value ) {

@@ -1,25 +1,13 @@
 package com.shatteredpixel.shatteredpixeldungeon;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.io.Writer;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Properties;
-import java.util.Scanner;
 import java.util.TimeZone;
 
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.HeroClass;
@@ -69,8 +57,6 @@ public class SeedFinder {
 	public static class Options {
 		public static int floors;
 		public static Condition condition;
-		public static String itemListFile;
-		public static String ouputFile;
 		public static long seed;
 
 		public static boolean searchForDaily;
@@ -109,41 +95,11 @@ public class SeedFinder {
 	List<Class<? extends Item>> blacklist;
 	ArrayList<String> itemList;
 
-	private void parseArgs(String[] args) {
-		if (args.length == 2) {
-			Options.ouputFile = "stdout";
-			Options.floors = Integer.parseInt(args[0]);
-			Options.seed = DungeonSeed.convertFromText(args[1]);
-
-			if (args[1].contains("daily")) {
-				Options.searchForDaily = true;
-				String offsetNumber = args[1].replace("daily", "");
-
-				if (!offsetNumber.equals("")) {
-					Options.DailyOffset = Integer.valueOf(offsetNumber);
-				}
-
-			}
-
-			return;
-		}
-
-		Options.floors = Integer.parseInt(args[0]);
-		Options.condition = args[1].equals("any") ? Condition.ANY : Condition.ALL;
-		Options.itemListFile = args[2];
-
-		if (args.length < 4)
-			Options.ouputFile = "out.txt";
-
-		else
-			Options.ouputFile = args[3];
-	}
-
 	private void loadConfig() {
 
 		// pull options from SPDSettings
 		Options.floors = SPDSettings.seedfinderFloors();
-		Options.condition = Condition.ALL;
+		Options.condition = SPDSettings.seedfinderConditionANY() ? Condition.ANY : Condition.ALL;
 
 		Options.useRooms = SPDSettings.useRooms();
 
