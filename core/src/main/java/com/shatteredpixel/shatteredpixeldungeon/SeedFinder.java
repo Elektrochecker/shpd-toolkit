@@ -101,6 +101,8 @@ public class SeedFinder {
 		Options.floors = SPDSettings.seedfinderFloors();
 		Options.condition = SPDSettings.seedfinderConditionANY() ? Condition.ANY : Condition.ALL;
 
+		Options.searchForDaily = false;
+
 		Options.useRooms = SPDSettings.useRooms();
 
 		Options.logEquipment = SPDSettings.logEquipment() && !SPDSettings.useRooms();
@@ -336,6 +338,7 @@ public class SeedFinder {
 	private boolean testSeed(String seed, int floors) {
 		SPDSettings.customSeed(seed);
 		SPDSettings.challenges(Options.challenges);
+		Dungeon.daily = Options.searchForDaily;
 		GamesInProgress.selectedClass = HeroClass.WARRIOR;
 		Dungeon.init();
 
@@ -677,7 +680,6 @@ public class SeedFinder {
 	// logging without arguments uses SHPDSettings
 	public String[] logSeedItemsSeededRun(Long seed) {
 		loadConfig();
-		Options.searchForDaily = false;
 		return logSeedItems(Long.toString(seed), SPDSettings.seedfinderFloors());
 	}
 

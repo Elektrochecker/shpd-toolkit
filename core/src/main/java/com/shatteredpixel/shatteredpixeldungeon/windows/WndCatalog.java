@@ -77,7 +77,7 @@ public class WndCatalog extends WndTabbed {
 						super.select(value);
 						catalogTab.active = catalogTab.visible = value;
 						if (value)
-							last_index = 3;
+							last_index = 0;
 					}
 				}
 		};
