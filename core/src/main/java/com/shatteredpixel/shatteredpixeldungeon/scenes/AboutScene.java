@@ -23,6 +23,8 @@ package com.shatteredpixel.shatteredpixeldungeon.scenes;
 
 import com.shatteredpixel.shatteredpixeldungeon.ShatteredPixelDungeon;
 import com.shatteredpixel.shatteredpixeldungeon.effects.Flare;
+import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSprite;
+import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSpriteSheet;
 import com.shatteredpixel.shatteredpixeldungeon.ui.Archs;
 import com.shatteredpixel.shatteredpixeldungeon.ui.ExitButton;
 import com.shatteredpixel.shatteredpixeldungeon.ui.Icons;
@@ -62,6 +64,40 @@ public class AboutScene extends PixelScene {
 		Component content = list.content();
 		content.clear();
 
+		// SHPD Toolkit & seedfinder credits
+
+		String toolkitLink = "https://github.com/Elektrochecker/shpd-toolkit";
+		String seedfinderLink = "https://github.com/Elektrochecker/shpd-seed-finder";
+
+		CreditsBlock toolkit = new CreditsBlock(true, 0x10e3a7,
+				"SHPD Toolkit",
+				Icons.get(Icons.MAGNIFY),
+				"Developed by: _Timon Lilje_ aka. _Elektrochecker_",
+				"github.com",
+				toolkitLink);
+		if (landscape()) {
+			toolkit.setRect((w - fullWidth) / 2f - 6, 10, 120, 0);
+		} else {
+			toolkit.setRect((w - fullWidth) / 2f, 6, 120, 0);
+		}
+		content.add(toolkit);
+
+		CreditsBlock seedfinder = new CreditsBlock(true, 0x10e3a7,
+				"SHPD Seedfinder",
+				new ItemSprite(ItemSpriteSheet.SEED_SUNGRASS),
+				"Developed by: _Timon Lilje_ based on _Alessiomarotta_'s source code",
+				"github.com",
+				seedfinderLink);
+		seedfinder.setSize(120, 0);
+		if (landscape()) {
+			seedfinder.setPos(toolkit.right(), toolkit.top());
+		} else {
+			seedfinder.setPos(w / 2f - colWidth / 2f, toolkit.bottom() + 5);
+		}
+		content.add(seedfinder);
+
+		addLine(seedfinder.bottom() + 4, content);
+
 		//*** Shattered Pixel Dungeon Credits ***
 
 		String shpxLink = "https://ShatteredPixel.com";
@@ -77,9 +113,9 @@ public class AboutScene extends PixelScene {
 				"ShatteredPixel.com",
 				shpxLink);
 		if (landscape()){
-			shpx.setRect((w - fullWidth)/2f - 6, 10, 120, 0);
+			shpx.setRect((w - fullWidth)/2f - 6, seedfinder.bottom() + 12, 120, 0);
 		} else {
-			shpx.setRect((w - fullWidth)/2f, 6, 120, 0);
+			shpx.setRect((w - fullWidth)/2f, seedfinder.bottom() + 10, 120, 0);
 		}
 		content.add(shpx);
 
