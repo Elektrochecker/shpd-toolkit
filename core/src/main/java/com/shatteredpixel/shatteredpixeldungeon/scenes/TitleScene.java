@@ -37,12 +37,16 @@ import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.services.updates.AvailableUpdateData;
 import com.shatteredpixel.shatteredpixeldungeon.services.updates.Updates;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.CharSprite;
+import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSprite;
+import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSpriteSheet;
 import com.shatteredpixel.shatteredpixeldungeon.ui.Archs;
 import com.shatteredpixel.shatteredpixeldungeon.ui.ExitButton;
 import com.shatteredpixel.shatteredpixeldungeon.ui.Icons;
 import com.shatteredpixel.shatteredpixeldungeon.ui.StyledButton;
 import com.shatteredpixel.shatteredpixeldungeon.ui.Window;
 import com.shatteredpixel.shatteredpixeldungeon.utils.DungeonSeed;
+import com.shatteredpixel.shatteredpixeldungeon.windows.WndCatalog;
+import com.shatteredpixel.shatteredpixeldungeon.windows.WndJournal;
 import com.shatteredpixel.shatteredpixeldungeon.windows.WndOptions;
 import com.shatteredpixel.shatteredpixeldungeon.windows.WndSeedfinderLog;
 import com.shatteredpixel.shatteredpixeldungeon.windows.WndSeedfinderSeedinput;
@@ -216,14 +220,14 @@ public class TitleScene extends PixelScene {
 		add(btnScoutDaily);
 		Dungeon.daily = Dungeon.dailyReplay = false;
 
-		StyledButton btnBadges = new StyledButton(GREY_TR, Messages.get(this, "badges")){
+		StyledButton btnCatalog = new StyledButton(GREY_TR, Messages.get(this, "item_catalog")){
 			@Override
 			protected void onClick() {
-				ShatteredPixelDungeon.switchNoFade( BadgesScene.class );
+				ShatteredPixelDungeon.scene().addToFront(new WndCatalog());
 			}
 		};
-		btnBadges.icon(Icons.get(Icons.BADGES));
-		add(btnBadges);
+		btnCatalog.icon(new ItemSprite(ItemSpriteSheet.POTION_AZURE));
+		add(btnCatalog);
 
 		StyledButton btnSource = new StyledButton(GREY_TR, Messages.get(this, "source")) {
 			@Override
@@ -260,7 +264,7 @@ public class TitleScene extends PixelScene {
 			align(btnScout);
 			btnSeedfinder.setRect(btnScout.right()+2, btnScout.top(), btnScout.width(), BTN_HEIGHT);
 			btnScoutDaily.setRect(btnScout.left(), btnScout.bottom()+ GAP, (btnScout.width()*.67f)-1, BTN_HEIGHT);
-			btnBadges.setRect(btnScoutDaily.left(), btnScoutDaily.bottom()+GAP, btnScoutDaily.width(), BTN_HEIGHT);
+			btnCatalog.setRect(btnScoutDaily.left(), btnScoutDaily.bottom()+GAP, btnScoutDaily.width(), BTN_HEIGHT);
 			btnSource.setRect(btnScoutDaily.right()+2, btnScoutDaily.top(), btnScoutDaily.width(), BTN_HEIGHT);
 			btnChanges.setRect(btnSource.left(), btnSource.bottom() + GAP, btnScoutDaily.width(), BTN_HEIGHT);
 			btnSettings.setRect(btnSource.right()+2, btnSource.top(), btnScoutDaily.width(), BTN_HEIGHT);
@@ -270,7 +274,7 @@ public class TitleScene extends PixelScene {
 			align(btnScout);
 			btnSeedfinder.setRect(btnScout.left(), btnScout.bottom()+ GAP, btnScout.width(), BTN_HEIGHT);
 			btnScoutDaily.setRect(btnScout.left(), btnSeedfinder.bottom()+ GAP, (btnScout.width()/2)-1, BTN_HEIGHT);
-			btnBadges.setRect(btnScoutDaily.right()+2, btnScoutDaily.top(), btnScoutDaily.width(), BTN_HEIGHT);
+			btnCatalog.setRect(btnScoutDaily.right()+2, btnScoutDaily.top(), btnScoutDaily.width(), BTN_HEIGHT);
 			btnSource.setRect(btnScoutDaily.left(), btnScoutDaily.bottom()+ GAP, btnScoutDaily.width(), BTN_HEIGHT);
 			btnChanges.setRect(btnSource.right()+2, btnSource.top(), btnSource.width(), BTN_HEIGHT);
 			btnSettings.setRect(btnSource.left(), btnSource.bottom()+GAP, btnScoutDaily.width(), BTN_HEIGHT);

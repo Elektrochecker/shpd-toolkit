@@ -406,10 +406,23 @@ public class WndSettings extends WndTabbed {
 					ShatteredPixelDungeon.scene().addToFront(new WndChallenges(SPDSettings.challenges(), true) {
 						public void onBackPressed() {
 							super.onBackPressed();
+
+							// reload scene for new button color
+							ShatteredPixelDungeon.seamlessResetScene(new Game.SceneChangeCallback() {
+								@Override
+								public void beforeCreate() {
+								}
+		
+								@Override
+								public void afterCreate() {
+									//do nothing
+								}
+							});
 						}
 					});
 				}
 			};
+			btnChallenges.textColor(SPDSettings.challenges() == 0 ? WHITE : TITLE_COLOR);
 			add(btnChallenges);
 
 			String modeBtnDescKey = SPDSettings.seedfinderConditionANY() ? "mode_any" : "mode_all";
@@ -417,6 +430,8 @@ public class WndSettings extends WndTabbed {
 				@Override
 				protected void onClick() {
 					SPDSettings.seedfinderConditionANY(!SPDSettings.seedfinderConditionANY());
+
+					// reload scene for new button text
 					ShatteredPixelDungeon.seamlessResetScene(new Game.SceneChangeCallback() {
 						@Override
 						public void beforeCreate() {
