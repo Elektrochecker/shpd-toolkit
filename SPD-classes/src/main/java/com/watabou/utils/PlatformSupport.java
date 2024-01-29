@@ -26,6 +26,7 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.PixmapPacker;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.watabou.input.ControllerHandler;
 import com.watabou.noosa.Game;
 
 import java.util.HashMap;
@@ -38,9 +39,14 @@ public abstract class PlatformSupport {
 
 	public abstract boolean connectedToUnmeteredNetwork();
 
+	public abstract boolean supportsVibration();
+
 	public void vibrate( int millis ){
-		//regular GDX vibration by default
-		Gdx.input.vibrate( millis );
+		if (ControllerHandler.isControllerConnected()) {
+			ControllerHandler.vibrate(millis);
+		} else {
+			Gdx.input.vibrate( millis );
+		}
 	}
 
 	public void setHonorSilentSwitch( boolean value ){
