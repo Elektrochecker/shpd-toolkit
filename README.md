@@ -5,6 +5,8 @@ This repository is a fork of [Shattered Pixel Dungeon](https://github.com/00-Eva
 # Installation
 This application can be installed on Android by downloading and installing the appropriate `.apk` file from the [releases](https://github.com/Elektrochecker/shpd-toolkit/releases) tab. It can also be used on desktop computers by downloading the `.jar` executable from the [releases](https://github.com/Elektrochecker/shpd-toolkit/releases) tab. In order to run the application on desktop, Java must be installed. If you intend to use this application on a desktop computer, consider using [the original seedfinder CLI tool](https://github.com/Elektrochecker/shpd-seed-finder) instead. It is faster, more powerful and will receive updates sooner.
 
+As different versions of Shattered Pixel Dungeon (SHPD) generate different dungeons, a release of SHPD Toolkit will only work with certain versions of SHPD. Versions that only differ by the last digit in the version code (for example v2.3.0 and v2.3.1) are likeley, but not guaranteed to share the same level generation.
+
 # Usage
 
 ### scouting mode
