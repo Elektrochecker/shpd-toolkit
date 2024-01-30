@@ -1,27 +1,45 @@
-# Shattered Pixel Dungeon
+# SHPD Toolkit
 
-[Shattered Pixel Dungeon](https://shatteredpixel.com/shatteredpd/) is an open-source traditional roguelike dungeon crawler with randomized levels and enemies, and hundreds of items to collect and use. It's based on the [source code of Pixel Dungeon](https://github.com/00-Evan/pixel-dungeon-gradle), by [Watabou](https://www.watabou.ru).
+This repository is a fork of [Shattered Pixel Dungeon](https://github.com/00-Evan/shattered-pixel-dungeon) and contains code from [SHPD Seedfinder](https://github.com/Elektrochecker/shpd-seed-finder) which is a fork of [Alessiomarotta's SHPD Seedfinder](https://github.com/alessiomarotta/shpd-seed-finder).
 
-Shattered Pixel Dungeon currently compiles for Android, iOS, and Desktop platforms. You can find official releases of the game on:
+# Installation
+This application can be installed on Android by downloading and installing the appropriate `.apk` file from the [releases](https://github.com/Elektrochecker/shpd-toolkit/releases) tab. It can also be used on desktop computers by downloading the `.jar` executable from the [releases](https://github.com/Elektrochecker/shpd-toolkit/releases) tab. In order to run the application on desktop, Java must be installed. If you intend to use this application on a desktop computer, consider using [the original seedfinder CLI tool](https://github.com/Elektrochecker/shpd-seed-finder) instead. It is faster, more powerful and will receive updates sooner.
 
-[![Get it on Google Play](https://shatteredpixel.com/assets/images/badges/gplay.png)](https://play.google.com/store/apps/details?id=com.shatteredpixel.shatteredpixeldungeon)
-[![Download on the App Store](https://shatteredpixel.com/assets/images/badges/appstore.png)](https://apps.apple.com/app/shattered-pixel-dungeon/id1563121109)
-[![Steam](https://shatteredpixel.com/assets/images/badges/steam.png)](https://store.steampowered.com/app/1769170/Shattered_Pixel_Dungeon/)<br>
-[![GOG.com](https://shatteredpixel.com/assets/images/badges/gog.png)](https://www.gog.com/game/shattered_pixel_dungeon)
-[![Itch.io](https://shatteredpixel.com/assets/images/badges/itch.png)](https://shattered-pixel.itch.io/shattered-pixel-dungeon)
-[![Github Releases](https://shatteredpixel.com/assets/images/badges/github.png)](https://github.com/00-Evan/shattered-pixel-dungeon/releases)
+# Usage
 
-If you like this game, please consider [supporting me on Patreon](https://www.patreon.com/ShatteredPixel)!
+### scouting mode
+Scouting mode can be used to gain information about a given dungeon seed. The maximum depth of the search can be changed in the seedfinder settings. By changing the logging options, the item categories to be shown can be changed. On smaller devices it may be necessary to disable some of them in order to make the appearing window fit on the screen. The item log window is intentionally "sticky": in order to close it, press back on mobile or escape on desktop. Daily run scouting works similarly to regular seed scouting.
 
-There is an official blog for this project at [ShatteredPixel.com](https://www.shatteredpixel.com/blog/).
+### seedfinding
+Seedfinding mode is used to generate seeds to fit user specified criteria. When pressing on "Find Seed", the user will be prompted to enter a list of items for the seed to contain. This list needs to fulfill the same conditions as the item list from the original seedfinder:
 
-The game also has a translation project hosted on [Transifex](https://www.transifex.com/shattered-pixel/shattered-pixel-dungeon/).
+- item names are the same as read in-game, including upgrade level
+- all items must be written in lowercase letters
+- each item must go on a new line
 
-Note that **this repository does not accept pull requests!** The code here is provided in hopes that others may find it useful for their own projects, not to allow community contribution. Issue reports of all kinds (bug reports, feature requests, etc.) are welcome.
+The following two examples are valid inputs and functionally equivalent:
 
-If you'd like to work with the code, you can find the following guides in `/docs`:
-- [Compiling for Android.](docs/getting-started-android.md)
-    - **[If you plan to distribute on Google Play please read the end of this guide.](docs/getting-started-android.md#distributing-your-apk)**
-- [Compiling for desktop platforms.](docs/getting-started-desktop.md)
-- [Compiling for iOS.](docs/getting-started-ios.md)
-- [Recommended changes for making your own version.](docs/recommended-changes.md)
+```
+ring of sharpshooting +2
+alchemist's toolkit
+```
+```
+sharpshooting +2
+toolkit
+```
+The seedfinder can run in two different modes which can be changed in the settings:
+- ANY mode: find seeds that contain any one of the specified items
+- ALL mode: find seeds that contain all of the specified items
+
+The max. depth slider in the settings controls until which floor the condition has to be met. Setting the slider to 4 and the mode to ALL will generate seeds that contain all of the specified items before floor 5.
+
+Upon starting the seedfinder the app will loop through different seeds until it finds a fitting one. The app will appear frozen until a seed is found. When entering an invalid, impossible or sufficiently unlikeley combination of items, the app will lock up and has to be forcefully closed.
+
+### Item catalog
+The item catalog can be used to check/confirm the names of different items. After finding or scouting a seed, the consumables in the catalog will have the types of the ones in this seed.
+
+### Challenges
+Some challenges such as "forbidden runes" change level generation. The challenges the seedfinder uses can be changed in the settings.
+
+# Building
+SHPD Toolkit can be compiled exactly like [Shattered Pixel Dungeon](https://github.com/00-Evan/shattered-pixel-dungeon).
