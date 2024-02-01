@@ -172,7 +172,7 @@ public class TitleScene extends PixelScene {
 									SPDSettings.seeditemsText(seeditems_userInput);
 
 									//activate the seedfinder. this one takes a while
-									String foundSeed = new SeedFinder().find_seed(seeditems_userInput);
+									String foundSeed = new SeedFinder().find_seed(seeditems_userInput.toLowerCase());
 
 									//copy seed to clipboard on success
 									Clipboard clipboard = Gdx.app.getClipboard();
