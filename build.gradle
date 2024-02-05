@@ -16,8 +16,8 @@ allprojects {
         appName = 'SHPD toolkit'
         appPackageName = 'com.elektrochecker.shatteredtoolkit'
 
-        appVersionCode = 767
-        appVersionName = '2.3.1 - 1.0'
+        appVersionCode = 768
+        appVersionName = '2.3.2 - 1.0'
 
         appJavaCompatibility = JavaVersion.VERSION_1_8
 
