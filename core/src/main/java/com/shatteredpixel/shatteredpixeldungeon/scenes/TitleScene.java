@@ -31,7 +31,6 @@ import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.SPDSettings;
 import com.shatteredpixel.shatteredpixeldungeon.ShatteredPixelDungeon;
 import com.shatteredpixel.shatteredpixeldungeon.effects.BannerSprites;
-import com.shatteredpixel.shatteredpixeldungeon.effects.Fireball;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Languages;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.services.updates.AvailableUpdateData;
@@ -184,7 +183,7 @@ public class TitleScene extends PixelScene {
 
 									ShatteredPixelDungeon.scene().addToFront(
 											new WndSeedfinderLog(Icons.get(Icons.BACKPACK),
-													"Found for seed " + DungeonSeed.convertToCode(Dungeon.seed),
+													"Found seed " + DungeonSeed.convertToCode(Dungeon.seed),
 													seedfinderOutputLog));
 
 								} else {
@@ -294,12 +293,6 @@ public class TitleScene extends PixelScene {
 		}
 
 		fadeIn();
-	}
-	
-	private void placeTorch( float x, float y ) {
-		Fireball fb = new Fireball();
-		fb.setPos( x, y );
-		add( fb );
 	}
 
 	private static class ChangesButton extends StyledButton {

@@ -244,11 +244,23 @@ public class WndSettings extends WndTabbed {
 			title.hardlight(TITLE_COLOR);
 			add(title);
 			
-			numFloors = new OptionSlider(Messages.get(this, "floors_slider"),
+			numFloors = new OptionSlider(Messages.get(this, "floors_slider") + " (" + SPDSettings.seedfinderFloors() + ")",
 			"1", "24", 1, 24) {
 				@Override
 				protected void onChange() {
 					SPDSettings.seedfinderFloors(getSelectedValue());
+
+					// reload scene for floor number desc
+					ShatteredPixelDungeon.seamlessResetScene(new Game.SceneChangeCallback() {
+						@Override
+						public void beforeCreate() {
+						}
+
+						@Override
+						public void afterCreate() {
+							//do nothing
+						}
+					});
 				}
 			};
 			numFloors.setSelectedValue(SPDSettings.seedfinderFloors());
