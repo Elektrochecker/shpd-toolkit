@@ -45,7 +45,7 @@ import com.shatteredpixel.shatteredpixeldungeon.items.weapon.Weapon;
 import com.shatteredpixel.shatteredpixeldungeon.levels.Level;
 import com.shatteredpixel.shatteredpixeldungeon.levels.RegularLevel;
 import com.shatteredpixel.shatteredpixeldungeon.utils.DungeonSeed;
-
+import com.shatteredpixel.shatteredpixeldungeon.windows.WndMessage;
 import com.watabou.utils.Random;
 import com.watabou.noosa.Game;
 
@@ -133,7 +133,7 @@ public class SeedFinder {
 		if (text.isEmpty())
 			return itemList;
 
-		String[] itemList_s = text.split(System.lineSeparator());
+		String[] itemList_s = text.toLowerCase().split(System.lineSeparator());
 		itemList = new ArrayList<String>(Arrays.asList(itemList_s));
 
 		return itemList;
@@ -225,27 +225,31 @@ public class SeedFinder {
 		loadConfig();
 		itemList = getItemList(items);
 
-		// only generate natural seeds
+		// only generate natural seeds, currently not available in shpd toolkit
 		if (Options.trueRandom) {
 			for (int i = 0; i < DungeonSeed.TOTAL_SEEDS; i++) {
 				long seed = DungeonSeed.randomSeed();
 				if (testSeed(Long.toString(seed), Options.floors)) {
+					ShatteredPixelDungeon.scene().addToFront(new WndMessage("searched through _" + Long.toString(i) + "_ seeds."));
 					return DungeonSeed.convertToCode(Dungeon.seed);
 				}
 			}
 
-			// sequential mode: start at 0
+			// sequential mode: start at 0, currently not available in shpd toolkit
 		} else if (Options.sequentialMode) {
 			for (long i = Options.startingSeed; i < DungeonSeed.TOTAL_SEEDS; i++) {
 				if (testSeed(Long.toString(i), Options.floors)) {
+					ShatteredPixelDungeon.scene().addToFront(new WndMessage("searched through _" + Long.toString(i - Options.startingSeed) + "_ seeds."));
 					return DungeonSeed.convertToCode(Dungeon.seed);
 				}
 			}
 
 			// default (random) mode
 		} else {
-			for (long i = Random.Long(DungeonSeed.TOTAL_SEEDS); i < DungeonSeed.TOTAL_SEEDS; i++) {
+			long start = Random.Long(DungeonSeed.TOTAL_SEEDS);
+			for (long i = start; i < DungeonSeed.TOTAL_SEEDS; i++) {
 				if (testSeed(Long.toString(i), Options.floors)) {
+					ShatteredPixelDungeon.scene().addToFront(new WndMessage("searched through _" + Long.toString(i - start) + "_ seeds."));
 					return DungeonSeed.convertToCode(Dungeon.seed);
 				}
 			}
