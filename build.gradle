@@ -16,8 +16,8 @@ allprojects {
         appName = 'SHPD toolkit'
         appPackageName = 'com.elektrochecker.shatteredtoolkit'
 
-        appVersionCode = 768
-        appVersionName = '2.3.2 - 1.1'
+        appVersionCode = 780
+        appVersionName = '2.4.0 - 1.1'
 
         appJavaCompatibility = JavaVersion.VERSION_1_8
 
@@ -27,7 +27,7 @@ allprojects {
 
         gdxVersion = '1.12.1'
         gdxControllersVersion = '2.2.4-SNAPSHOT'
-        robovmVersion = '2.3.20'
+        robovmVersion = '2.3.21'
     }
     version = appVersionName
 
