@@ -476,7 +476,7 @@ public class DwarfKing extends Mob {
 		super.damage(dmg, src);
 
 		LockedFloor lock = Dungeon.hero.buff(LockedFloor.class);
-		if (lock != null && !isImmune(src.getClass())){
+		if (lock != null && !isImmune(src.getClass()) && !isInvulnerable(src.getClass())){
 			if (Dungeon.isChallenged(Challenges.STRONGER_BOSSES))   lock.addTime(dmg/5f);
 			else                                                    lock.addTime(dmg/3f);
 		}
@@ -498,8 +498,15 @@ public class DwarfKing extends Mob {
 					s.detach();
 				}
 				for (Mob m : Dungeon.level.mobs.toArray(new Mob[0])) {
-					if (m instanceof Ghoul || m instanceof Monk || m instanceof Warlock || m instanceof Golem) {
-						m.die(null);
+					if (m.alignment == alignment) {
+						if (m instanceof Ghoul || m instanceof Monk || m instanceof Warlock || m instanceof Golem) {
+							m.die(null);
+						}
+					}
+				}
+				for (Buff b: buffs()){
+					if (b instanceof LifeLink){
+						b.detach();
 					}
 				}
 			}

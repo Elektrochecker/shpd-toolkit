@@ -80,9 +80,78 @@ public class v2_X_Changes {
 
 	public static void add_v2_4_Changes( ArrayList<ChangeInfo> changeInfos ) {
 
-		ChangeInfo changes = new ChangeInfo("v2.4.0", true, "");
+		ChangeInfo changes = new ChangeInfo("v2.4", true, "");
 		changes.hardlight(Window.TITLE_COLOR);
 		changeInfos.add(changes);
+
+		changes = new ChangeInfo("v2.4.2", false, null);
+		changes.hardlight(Window.TITLE_COLOR);
+		changeInfos.add(changes);
+
+		changes.addButton( new ChangeButton(new ItemSprite(ItemSpriteSheet.SICKLE), "Weapon Ability Buffs",
+				"Overall success rates are up across the board for the Duelist and weapon abilities, but I've giving out some buffs to a few abilities that didn't benefit as strongly from v.2.4.0:\n" +
+				"_- Harvest_ bleeding increased by ~30%\n" +
+				"_- Harvest_ now deals regular damage to bleed-immune foes\n" +
+				"_- Spin_ damage boost up to 8+lvl from 6+lvl\n" +
+				"_- Runic Slash_ base enchant boost up to 300% from 200%\n\n" +
+				"I'm also making a general change to the Duelist's weapon ability charge cap to improve her scaling a tiny bit, especially at level 4:\n" +
+				"_-_ Duelist now gains another weapon charge every 3 levels, down from 4\n" +
+				"_-_ Max possible charges unchanged, but they are now reached at level 19, down from 25\n\n" +
+				"I had mentioned in v2.4.1 that I was planning to make more changes to trinkets, but I've decided to hold off on that for now."));
+
+		changes.addButton(new ChangeButton(Icons.get(Icons.PREFS), Messages.get(ChangesScene.class, "misc"),
+				"_-_ Buffed the bonus damage on the Warrior's new _Provoked Anger_ talent. Now grants 2 or 3 damage, up from 1-2 or 2.\n" +
+				"\n" +
+				"_-_ Cursed wands can no longer turn important NPCs into sheep\n" +
+				"_-_ Spectral necromancers now only kill wraiths they are aligned with when they die\n" +
+				"_-_ Dwarf King now only clears minions that are still allied with him when transitioning phases."));
+
+		changes.addButton(new ChangeButton(new Image(Assets.Sprites.SPINNER, 144, 0, 16, 16), Messages.get(ChangesScene.class, "bugfixes"),
+				"Fixed the following bugs:\n" +
+				"_Caused by v2.4.0:_\n" +
+				"_-_ Wondrous Resin not triggering when using wild magic\n" +
+				"_-_ Lingering magic duration stacking instead of resetting when re-triggered\n" +
+				"_-_ Various rare actor order issues caused by dagger blink ability\n" +
+				"_-_ Alchemy UI disabling cancel button when it shouldn't in specific cases\n" +
+				"\n" +
+				"_Existed Prior to v2.4.0:_\n" +
+				"_-_ Various minor visual and textual errors"));
+
+		changes = new ChangeInfo("v2.4.1", false, null);
+		changes.hardlight(Window.TITLE_COLOR);
+		changeInfos.add(changes);
+
+		changes.addButton( new ChangeButton(new ItemSprite(ItemSpriteSheet.MOSSY_CLUMP), "Trinket Balance Changes",
+				"I'm making some balance tweaks to trinkets based on early gameplay data. I expect I'll be making more tweaks here later on, both to trinkets and the new Duelist abilities, once a little more time has passed.\n" +
+				"\n" +
+				"_- Mossy Clump_ upgrade cost increased\n" +
+				"\n" +
+				"_Ebony Mimics_ (from Mimic Tooth) adjusted to be more rewarding:\n" +
+				"_-_ Stats reduced by ~20%, now a little weaker than golden mimics\n" +
+				"_-_ Surprise attack damage unchanged (still really hurts!)\n" +
+				"_-_ Now contain two random item drops, in addition to normal golden mimic loot\n" +
+				"\n" +
+				"_- Trap Mechanism_ upgrade cost reduced\n" +
+				"_- Dimensional Sundial_ upgrade cost reduced\n" +
+				"_- Thirteen Leaf Clover_ upgrade cost reduced"));
+
+		changes.addButton(new ChangeButton(Icons.get(Icons.PREFS), Messages.get(ChangesScene.class, "misc"),
+				"_-_ Enemies seen via mind vision can now be auto-targeted, but the game won't auto-aim as aggressively for performance reasons\n" +
+				"_-_ Added dev commentary for v1.3.0"));
+
+		changes.addButton(new ChangeButton(new Image(Assets.Sprites.SPINNER, 144, 0, 16, 16), Messages.get(ChangesScene.class, "bugfixes"),
+				"Fixed the following bugs:\n" +
+				"_Caused by v2.4.0:_\n" +
+				"_-_ Saves from before v2.4 sometimes generating trinkets in the dungeon\n" +
+				"_-_ Errors when DM-300 took massive amounts of damage\n" +
+				"_-_ Duelist harvest ability being reduced by damage reduction effects twice\n" +
+				"\n" +
+				"_Existed Prior to v2.4.0:_\n" +
+				"_-_ Various minor visual bugs and typos\n" +
+				"_-_ Swiftness glyph not working near neutral characters\n" +
+				"_-_ Specific cases where damaging immune enemies would count towards regen time during boss fights\n" +
+				"_-_ Ascension hero speed debuff triggering at 7+ amulet curse stacks instead of 6+\n" +
+				"_-_ Fixed view distance becoming 0 during final boss in specific cases"));
 
 		changes = new ChangeInfo(Messages.get(ChangesScene.class, "new"), false, null);
 		changes.hardlight(Window.TITLE_COLOR);
