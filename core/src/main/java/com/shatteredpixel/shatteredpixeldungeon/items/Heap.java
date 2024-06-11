@@ -72,7 +72,8 @@ public class Heap implements Bundlable {
 		MIMIC,
 		GOLDEN_MIMIC,
 		CRYSTAL_MIMIC,
-		STATUE
+		STATUE,
+		TrinketCatalyst
 	}
 	public Type type = Type.HEAP;
 	
@@ -394,8 +395,10 @@ public class Heap implements Bundlable {
 				return "crystal mimic";
 			case STATUE:
 				return "statue";
+			case TrinketCatalyst:
+				return "magical catalyst";
 			default:
-				return peek().title();
+				return peek().title().toLowerCase();
 		}
 	}
 

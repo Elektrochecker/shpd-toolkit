@@ -16,6 +16,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.CrystalMimic;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.GoldenMimic;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mimic;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob;
+import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.npcs.Blacksmith;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.npcs.Ghost;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.npcs.Imp;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.npcs.Wandmaker;
@@ -24,6 +25,7 @@ import com.shatteredpixel.shatteredpixeldungeon.items.armor.Armor;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.Artifact;
 import com.shatteredpixel.shatteredpixeldungeon.items.Dewdrop;
 import com.shatteredpixel.shatteredpixeldungeon.items.EnergyCrystal;
+import com.shatteredpixel.shatteredpixeldungeon.items.Generator;
 import com.shatteredpixel.shatteredpixeldungeon.items.Gold;
 import com.shatteredpixel.shatteredpixeldungeon.items.Heap;
 import com.shatteredpixel.shatteredpixeldungeon.items.Heap.Type;
@@ -39,6 +41,8 @@ import com.shatteredpixel.shatteredpixeldungeon.items.quest.Embers;
 import com.shatteredpixel.shatteredpixeldungeon.items.quest.Pickaxe;
 import com.shatteredpixel.shatteredpixeldungeon.items.rings.Ring;
 import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.Scroll;
+import com.shatteredpixel.shatteredpixeldungeon.items.trinkets.Trinket;
+import com.shatteredpixel.shatteredpixeldungeon.items.trinkets.TrinketCatalyst;
 import com.shatteredpixel.shatteredpixeldungeon.items.wands.Wand;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.MeleeWeapon;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.Weapon;
@@ -69,6 +73,7 @@ public class SeedFinder {
 		public static boolean useRooms;
 		public static boolean logPotions;
 		public static boolean logScrolls;
+		public static boolean logTrinkets;
 		public static boolean logEquipment;
 		public static boolean logRings;
 		public static boolean logWands;
@@ -90,6 +95,10 @@ public class SeedFinder {
 			this.item = item;
 			this.heap = heap;
 		}
+
+		public String name() {
+			return item.name();
+		}
 	}
 
 	List<Class<? extends Item>> blacklist;
@@ -105,6 +114,7 @@ public class SeedFinder {
 
 		Options.useRooms = SPDSettings.useRooms();
 
+		Options.logTrinkets = SPDSettings.logTrinkets() && !SPDSettings.useRooms();
 		Options.logEquipment = SPDSettings.logEquipment() && !SPDSettings.useRooms();
 		Options.logScrolls = SPDSettings.logScrolls() && !SPDSettings.useRooms();
 		Options.logPotions = SPDSettings.logPotions() && !SPDSettings.useRooms();
@@ -278,6 +288,14 @@ public class SeedFinder {
 			} else if (room.contains("secret")) {
 				room = room.replace("secret.", "");
 				roomType = "secret";
+			} else if (room.contains("entrance")) {
+				room = room.replace("entrance.", "");
+				room = room.replace("standard.", "");
+				roomType = "entrance";
+			} else if (room.contains("exit")) {
+				room = room.replace("exit.", "");
+				room = room.replace("standard.", "");
+				roomType = "exit";
 			} else if (room.contains("standard")) {
 				room = room.replace("standard.", "");
 				roomType = "standard";
@@ -298,23 +316,43 @@ public class SeedFinder {
 		return rooms;
 	}
 
+	private ArrayList<HeapItem> getTrinkets() {
+		TrinketCatalyst cata = new TrinketCatalyst();
+		int NUM_TRINKETS = TrinketCatalyst.WndTrinket.NUM_TRINKETS;
+
+		// roll new trinkets if trinkets were not already rolled
+		while (cata.rolledTrinkets.size() < NUM_TRINKETS) {
+			cata.rolledTrinkets.add((Trinket) Generator.random(Generator.Category.TRINKET));
+		}
+
+		ArrayList<HeapItem> trinkets = new ArrayList<>();
+
+		for (int i = 0; i < NUM_TRINKETS; i++) {
+			Heap h = new Heap();
+			h.type = Heap.Type.TrinketCatalyst;
+			trinkets.add(new HeapItem(cata.rolledTrinkets.get(i), h));
+		}
+
+		return trinkets;
+	}
+
 	private ArrayList<Heap> getMobDrops(Level l) {
 		ArrayList<Heap> heaps = new ArrayList<>();
 
 		for (Mob m : l.mobs) {
-			if (m instanceof Statue) {
-				Heap h = new Heap();
-				h.items = new LinkedList<>();
-				h.items.add(((Statue) m).weapon.identify());
-				h.type = Type.STATUE;
-				heaps.add(h);
-			}
-
-			else if (m instanceof ArmoredStatue) {
+			if (m instanceof ArmoredStatue) {
 				Heap h = new Heap();
 				h.items = new LinkedList<>();
 				h.items.add(((ArmoredStatue) m).armor.identify());
 				h.items.add(((ArmoredStatue) m).weapon.identify());
+				h.type = Type.STATUE;
+				heaps.add(h);
+			}
+
+			else if (m instanceof Statue) {
+				Heap h = new Heap();
+				h.items = new LinkedList<>();
+				h.items.add(((Statue) m).weapon.identify());
 				h.type = Type.STATUE;
 				heaps.add(h);
 			}
@@ -373,6 +411,21 @@ public class SeedFinder {
 									itemsFound[j] = true;
 									break;
 								}
+							}
+						}
+					}
+				}
+			}
+
+			// check trinkets
+			if(Options.logTrinkets && i < 1) {
+				ArrayList<HeapItem> trinkets = getTrinkets();
+				for (int k = 0; k < trinkets.size(); k++) {
+					for (int j = 0; j < itemList.size(); j++) {
+						if (trinkets.get(k).name().toLowerCase().contains(itemList.get(j))) {
+							if (!itemsFound[j]) {
+								itemsFound[j] = true;
+								break;
 							}
 						}
 					}
@@ -460,6 +513,10 @@ public class SeedFinder {
 	public String[] logSeedItems(String seed, int floors) {
 		String[] log = new String[floors];
 
+		for (int i = 0; i < floors; i++) {
+			log[i] = "";
+		}
+
 		if (Options.searchForDaily) {
 			Dungeon.daily = true;
 			long DAY = 1000 * 60 * 60 * 24;
@@ -487,8 +544,14 @@ public class SeedFinder {
 			blacklist = Arrays.asList();
 		}
 
+		if (Options.logTrinkets) {
+			ArrayList<HeapItem> trinkets = getTrinkets();
+			StringBuilder builder = new StringBuilder();
+			addTextItems("Trinkets", trinkets, builder, "\n");
+			log[0] += builder.toString();
+		}
+
 		for (int i = 0; i < floors; i++) {
-			log[i] = "";
 
 			Level l = Dungeon.newLevel();
 			ArrayList<Heap> heaps = new ArrayList<>(l.heaps.valueList());
@@ -599,6 +662,26 @@ public class SeedFinder {
 				}
 
 				addTextQuest("Wandmaker quest rewards", rewards, builder);
+			}
+
+			if (Blacksmith.Quest.type != 0) {
+				builder.append("Blacksmith quest: ");
+				switch (Blacksmith.Quest.type) {
+					case 0:
+						builder.append("old (pre-2.3)");
+						break;
+					case 1:
+						builder.append("crystal cave");
+						break;
+					case 2:
+						builder.append("gnoll geomancer");
+						break;
+					case 3:
+						builder.append("fungus monster");
+						break;
+				}
+				builder.append("\n\n");
+				Blacksmith.Quest.type = 0;
 			}
 
 			if (Imp.Quest.reward != null) {

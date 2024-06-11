@@ -43,7 +43,6 @@ import com.shatteredpixel.shatteredpixeldungeon.ui.Window;
 import com.watabou.input.ControllerHandler;
 import com.watabou.noosa.ColorBlock;
 import com.watabou.noosa.Game;
-import com.watabou.noosa.Image;
 import com.watabou.noosa.audio.Sample;
 import com.watabou.noosa.ui.Component;
 import com.watabou.utils.DeviceCompat;
@@ -275,6 +274,7 @@ public class WndSettings extends WndTabbed {
 					ShatteredPixelDungeon.scene().addToFront(new Window() {
 						RenderedTextBlock barDesc;
 
+						CheckBox chkTrinkets;
 						CheckBox chkEquipment;
 						CheckBox chkScrolls;
 						CheckBox chkPotions;
@@ -284,12 +284,26 @@ public class WndSettings extends WndTabbed {
 						CheckBox chkMisc;
 
 						ColorBlock sep2;
+						ColorBlock sep3;
 						CheckBox chkRooms;
 						CheckBox chkBlacklist;
 
 						{
 							barDesc = PixelScene.renderTextBlock(Messages.get(WndSettings.SeedfinderTab.this, "logging_options"), 6);
 							add(barDesc);
+
+							sep2 = new ColorBlock(1, 1, 0xFF000000);
+							add(sep2);
+
+							chkTrinkets = new CheckBox(Messages.get(WndSettings.SeedfinderTab.this, "trinkets")){
+								@Override
+								protected void onClick() {
+									super.onClick();
+									SPDSettings.logTrinkets(checked());
+								}
+							};
+							chkTrinkets.checked(SPDSettings.logTrinkets());
+							add(chkTrinkets);
 
 							chkEquipment = new CheckBox(Messages.get(WndSettings.SeedfinderTab.this, "equipment")){
 								@Override
@@ -361,8 +375,8 @@ public class WndSettings extends WndTabbed {
 							chkMisc.checked(SPDSettings.logMisc());
 							add(chkMisc);
 
-							sep2 = new ColorBlock(1, 1, 0xFF000000);
-							add(sep2);
+							sep3 = new ColorBlock(1, 1, 0xFF000000);
+							add(sep3);
 
 							chkRooms = new CheckBox(Messages.get(WndSettings.SeedfinderTab.this, "use_rooms")){
 								@Override
@@ -390,7 +404,11 @@ public class WndSettings extends WndTabbed {
 							barDesc.setPos((width - barDesc.width()) / 2f, GAP);
 							PixelScene.align(barDesc);
 
-							chkEquipment.setRect(0, barDesc.bottom() + GAP, width, BTN_HEIGHT);
+							sep2.size(width, 1);
+							sep2.y = barDesc.bottom() + GAP;
+
+							chkTrinkets.setRect(0, sep2.y + 1 + GAP, width, BTN_HEIGHT);
+							chkEquipment.setRect(0, chkTrinkets.bottom() + GAP, width, BTN_HEIGHT);
 							chkScrolls.setRect(0, chkEquipment.bottom() + GAP, width, BTN_HEIGHT);
 							chkPotions.setRect(0, chkScrolls.bottom() + GAP, width, BTN_HEIGHT);
 							chkRings.setRect(0, chkPotions.bottom() + GAP, width, BTN_HEIGHT);
@@ -398,10 +416,10 @@ public class WndSettings extends WndTabbed {
 							chkArtifacts.setRect(0, chkWands.bottom() + GAP, width, BTN_HEIGHT);
 							chkMisc.setRect(0, chkArtifacts.bottom() + GAP, width, BTN_HEIGHT);
 
-							sep2.size(width, 1);
-							sep2.y = chkMisc.bottom() + GAP;
+							sep3.size(width, 1);
+							sep3.y = chkMisc.bottom() + GAP;
 
-							chkRooms.setRect(0, sep2.y + 1 + GAP, width, BTN_HEIGHT);
+							chkRooms.setRect(0, sep3.y + 1 + GAP, width, BTN_HEIGHT);
 							chkBlacklist.setRect(0, chkRooms.bottom() + GAP, width, BTN_HEIGHT);
 
 							resize(WIDTH_P, (int)chkBlacklist.bottom());
