@@ -119,6 +119,9 @@ public enum Catalog {
 		}
 		return false;
 	}
+
+	public static void countUse(Class<?> c) {}
+	public static void countUses(Class<?> c, int i) {}
 	
 	public static void setSeen(Class<? extends Item> itemClass){
 		for (Catalog cat : values()) {
@@ -127,7 +130,7 @@ public enum Catalog {
 				Journal.saveNeeded = true;
 			}
 		}
-		Badges.validateItemsIdentified();
+		// Badges.validateItemsIdentified();
 	}
 	
 	private static final String CATALOG_ITEMS = "catalog_items";
