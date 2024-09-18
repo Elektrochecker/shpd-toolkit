@@ -107,6 +107,7 @@ public class AlchemyScene extends PixelScene {
 	private boolean energyAddBlinking = false;
 
 	private static boolean splitAlchGuide = false;
+	// private WndJournal.AlchemyTab alchGuide = null;
 	private static int centerW;
 
 	private static final int BTN_SIZE	= 28;
@@ -648,6 +649,10 @@ public class AlchemyScene extends PixelScene {
 
 		energyAddBlinking = promptToAddEnergy;
 
+		// if (alchGuide != null){
+		// 	alchGuide.updateList();
+		// }
+
 	}
 	
 	private void combine( int slot ){
@@ -721,6 +726,10 @@ public class AlchemyScene extends PixelScene {
 				}
 			}
 		}
+
+		// if (alchGuide != null){
+		// 	alchGuide.updateList();
+		// }
 	}
 
 	public void craftItem( ArrayList<Item> ingredients, Item result ){
@@ -819,6 +828,9 @@ public class AlchemyScene extends PixelScene {
 		}
 		cancel.enable(false);
 		repeat.enable(lastRecipe != null);
+		// if (alchGuide != null){
+		// 	alchGuide.updateList();
+		// }
 	}
 
 	public void createEnergy(){
