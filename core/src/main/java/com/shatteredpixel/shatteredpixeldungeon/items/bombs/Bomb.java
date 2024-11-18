@@ -28,7 +28,6 @@ import com.shatteredpixel.shatteredpixeldungeon.SPDSettings;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
-import com.shatteredpixel.shatteredpixeldungeon.effects.Beam;
 import com.shatteredpixel.shatteredpixeldungeon.effects.CellEmitter;
 import com.shatteredpixel.shatteredpixeldungeon.effects.particles.BlastParticle;
 import com.shatteredpixel.shatteredpixeldungeon.effects.particles.SmokeParticle;
@@ -240,12 +239,13 @@ public class Bomb extends Item {
 	
 	@Override
 	public String desc() {
-		int depth = Dungeon.depth == -1 ? 1 : Dungeon.depth;
+		int depth = Dungeon.hero == null ? 1 : Dungeon.scalingDepth();
 		String desc = Messages.get(this, "desc", 4+depth, 12+3*depth);
-		if (fuse == null)
+		if (fuse == null) {
 			return desc + "\n\n" + Messages.get(this, "desc_fuse");
-		else
+		} else {
 			return desc + "\n\n" + Messages.get(this, "desc_burning");
+		}
 	}
 
 	private static final String FUSE = "fuse";
