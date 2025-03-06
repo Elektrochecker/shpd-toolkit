@@ -23,6 +23,7 @@ package com.shatteredpixel.shatteredpixeldungeon.items;
 
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.Armor;
+import com.shatteredpixel.shatteredpixeldungeon.items.armor.ClericArmor;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.ClothArmor;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.DuelistArmor;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.HuntressArmor;
@@ -39,6 +40,7 @@ import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.ChaliceOfBlood;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.CloakOfShadows;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.DriedRose;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.EtherealChains;
+import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.HolyTome;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.HornOfPlenty;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.MasterThievesArmband;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.SandalsOfNature;
@@ -141,6 +143,7 @@ import com.shatteredpixel.shatteredpixeldungeon.items.wands.WandOfWarding;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.AssassinsBlade;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.BattleAxe;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.Crossbow;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.Cudgel;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.Dagger;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.Dirk;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.Flail;
@@ -414,9 +417,10 @@ public class Generator {
 					MagesStaff.class,
 					Dagger.class,
 					Gloves.class,
-					Rapier.class
+					Rapier.class,
+					Cudgel.class,
 			};
-			WEP_T1.defaultProbs = new float[]{ 2, 0, 2, 2, 2 };
+			WEP_T1.defaultProbs = new float[]{ 2, 0, 2, 2, 2, 2 };
 			WEP_T1.probs = WEP_T1.defaultProbs.clone();
 			
 			WEP_T2.classes = new Class<?>[]{
@@ -477,9 +481,10 @@ public class Generator {
 					MageArmor.class,
 					RogueArmor.class,
 					HuntressArmor.class,
-					DuelistArmor.class
+					DuelistArmor.class,
+					ClericArmor.class
 			};
-			ARMOR.probs = new float[]{ 1, 1, 1, 1, 1, 0, 0, 0, 0, 0 };
+			ARMOR.probs = new float[]{ 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0 };
 			
 			//see Generator.randomMissile
 			MISSILE.classes = new Class<?>[]{};
@@ -555,6 +560,7 @@ public class Generator {
 					CloakOfShadows.class,
 					DriedRose.class,
 					EtherealChains.class,
+					HolyTome.class,
 					HornOfPlenty.class,
 					MasterThievesArmband.class,
 					SandalsOfNature.class,
@@ -562,7 +568,7 @@ public class Generator {
 					TimekeepersHourglass.class,
 					UnstableSpellbook.class
 			};
-			ARTIFACT.defaultProbs = new float[]{ 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1 };
+			ARTIFACT.defaultProbs = new float[]{ 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1 };
 			ARTIFACT.probs = ARTIFACT.defaultProbs.clone();
 
 			//Trinkets are unique like artifacts, but unlike them you can only have one at once
@@ -740,7 +746,19 @@ public class Generator {
 		} else if (cat.defaultProbsTotal != null){
 			return ((Item) Reflection.newInstance(cat.classes[Random.chances(cat.defaultProbsTotal)])).random();
 		} else {
-			return ((Item) Reflection.newInstance(cat.classes[Random.chances(cat.defaultProbs)])).random();
+			Class<?> itemCls = cat.classes[Random.chances(cat.defaultProbs)];
+
+			if (ExoticPotion.regToExo.containsKey(itemCls)){
+				if (Random.Float() < ExoticCrystals.consumableExoticChance()){
+					itemCls = ExoticPotion.regToExo.get(itemCls);
+				}
+			} else if (ExoticScroll.regToExo.containsKey(itemCls)){
+				if (Random.Float() < ExoticCrystals.consumableExoticChance()){
+					itemCls = ExoticScroll.regToExo.get(itemCls);
+				}
+			}
+
+			return ((Item) Reflection.newInstance(itemCls)).random();
 		}
 	}
 	
@@ -927,6 +945,22 @@ public class Generator {
 					cat.seed = bundle.getLong(cat.name().toLowerCase() + CATEGORY_SEED);
 					cat.dropped = bundle.getInt(cat.name().toLowerCase() + CATEGORY_DROPPED);
 				}
+
+				//pre-v3.0.0 conversion for artifacts specifically
+				if (cat == Category.ARTIFACT && probs.length != cat.defaultProbs.length){
+					int tomeIDX = 5;
+					int j = 0;
+					for (int i = 0; i < probs.length; i++){
+						if (i == tomeIDX){
+							cat.probs[j] = 0;
+							j++;
+						}
+						cat.probs[j] = probs[i];
+						j++;
+					}
+
+				}
+
 			}
 		}
 		

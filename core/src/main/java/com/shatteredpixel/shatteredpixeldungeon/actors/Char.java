@@ -75,11 +75,18 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Vertigo;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Vulnerable;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Weakness;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.HeroClass;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.HeroSubClass;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.cleric.PowerOfMany;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.duelist.Challenge;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.rogue.DeathMark;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.warrior.Endure;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.spells.AuraOfProtection;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.spells.BeamingRay;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.spells.GuidingLight;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.spells.LifeLinkSpell;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.spells.ShieldOfLight;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Brute;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.CrystalSpire;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.DwarfKing;
@@ -93,8 +100,14 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.npcs.PrismaticImage;
 import com.shatteredpixel.shatteredpixeldungeon.effects.FloatingText;
 import com.shatteredpixel.shatteredpixeldungeon.effects.particles.ShadowParticle;
 import com.shatteredpixel.shatteredpixeldungeon.items.Heap;
+import com.shatteredpixel.shatteredpixeldungeon.items.armor.Armor;
+import com.shatteredpixel.shatteredpixeldungeon.items.armor.curses.Bulk;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.glyphs.AntiMagic;
+import com.shatteredpixel.shatteredpixeldungeon.items.armor.glyphs.Brimstone;
+import com.shatteredpixel.shatteredpixeldungeon.items.armor.glyphs.Flow;
+import com.shatteredpixel.shatteredpixeldungeon.items.armor.glyphs.Obfuscation;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.glyphs.Potential;
+import com.shatteredpixel.shatteredpixeldungeon.items.armor.glyphs.Swiftness;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.glyphs.Viscosity;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.DriedRose;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.TimekeepersHourglass;
@@ -132,6 +145,7 @@ import com.shatteredpixel.shatteredpixeldungeon.plants.Swiftthistle;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.CharSprite;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.MobSprite;
+import com.shatteredpixel.shatteredpixeldungeon.ui.TargetHealthIndicator;
 import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
 import com.watabou.noosa.audio.Sample;
 import com.watabou.utils.BArray;
@@ -399,11 +413,30 @@ public abstract class Char extends Actor {
 			//flat damage bonus is affected by multipliers
 			dmg += dmgBonus;
 
+			if (enemy.buff(GuidingLight.Illuminated.class) != null){
+				enemy.buff(GuidingLight.Illuminated.class).detach();
+				if (this == Dungeon.hero && Dungeon.hero.hasTalent(Talent.SEARING_LIGHT)){
+					dmg += 2 + 2*Dungeon.hero.pointsInTalent(Talent.SEARING_LIGHT);
+				}
+				if (this != Dungeon.hero && Dungeon.hero.subClass == HeroSubClass.PRIEST){
+					enemy.damage(Dungeon.hero.lvl, GuidingLight.INSTANCE);
+				}
+			}
+
 			Berserk berserk = buff(Berserk.class);
 			if (berserk != null) dmg = berserk.damageFactor(dmg);
 
 			if (buff( Fury.class ) != null) {
 				dmg *= 1.5f;
+			}
+
+			if (buff( PowerOfMany.PowerBuff.class) != null){
+				if (buff( BeamingRay.BeamingRayBoost.class) != null
+					&& buff( BeamingRay.BeamingRayBoost.class).object == enemy.id()){
+					dmg *= 1.3f + 0.05f*Dungeon.hero.pointsInTalent(Talent.BEAMING_RAY);
+				} else {
+					dmg *= 1.25f;
+				}
 			}
 
 			for (ChampionEnemy buff : buffs(ChampionEnemy.class)){
@@ -424,6 +457,12 @@ public abstract class Char extends Actor {
 
 			if (enemy.buff(ScrollOfChallenge.ChallengeArena.class) != null){
 				dmg *= 0.67f;
+			}
+
+			if (Dungeon.hero.alignment == enemy.alignment
+					&& Dungeon.hero.buff(AuraOfProtection.AuraBuff.class) != null
+					&& (Dungeon.level.distance(enemy.pos, Dungeon.hero.pos) <= 2 || enemy.buff(LifeLinkSpell.LifeLinkSpellBuff.class) != null)){
+				dmg *= 0.925f - 0.075f*Dungeon.hero.pointsInTalent(Talent.AURA_OF_PROTECTION);
 			}
 
 			if (enemy.buff(MonkEnergy.MonkAbility.Meditate.MeditateResistance.class) != null){
@@ -598,6 +637,12 @@ public abstract class Char extends Actor {
 			acuRoll *= buff.evasionAndAccuracyFactor();
 		}
 		acuRoll *= AscensionChallenge.statModifier(attacker);
+		if (Dungeon.hero.heroClass != HeroClass.CLERIC
+				&& Dungeon.hero.hasTalent(Talent.BLESS)
+				&& attacker.alignment == Alignment.ALLY){
+			// + 3%/5%
+			acuRoll *= 1.01f + 0.02f*Dungeon.hero.pointsInTalent(Talent.BLESS);
+		}
 		
 		float defRoll = Random.Float( defStat );
 		if (defender.buff(Bless.class) != null) defRoll *= 1.25f;
@@ -607,6 +652,12 @@ public abstract class Char extends Actor {
 			defRoll *= buff.evasionAndAccuracyFactor();
 		}
 		defRoll *= AscensionChallenge.statModifier(defender);
+		if (Dungeon.hero.heroClass != HeroClass.CLERIC
+				&& Dungeon.hero.hasTalent(Talent.BLESS)
+				&& defender.alignment == Alignment.ALLY){
+			// + 3%/5%
+			defRoll *= 1.01f + 0.02f*Dungeon.hero.pointsInTalent(Talent.BLESS);
+		}
 		
 		return (acuRoll * accMulti) >= defRoll;
 	}
@@ -652,7 +703,44 @@ public abstract class Char extends Actor {
 			damage = armor.absorb( damage );
 		}
 
+		ShieldOfLight.ShieldOfLightTracker shield = buff( ShieldOfLight.ShieldOfLightTracker.class);
+		if (shield != null && shield.object == enemy.id()){
+			int min = 1 + Dungeon.hero.pointsInTalent(Talent.SHIELD_OF_LIGHT);
+			damage -= Random.NormalIntRange(min, 2*min);
+			damage = Math.max(damage, 0);
+		} else if (this == Dungeon.hero
+				&& Dungeon.hero.heroClass != HeroClass.CLERIC
+				&& Dungeon.hero.hasTalent(Talent.SHIELD_OF_LIGHT)
+				&& TargetHealthIndicator.instance.target() == enemy){
+			//33/50%
+			if (Random.Int(6) < 1+Dungeon.hero.pointsInTalent(Talent.SHIELD_OF_LIGHT)){
+				damage -= 1;
+			}
+		}
+
+		// hero and pris images skip this as they already benefit from hero's armor glyph proc
+		if (!(this instanceof Hero || this instanceof PrismaticImage)) {
+			if (Dungeon.hero.alignment == alignment && Dungeon.hero.belongings.armor() != null
+					&& Dungeon.hero.buff(AuraOfProtection.AuraBuff.class) != null
+					&& (Dungeon.level.distance(pos, Dungeon.hero.pos) <= 2 || buff(LifeLinkSpell.LifeLinkSpellBuff.class) != null)) {
+				damage = Dungeon.hero.belongings.armor().proc( enemy, this, damage );
+			}
+		}
+
 		return damage;
+	}
+
+	//Returns the level a glyph is at for a char, or -1 if they are not benefitting from that glyph
+	//This function is needed as (unlike enchantments) many glyphs trigger in a variety of cases
+	public int glyphLevel(Class<? extends Armor.Glyph> cls){
+		if (Dungeon.hero != null && Dungeon.level != null
+				&& this != Dungeon.hero && Dungeon.hero.alignment == alignment
+				&& Dungeon.hero.buff(AuraOfProtection.AuraBuff.class) != null
+				&& (Dungeon.level.distance(pos, Dungeon.hero.pos) <= 2 || buff(LifeLinkSpell.LifeLinkSpellBuff.class) != null)) {
+			return Dungeon.hero.glyphLevel(cls);
+		} else {
+			return -1;
+		}
 	}
 	
 	public float speed() {
@@ -662,6 +750,11 @@ public abstract class Char extends Actor {
 		if ( buff( Adrenaline.class ) != null) speed *= 2f;
 		if ( buff( Haste.class ) != null) speed *= 3f;
 		if ( buff( Dread.class ) != null) speed *= 2f;
+
+		speed *= Swiftness.speedBoost(this, glyphLevel(Swiftness.class));
+		speed *= Flow.speedBoost(this, glyphLevel(Flow.class));
+		speed *= Bulk.speedBoost(this, glyphLevel(Bulk.class));
+
 		return speed;
 	}
 
@@ -698,7 +791,7 @@ public abstract class Char extends Actor {
 			return;
 		}
 
-		if (!(src instanceof LifeLink) && buff(LifeLink.class) != null){
+		if (!(src instanceof LifeLink || src instanceof Hunger) && buff(LifeLink.class) != null){
 			HashSet<LifeLink> links = buffs(LifeLink.class);
 			for (LifeLink link : links.toArray(new LifeLink[0])){
 				if (Actor.findById(link.object) == null){
@@ -715,6 +808,26 @@ public abstract class Char extends Actor {
 						link.detach();
 					}
 				}
+			}
+		}
+
+		//temporarily assign to a float to avoid rounding a bunch
+		float damage = dmg;
+
+		//if dmg is from a character we already reduced it in defenseProc
+		if (!(src instanceof Char)) {
+			if (Dungeon.hero.alignment == alignment
+					&& Dungeon.hero.buff(AuraOfProtection.AuraBuff.class) != null
+					&& (Dungeon.level.distance(pos, Dungeon.hero.pos) <= 2 || buff(LifeLinkSpell.LifeLinkSpellBuff.class) != null)) {
+				damage *= 0.925f - 0.075f*Dungeon.hero.pointsInTalent(Talent.AURA_OF_PROTECTION);
+			}
+		}
+
+		if (buff(PowerOfMany.PowerBuff.class) != null){
+			if (buff(LifeLinkSpell.LifeLinkSpellBuff.class) != null){
+				damage *= 0.70f - 0.05f*Dungeon.hero.pointsInTalent(Talent.LIFE_LINK);
+			} else {
+				damage *= 0.75f;
 			}
 		}
 
@@ -737,10 +850,10 @@ public abstract class Char extends Actor {
 			Buff.detach(this, MagicalSleep.class);
 		}
 		if (this.buff(Doom.class) != null && !isImmune(Doom.class)){
-			dmg *= 1.67f;
+			damage *= 1.67f;
 		}
 		if (alignment != Alignment.ALLY && this.buff(DeathMark.DeathMarkTracker.class) != null){
-			dmg *= 1.25f;
+			damage *= 1.25f;
 		}
 
 		if (buff(Sickle.HarvestBleedTracker.class) != null){
@@ -759,20 +872,27 @@ public abstract class Char extends Actor {
 			}
 		}
 
+		Class<?> srcClass = src.getClass();
+		if (isImmune( srcClass )) {
+			damage = 0;
+		} else {
+			damage *= resist( srcClass );
+		}
+
+		dmg = Math.round(damage);
+
+		//we ceil these specifically to favor the player vs. champ dmg reduction
+		// most important vs. giant champions in the earlygame
 		for (ChampionEnemy buff : buffs(ChampionEnemy.class)){
 			dmg = (int) Math.ceil(dmg * buff.damageTakenFactor());
 		}
-
-		Class<?> srcClass = src.getClass();
-		if (isImmune( srcClass )) {
-			dmg = 0;
-		} else {
-			dmg = Math.round( dmg * resist( srcClass ));
-		}
 		
 		//TODO improve this when I have proper damage source logic
-		if (AntiMagic.RESISTS.contains(src.getClass()) && buff(ArcaneArmor.class) != null){
-			dmg -= Random.NormalIntRange(0, buff(ArcaneArmor.class).level());
+		if (AntiMagic.RESISTS.contains(src.getClass())){
+			dmg -= AntiMagic.drRoll(this, glyphLevel(AntiMagic.class));
+			if (buff(ArcaneArmor.class) != null) {
+				dmg -= Random.NormalIntRange(0, buff(ArcaneArmor.class).level());
+			}
 			if (dmg < 0) dmg = 0;
 		}
 		
@@ -838,6 +958,12 @@ public abstract class Char extends Actor {
 					&& Dungeon.hero.subClass == HeroSubClass.SNIPER
 					&& !Dungeon.level.adjacent(Dungeon.hero.pos, pos)
 					&& Dungeon.hero.belongings.attackingWeapon() instanceof MissileWeapon){
+				icon = FloatingText.PHYS_DMG_NO_BLOCK;
+			}
+
+			//special case for monk using unarmed abilities
+			if (src == Dungeon.hero
+					&& Dungeon.hero.buff(MonkEnergy.MonkAbility.UnarmedAbilityTracker.class) != null){
 				icon = FloatingText.PHYS_DMG_NO_BLOCK;
 			}
 
@@ -1071,7 +1197,11 @@ public abstract class Char extends Actor {
 	}
 	
 	public float stealth() {
-		return 0;
+		float stealth = 0;
+
+		stealth += Obfuscation.stealthBoost(this, glyphLevel(Obfuscation.class));
+
+		return stealth;
 	}
 
 	public final void move( int step ) {
@@ -1161,6 +1291,9 @@ public abstract class Char extends Actor {
 		}
 		for (Buff b : buffs()){
 			immunes.addAll(b.immunities());
+		}
+		if (glyphLevel(Brimstone.class) >= 0){
+			immunes.add(Burning.class);
 		}
 		
 		for (Class c : immunes){

@@ -7,10 +7,7 @@ buildscript {
         }
     }
     dependencies {
-        //gradle version packaged with AGP 8.5 causes crashes on Android 4.4-
-        //this won't be needed once the bundled R8 version is 8.7.11+ (should happen with AGP 8.6)
-        classpath 'com.android.tools:r8:8.7.11'
-        classpath 'com.android.tools.build:gradle:8.5.2'
+        classpath 'com.android.tools.build:gradle:8.7.1'
     }
 }
 
@@ -20,12 +17,12 @@ allprojects {
         appName = 'SHPD toolkit'
         appPackageName = 'com.elektrochecker.shatteredtoolkit'
 
-        appVersionCode = 802
-        appVersionName = '2.5.4 - 1.2'
+        appVersionCode = 831
+        appVersionName = '3.0.0 - 1.2'
 
         appJavaCompatibility = JavaVersion.VERSION_1_8
 
-        appAndroidCompileSDK = 33 //compile SDK is still 33 atm as we're sticking with AGP 8.0.2
+        appAndroidCompileSDK = 34
         appAndroidMinSDK = 14
         appAndroidTargetSDK = 34
 

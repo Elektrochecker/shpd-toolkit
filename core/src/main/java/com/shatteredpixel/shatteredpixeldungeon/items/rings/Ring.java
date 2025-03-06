@@ -23,12 +23,14 @@ package com.shatteredpixel.shatteredpixeldungeon.items.rings;
 
 import com.shatteredpixel.shatteredpixeldungeon.Badges;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
+import com.shatteredpixel.shatteredpixeldungeon.Statistics;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.EnhancedRings;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.MagicImmune;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.spells.SpiritForm;
 import com.shatteredpixel.shatteredpixeldungeon.items.Generator;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
 import com.shatteredpixel.shatteredpixeldungeon.items.ItemStatusHandler;
@@ -49,6 +51,7 @@ import java.util.LinkedHashMap;
 public class Ring extends KindofMisc {
 	
 	protected Buff buff;
+	protected Class<? extends RingBuff> buffClass;
 
 	private static final LinkedHashMap<String, Integer> gems = new LinkedHashMap<String, Integer>() {
 		{
@@ -161,6 +164,7 @@ public class Ring extends KindofMisc {
 
 			if (Dungeon.hero.isAlive()) {
 				Catalog.setSeen(getClass());
+				Statistics.itemTypesDiscovered.add(getClass());
 			}
 		}
 	}
@@ -258,6 +262,10 @@ public class Ring extends KindofMisc {
 		return super.identify(byHero);
 	}
 
+	public void setIDReady(){
+		levelsToID = -1;
+	}
+
 	public boolean readyToIdentify(){
 		return !isIdentified() && levelsToID <= 0;
 	}
@@ -343,7 +351,7 @@ public class Ring extends KindofMisc {
 				if (levelsToID > -1){
 					GLog.p(Messages.get(ShardOfOblivion.class, "identify_ready"), name());
 				}
-				levelsToID = -1;
+				setIDReady();
 			} else {
 				identify();
 				GLog.p(Messages.get(Ring.class, "identify"));
@@ -367,6 +375,13 @@ public class Ring extends KindofMisc {
 		for (RingBuff buff : target.buffs(type)) {
 			bonus += buff.level();
 		}
+		SpiritForm.SpiritFormBuff spiritForm = target.buff(SpiritForm.SpiritFormBuff.class);
+		if (bonus == 0
+				&& spiritForm != null
+				&& spiritForm.ring() != null
+				&& spiritForm.ring().buffClass == type){
+			bonus += spiritForm.ring().soloBonus();
+		}
 		return bonus;
 	}
 
@@ -375,6 +390,12 @@ public class Ring extends KindofMisc {
 		int bonus = 0;
 		for (RingBuff buff : target.buffs(type)) {
 			bonus += buff.buffedLvl();
+		}
+		if (bonus == 0
+				&& target.buff(SpiritForm.SpiritFormBuff.class) != null
+				&& target.buff(SpiritForm.SpiritFormBuff.class).ring() != null
+				&& target.buff(SpiritForm.SpiritFormBuff.class).ring().buffClass == type){
+			bonus += target.buff(SpiritForm.SpiritFormBuff.class).ring().soloBuffedBonus();
 		}
 		return bonus;
 	}

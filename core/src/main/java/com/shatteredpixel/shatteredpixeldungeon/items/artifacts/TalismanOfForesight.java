@@ -135,7 +135,7 @@ public class TalismanOfForesight extends Artifact {
 		return Math.min(5 + 2*level(), (charge-3)/1.08f);
 	}
 
-	private CellSelector.Listener scry = new CellSelector.Listener(){
+	public CellSelector.Listener scry = new CellSelector.Listener(){
 
 		@Override
 		public void onSelect(Integer target) {
@@ -189,6 +189,8 @@ public class TalismanOfForesight extends Artifact {
 					Char ch = Actor.findChar(cell);
 					if (ch != null && ch.alignment != Char.Alignment.NEUTRAL && ch.alignment != curUser.alignment){
 						Buff.append(curUser, CharAwareness.class, 5 + 2*level()).charID = ch.id();
+
+						artifactProc(ch, visiblyUpgraded(), (int)(3 + dist*1.08f));
 
 						if (!curUser.fieldOfView[ch.pos]){
 							earnedExp += 10;

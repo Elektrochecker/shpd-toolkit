@@ -99,9 +99,15 @@ public class WndJournal extends WndTabbed {
 // 	private CatalogTab catalogTab;
 // 	private BadgesTab badgesTab;
 	
-// 	public static int last_index = 0;
+	// public static int last_index = 0;
+
+	// private static WndJournal INSTANCE = null;
 	
-// 	public WndJournal(){
+	// public WndJournal(){
+
+	// 	if (INSTANCE != null){
+	// 		INSTANCE.hide();
+	// 	}
 		
 // 		int width = PixelScene.landscape() ? WIDTH_L : WIDTH_P;
 // 		int height = PixelScene.landscape() ? HEIGHT_L : HEIGHT_P;
@@ -201,8 +207,10 @@ public class WndJournal extends WndTabbed {
 		
 // 		layoutTabs();
 		
-// 		select(last_index);
-// 	}
+	// 	select(last_index);
+
+	// 	INSTANCE = this;
+	// }
 
 // 	@Override
 // 	public boolean onSignal(KeyEvent event) {
@@ -756,19 +764,19 @@ public class WndJournal extends WndTabbed {
 // 					}
 // 				}
 
-// 				sprite = new ItemSprite(item.image, seen ? item.glowing() : null);
-// 				if (!seen)  {
-// 					sprite.lightness(0);
-// 					title = "???";
-// 					desc = Messages.get(CatalogTab.class, "not_seen_item");
-// 				} else {
-// 					title = Messages.titleCase(item.trueName());
-// 					//some items don't include direct stats, generally when they're not applicable
-// 					if (item instanceof ClassArmor || item instanceof SpiritBow){
-// 						desc += item.desc();
-// 					} else {
-// 						desc += item.info();
-// 					}
+				// sprite = new ItemSprite(item.image, seen ? item.glowing() : null);
+				// if (!seen)  {
+				// 	sprite.lightness(0);
+				// 	title = "???";
+				// 	desc = Messages.get(CatalogTab.class, "not_seen_item");
+				// } else {
+				// 	title = Messages.titleCase( item.name() );
+				// 	//some items don't include direct stats, generally when they're not applicable
+				// 	if (item instanceof ClassArmor || item instanceof SpiritBow){
+				// 		desc += item.desc();
+				// 	} else {
+				// 		desc += item.info();
+				// 	}
 
 // 					if (Catalog.useCount(itemClass) > 1) {
 // 						if (item.isUpgradable() || item instanceof Artifact) {

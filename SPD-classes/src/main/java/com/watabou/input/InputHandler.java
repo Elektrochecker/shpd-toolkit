@@ -130,7 +130,18 @@ public class InputHandler extends InputAdapter {
 		}
 		return true;
 	}
-	
+
+	@Override
+	public boolean touchCancelled(int screenX, int screenY, int pointer, int button) {
+
+		if (button >= 3 && KeyBindings.isKeyBound( button + 1000 )) {
+			KeyEvent.addKeyEvent( new KeyEvent( button + 1000, false ) );
+		} else if (button < 3) {
+			PointerEvent.addPointerEvent(new PointerEvent(screenX, screenY, pointer, PointerEvent.Type.CANCEL, button));
+		}
+		return true;
+	}
+
 	@Override
 	public synchronized boolean touchDragged(int screenX, int screenY, int pointer) {
 		PointerEvent.addIfExisting(new PointerEvent(screenX, screenY, pointer, PointerEvent.Type.DOWN));
