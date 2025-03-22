@@ -814,7 +814,9 @@ public enum Talent {
 					removed = true;
 				}
 			}
-			if (removed) new Flare( 6, 32 ).color(0xFF4CD2, true).show( Dungeon.hero.sprite, 2f );
+			if (removed && Dungeon.hero.sprite != null) {
+				new Flare( 6, 32 ).color(0xFF4CD2, true).show( Dungeon.hero.sprite, 2f );
+			}
 		}
 	}
 
@@ -1149,27 +1151,12 @@ public enum Talent {
 		//v2.4.0
 		removedTalents.add("TEST_SUBJECT");
 		removedTalents.add("TESTED_HYPOTHESIS");
-		//v2.2.0
-		removedTalents.add("EMPOWERING_SCROLLS");
 	}
 
 	private static final HashMap<String, String> renamedTalents = new HashMap<>();
 	static{
 		//v2.4.0
 		renamedTalents.put("SECONDARY_CHARGE",          "VARIED_CHARGE");
-
-		//v2.2.0
-		renamedTalents.put("RESTORED_WILLPOWER",        "LIQUID_WILLPOWER");
-		renamedTalents.put("ENERGIZING_UPGRADE",        "INSCRIBED_POWER");
-		renamedTalents.put("MYSTICAL_UPGRADE",          "INSCRIBED_STEALTH");
-		renamedTalents.put("RESTORED_NATURE",           "LIQUID_NATURE");
-		renamedTalents.put("RESTORED_AGILITY",          "LIQUID_AGILITY");
-		//v2.1.0
-		renamedTalents.put("LIGHTWEIGHT_CHARGE",        "PRECISE_ASSAULT");
-		//v2.0.0 BETA
-		renamedTalents.put("LIGHTLY_ARMED",             "UNENCUMBERED_SPIRIT");
-		//v2.0.0
-		renamedTalents.put("ARMSMASTERS_INTUITION",     "VETERANS_INTUITION");
 	}
 
 	public static void restoreTalentsFromBundle( Bundle bundle, Hero hero ){
