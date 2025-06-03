@@ -3,7 +3,7 @@
  * Copyright (C) 2012-2015 Oleg Dolya
  *
  * Shattered Pixel Dungeon
- * Copyright (C) 2014-2024 Evan Debenham
+ * Copyright (C) 2014-2025 Evan Debenham
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,9 +39,11 @@ import com.shatteredpixel.shatteredpixeldungeon.items.armor.Armor;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.ClassArmor;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.Artifact;
 import com.shatteredpixel.shatteredpixeldungeon.items.potions.Potion;
+import com.shatteredpixel.shatteredpixeldungeon.items.potions.exotic.ExoticPotion;
 import com.shatteredpixel.shatteredpixeldungeon.items.rings.Ring;
 import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.Scroll;
 import com.shatteredpixel.shatteredpixeldungeon.items.trinkets.Trinket;
+import com.shatteredpixel.shatteredpixeldungeon.items.wands.WandOfRegrowth;
 import com.shatteredpixel.shatteredpixeldungeon.items.wands.WandOfWarding;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.SpiritBow;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.Weapon;
@@ -497,18 +499,18 @@ public class WndJournal extends WndTabbed {
 // 			if (!customRecs.isEmpty()){
 // 				grid.addHeader("_" + Messages.get(this, "custom_notes") + "_ (" + customRecs.size() + "/" + Notes.customRecordLimit() + ")");
 
-// 				for (Notes.CustomRecord rec : customRecs){
-// 					ScrollingGridPane.GridItem gridItem = new ScrollingGridPane.GridItem(rec.icon()){
-// 						@Override
-// 						public boolean onClick(float x, float y) {
-// 							if (inside(x, y)) {
-// 								GameScene.show(new CustomNoteButton.CustomNoteWindow(rec));
-// 								return true;
-// 							} else {
-// 								return false;
-// 							}
-// 						}
-// 					};
+				// for (Notes.CustomRecord rec : customRecs){
+				// 	ScrollingGridPane.GridItem gridItem = new ScrollingGridPane.GridItem(rec.icon()){
+				// 		@Override
+				// 		public boolean onClick(float x, float y) {
+				// 			if (inside(x, y)) {
+				// 				GameScene.show(new CustomNoteButton.CustomNoteWindow(rec, WndJournal.INSTANCE));
+				// 				return true;
+				// 			} else {
+				// 				return false;
+				// 			}
+				// 		}
+				// 	};
 
 // 					Visual secondIcon = rec.secondIcon();
 // 					if (secondIcon != null){
@@ -764,50 +766,54 @@ public class WndJournal extends WndTabbed {
 // 					}
 // 				}
 
-				// sprite = new ItemSprite(item.image, seen ? item.glowing() : null);
-				// if (!seen)  {
-				// 	sprite.lightness(0);
-				// 	title = "???";
-				// 	desc = Messages.get(CatalogTab.class, "not_seen_item");
-				// } else {
-				// 	title = Messages.titleCase( item.name() );
-				// 	//some items don't include direct stats, generally when they're not applicable
-				// 	if (item instanceof ClassArmor || item instanceof SpiritBow){
-				// 		desc += item.desc();
-				// 	} else {
-				// 		desc += item.info();
-				// 	}
-
-// 					if (Catalog.useCount(itemClass) > 1) {
-// 						if (item.isUpgradable() || item instanceof Artifact) {
-// 							desc += "\n\n" + Messages.get(CatalogTab.class, "upgrade_count", Catalog.useCount(itemClass));
-// 						} else if (item instanceof Trinket) {
-// 							desc += "\n\n" + Messages.get(CatalogTab.class, "trinket_count", Catalog.useCount(itemClass));
-// 						} else if (item instanceof Gold) {
-// 							desc += "\n\n" + Messages.get(CatalogTab.class, "gold_count", Catalog.useCount(itemClass));
-// 						} else if (item instanceof EnergyCrystal) {
-// 							desc += "\n\n" + Messages.get(CatalogTab.class, "energy_count", Catalog.useCount(itemClass));
-// 						} else {
-// 							desc += "\n\n" + Messages.get(CatalogTab.class, "use_count", Catalog.useCount(itemClass));
-// 						}
+// 				sprite = new ItemSprite(item.image, seen ? item.glowing() : null);
+// 				if (!seen)  {
+// 					if (item instanceof ExoticPotion){
+// 						sprite.frame(ItemSpriteSheet.POTION_CRIMSON);
+// 					}
+// 					sprite.lightness(0);
+// 					title = "???";
+// 					desc = Messages.get(CatalogTab.class, "not_seen_item");
+// 					desc += "\n\n" + Messages.get(item, "discover_hint");
+// 				} else {
+// 					title = Messages.titleCase( item.name() );
+// 					//some items don't include direct stats, generally when they're not applicable
+// 					if (item instanceof ClassArmor || item instanceof SpiritBow){
+// 						desc += item.desc();
+// 					} else {
+// 						desc += item.info();
 // 					}
 
-// 					//mage's staff normally has 2 pixels extra at the top for particle effects, we chop that off here
-// 					if (item instanceof MagesStaff){
-// 						RectF frame = sprite.frame();
-// 						frame.top += frame.height()/8f;
-// 						sprite.frame(frame);
-// 					}
+// // 					if (Catalog.useCount(itemClass) > 1) {
+// // 						if (item.isUpgradable() || item instanceof Artifact) {
+// // 							desc += "\n\n" + Messages.get(CatalogTab.class, "upgrade_count", Catalog.useCount(itemClass));
+// // 						} else if (item instanceof Trinket) {
+// // 							desc += "\n\n" + Messages.get(CatalogTab.class, "trinket_count", Catalog.useCount(itemClass));
+// // 						} else if (item instanceof Gold) {
+// // 							desc += "\n\n" + Messages.get(CatalogTab.class, "gold_count", Catalog.useCount(itemClass));
+// // 						} else if (item instanceof EnergyCrystal) {
+// // 							desc += "\n\n" + Messages.get(CatalogTab.class, "energy_count", Catalog.useCount(itemClass));
+// // 						} else {
+// // 							desc += "\n\n" + Messages.get(CatalogTab.class, "use_count", Catalog.useCount(itemClass));
+// // 						}
+// // 					}
 
-// 					if (item.icon != -1) {
-// 						secondIcon = new Image(Assets.Sprites.ITEM_ICONS);
-// 						secondIcon.frame(ItemSpriteSheet.Icons.film.get(item.icon));
-// 					}
-// 				}
+// // 					//mage's staff normally has 2 pixels extra at the top for particle effects, we chop that off here
+// // 					if (item instanceof MagesStaff){
+// // 						RectF frame = sprite.frame();
+// // 						frame.top += frame.height()/8f;
+// // 						sprite.frame(frame);
+// // 					}
 
-// 			} else if (Weapon.Enchantment.class.isAssignableFrom(itemClass)){
+// // 					if (item.icon != -1) {
+// // 						secondIcon = new Image(Assets.Sprites.ITEM_ICONS);
+// // 						secondIcon.frame(ItemSpriteSheet.Icons.film.get(item.icon));
+// // 					}
+// // 				}
 
-// 				Weapon.Enchantment ench = (Weapon.Enchantment) Reflection.newInstance(itemClass);
+// // 			} else if (Weapon.Enchantment.class.isAssignableFrom(itemClass)){
+
+// // 				Weapon.Enchantment ench = (Weapon.Enchantment) Reflection.newInstance(itemClass);
 
 // 				if (seen){
 // 					sprite = new ItemSprite(ItemSpriteSheet.WORN_SHORTSWORD, ench.glowing());
@@ -820,9 +826,9 @@ public class WndJournal extends WndTabbed {
 // 					desc = Messages.get(CatalogTab.class, "not_seen_enchantment");
 // 				}
 
-// 			} else if (Armor.Glyph.class.isAssignableFrom(itemClass)){
+// // 			} else if (Armor.Glyph.class.isAssignableFrom(itemClass)){
 
-// 				Armor.Glyph glyph = (Armor.Glyph) Reflection.newInstance(itemClass);
+// // 				Armor.Glyph glyph = (Armor.Glyph) Reflection.newInstance(itemClass);
 
 // 				if (seen){
 // 					sprite = new ItemSprite(ItemSpriteSheet.ARMOR_CLOTH, glyph.glowing());
@@ -896,18 +902,25 @@ public class WndJournal extends WndTabbed {
 // 				CharSprite sprite = mob.sprite();
 // 				sprite.idle();
 
-// 				icon = new Image(sprite);
-// 				if (seen) {
-// 					title = Messages.titleCase(mob.name());
-// 					desc = mob.description();
-// 					if (Bestiary.encounterCount(entityCls) > 1){
-// 						desc += "\n\n" + Messages.get(CatalogTab.class, "enemy_count", Bestiary.encounterCount(entityCls));
-// 					}
-// 				} else {
-// 					icon.lightness(0f);
-// 					title = "???";
-// 					desc = mob.alignment == Char.Alignment.ENEMY ? Messages.get(CatalogTab.class, "not_seen_enemy") : Messages.get(CatalogTab.class, "not_seen_ally");
-// 				}
+				// icon = new Image(sprite);
+				// if (seen) {
+				// 	title = Messages.titleCase(mob.name());
+				// 	desc = mob.description();
+				// 	if (Bestiary.encounterCount(entityCls) > 1){
+				// 		desc += "\n\n" + Messages.get(CatalogTab.class, "enemy_count", Bestiary.encounterCount(entityCls));
+				// 	}
+				// } else {
+				// 	icon.lightness(0f);
+				// 	title = "???";
+				// 	if (mob instanceof WandOfRegrowth.Lotus){
+				// 		desc = Messages.get(CatalogTab.class, "not_seen_plant");
+				// 	} else if (mob.alignment == Char.Alignment.ENEMY){
+				// 		desc = Messages.get(CatalogTab.class, "not_seen_enemy");
+				// 	} else {
+				// 		desc = Messages.get(CatalogTab.class, "not_seen_ally");
+				// 	}
+				// 	desc += "\n\n" + Messages.get(mob, "discover_hint");
+				// }
 
 // 				//we have to clip the bounds of the sprite if it's too large
 // 				if (icon.width() >= 17 || icon.height() >= 17) {
@@ -930,34 +943,36 @@ public class WndJournal extends WndTabbed {
 // 				Trap trap = (Trap) Reflection.newInstance(entityCls);
 // 				icon = TerrainFeaturesTilemap.getTrapVisual(trap);
 
-// 				if (seen) {
-// 					title = Messages.titleCase(trap.name());
-// 					desc = trap.desc();
-// 					if (Bestiary.encounterCount(entityCls) > 1){
-// 						desc += "\n\n" + Messages.get(CatalogTab.class, "trap_count", Bestiary.encounterCount(entityCls));
-// 					}
-// 				} else {
-// 					icon.lightness(0f);
-// 					title = "???";
-// 					desc = Messages.get(CatalogTab.class, "not_seen_trap");
-// 				}
+				// if (seen) {
+				// 	title = Messages.titleCase(trap.name());
+				// 	desc = trap.desc();
+				// 	if (Bestiary.encounterCount(entityCls) > 1){
+				// 		desc += "\n\n" + Messages.get(CatalogTab.class, "trap_count", Bestiary.encounterCount(entityCls));
+				// 	}
+				// } else {
+				// 	icon.lightness(0f);
+				// 	title = "???";
+				// 	desc = Messages.get(CatalogTab.class, "not_seen_trap");
+				// 	desc += "\n\n" + Messages.get(trap, "discover_hint");
+				// }
 
 // 			} else if (Plant.class.isAssignableFrom(entityCls)){
 
 // 				Plant plant = (Plant) Reflection.newInstance(entityCls);
 // 				icon = TerrainFeaturesTilemap.getPlantVisual(plant);
 
-// 				if (seen) {
-// 					title = Messages.titleCase(plant.name());
-// 					desc = plant.desc();
-// 					if (Bestiary.encounterCount(entityCls) > 1){
-// 						desc += "\n\n" + Messages.get(CatalogTab.class, "plant_count", Bestiary.encounterCount(entityCls));
-// 					}
-// 				} else {
-// 					icon.lightness(0f);
-// 					title = "???";
-// 					desc = Messages.get(CatalogTab.class, "not_seen_plant");
-// 				}
+				// if (seen) {
+				// 	title = Messages.titleCase(plant.name());
+				// 	desc = plant.desc();
+				// 	if (Bestiary.encounterCount(entityCls) > 1){
+				// 		desc += "\n\n" + Messages.get(CatalogTab.class, "plant_count", Bestiary.encounterCount(entityCls));
+				// 	}
+				// } else {
+				// 	icon.lightness(0f);
+				// 	title = "???";
+				// 	desc = Messages.get(CatalogTab.class, "not_seen_plant");
+				// 	desc += "\n\n" + Messages.get(plant, "discover_hint");
+				// }
 
 // 			}
 
@@ -1018,14 +1033,16 @@ public class WndJournal extends WndTabbed {
 // 								ShatteredPixelDungeon.scene().addToFront(new WndStory(sprite, doc.pageTitle(page), doc.pageBody(page)));
 // 							}
 
-// 							doc.readPage(page);
-// 							hardLightBG(1, 1, 1);
-// 						} else {
-// 							if (ShatteredPixelDungeon.scene() instanceof GameScene){
-// 								GameScene.show(new WndJournalItem(sprite, "???", Messages.get(CatalogTab.class, "not_seen_lore")));
-// 							} else {
-// 								ShatteredPixelDungeon.scene().addToFront(new WndJournalItem(sprite, "???", Messages.get(CatalogTab.class, "not_seen_lore")));
-// 							}
+						// 	doc.readPage(page);
+						// 	hardLightBG(1, 1, 1);
+						// } else {
+						// 	if (ShatteredPixelDungeon.scene() instanceof GameScene){
+						// 		GameScene.show(new WndJournalItem(sprite, "???",
+						// 				Messages.get(CatalogTab.class, "not_seen_lore") + "\n\n" + doc.discoverHint()));
+						// 	} else {
+						// 		ShatteredPixelDungeon.scene().addToFront(new WndJournalItem(sprite, "???",
+						// 				Messages.get(CatalogTab.class, "not_seen_lore") + "\n\n" + doc.discoverHint()));
+						// 	}
 
 // 						}
 // 						return true;
@@ -1035,19 +1052,19 @@ public class WndJournal extends WndTabbed {
 // 				}
 // 			};
 
-// 			if (seen){
-// 				BitmapText text = new BitmapText(Integer.toString(doc.pageIdx(page)+1), PixelScene.pixelFont);
-// 				text.measure();
-// 				gridItem.addSecondIcon( text );
-// 				if (!read) {
-// 					gridItem.hardLightBG(1f, 1f, 2f);
-// 				}
-// 			} else {
-// 				gridItem.hardLightBG(2f, 1f, 2f);
-// 			}
-// 			grid.addItem(gridItem);
-// 		}
-// 	}
+	// 		if (seen){
+	// 			BitmapText text = new BitmapText(Integer.toString(doc.pageIdx(page)+1), PixelScene.pixelFont);
+	// 			text.measure();
+	// 			gridItem.addSecondIcon( text );
+	// 			if (!read) {
+	// 				gridItem.hardLightBG(0.6f, 1f, 2f);
+	// 			}
+	// 		} else {
+	// 			gridItem.hardLightBG(2.2f, 1f, 2.2f);
+	// 		}
+	// 		grid.addItem(gridItem);
+	// 	}
+	// }
 
 // 	public static class BadgesTab extends Component {
 
