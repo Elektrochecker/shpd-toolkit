@@ -240,7 +240,8 @@ public class SeedFinder {
 			for (int i = 0; i < DungeonSeed.TOTAL_SEEDS; i++) {
 				long seed = DungeonSeed.randomSeed();
 				if (testSeed(Long.toString(seed), Options.floors)) {
-					ShatteredPixelDungeon.scene().addToFront(new WndMessage("searched through _" + Long.toString(i) + "_ seeds."));
+					ShatteredPixelDungeon.scene()
+							.addToFront(new WndMessage("searched through _" + Long.toString(i) + "_ seeds."));
 					return DungeonSeed.convertToCode(Dungeon.seed);
 				}
 			}
@@ -249,7 +250,8 @@ public class SeedFinder {
 		} else if (Options.sequentialMode) {
 			for (long i = Options.startingSeed; i < DungeonSeed.TOTAL_SEEDS; i++) {
 				if (testSeed(Long.toString(i), Options.floors)) {
-					ShatteredPixelDungeon.scene().addToFront(new WndMessage("searched through _" + Long.toString(i - Options.startingSeed) + "_ seeds."));
+					ShatteredPixelDungeon.scene().addToFront(new WndMessage(
+							"searched through _" + Long.toString(i - Options.startingSeed) + "_ seeds."));
 					return DungeonSeed.convertToCode(Dungeon.seed);
 				}
 			}
@@ -259,7 +261,8 @@ public class SeedFinder {
 			long start = Random.Long(DungeonSeed.TOTAL_SEEDS);
 			for (long i = start; i < DungeonSeed.TOTAL_SEEDS; i++) {
 				if (testSeed(Long.toString(i), Options.floors)) {
-					ShatteredPixelDungeon.scene().addToFront(new WndMessage("searched through _" + Long.toString(i - start) + "_ seeds."));
+					ShatteredPixelDungeon.scene()
+							.addToFront(new WndMessage("searched through _" + Long.toString(i - start) + "_ seeds."));
 					return DungeonSeed.convertToCode(Dungeon.seed);
 				}
 			}
@@ -387,6 +390,21 @@ public class SeedFinder {
 
 		boolean[] itemsFound = new boolean[itemList.size()];
 
+		// check trinkets
+		if (Options.logTrinkets) {
+			ArrayList<HeapItem> trinkets = getTrinkets();
+			for (int k = 0; k < trinkets.size(); k++) {
+				for (int j = 0; j < itemList.size(); j++) {
+					if (trinkets.get(k).name().toLowerCase().contains(itemList.get(j))) {
+						if (!itemsFound[j]) {
+							itemsFound[j] = true;
+							break;
+						}
+					}
+				}
+			}
+		}
+
 		for (int i = 0; i < floors; i++) {
 
 			Level l = Dungeon.newLevel();
@@ -412,21 +430,6 @@ public class SeedFinder {
 									itemsFound[j] = true;
 									break;
 								}
-							}
-						}
-					}
-				}
-			}
-
-			// check trinkets
-			if(Options.logTrinkets && i < 1) {
-				ArrayList<HeapItem> trinkets = getTrinkets();
-				for (int k = 0; k < trinkets.size(); k++) {
-					for (int j = 0; j < itemList.size(); j++) {
-						if (trinkets.get(k).name().toLowerCase().contains(itemList.get(j))) {
-							if (!itemsFound[j]) {
-								itemsFound[j] = true;
-								break;
 							}
 						}
 					}
@@ -462,34 +465,34 @@ public class SeedFinder {
 				}
 			}
 
-			// check quests
-			Item[] questitems = {
-					Ghost.Quest.armor,
-					Ghost.Quest.weapon,
-					Wandmaker.Quest.wand1,
-					Wandmaker.Quest.wand2,
-					Imp.Quest.reward
-			};
+			Dungeon.depth++;
+		}
 
-			if (Ghost.Quest.armor != null) {
-				questitems[0] = Ghost.Quest.armor.inscribe(Ghost.Quest.glyph);
-				questitems[1] = Ghost.Quest.weapon.enchant(Ghost.Quest.enchant);
-			}
+		// check quests
+		Item[] questitems = {
+				Ghost.Quest.armor,
+				Ghost.Quest.weapon,
+				Wandmaker.Quest.wand1,
+				Wandmaker.Quest.wand2,
+				Imp.Quest.reward
+		};
 
+		if (Ghost.Quest.armor != null) {
+			questitems[0] = Ghost.Quest.armor.inscribe(Ghost.Quest.glyph);
+			questitems[1] = Ghost.Quest.weapon.enchant(Ghost.Quest.enchant);
+		}
+
+		for (int k = 0; k < 5; k++) {
 			for (int j = 0; j < itemList.size(); j++) {
-				for (int k = 0; k < 5; k++) {
-					if (questitems[k] != null) {
-						if (questitems[k].identify().title().toLowerCase().contains(itemList.get(j))) {
-							if (!itemsFound[j]) {
-								itemsFound[j] = true;
-								break;
-							}
+				if (questitems[k] != null) {
+					if (questitems[k].identify().title().toLowerCase().contains(itemList.get(j))) {
+						if (!itemsFound[j]) {
+							itemsFound[j] = true;
+							break;
 						}
 					}
 				}
 			}
-
-			Dungeon.depth++;
 		}
 
 		if (Options.condition == Condition.ANY) {
