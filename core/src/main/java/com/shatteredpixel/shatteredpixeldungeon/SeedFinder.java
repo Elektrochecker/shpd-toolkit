@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import com.shatteredpixel.shatteredpixeldungeon.actors.blobs.WaterOfAwareness;
+import com.shatteredpixel.shatteredpixeldungeon.actors.blobs.WaterOfHealth;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.HeroClass;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.ArmoredStatue;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.CrystalMimic;
@@ -48,6 +50,9 @@ import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.MeleeWeapon;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.Weapon;
 import com.shatteredpixel.shatteredpixeldungeon.levels.Level;
 import com.shatteredpixel.shatteredpixeldungeon.levels.RegularLevel;
+import com.shatteredpixel.shatteredpixeldungeon.levels.rooms.Room;
+import com.shatteredpixel.shatteredpixeldungeon.levels.rooms.secret.SecretWellRoom;
+import com.shatteredpixel.shatteredpixeldungeon.levels.rooms.special.MagicWellRoom;
 import com.shatteredpixel.shatteredpixeldungeon.utils.DungeonSeed;
 import com.shatteredpixel.shatteredpixeldungeon.windows.WndMessage;
 import com.watabou.utils.Random;
@@ -274,45 +279,60 @@ public class SeedFinder {
 	private ArrayList<String> getRooms() {
 		ArrayList<String> rooms = new ArrayList<String>();
 		for (int k = 0; k < RegularLevel.roomList.size(); k++) {
-			String room = RegularLevel.roomList.get(k).toString()
+			Room room1 = RegularLevel.roomList.get(k);
+			String roomstr = RegularLevel.roomList.get(k).toString()
 					.replace("com.shatteredpixel.shatteredpixeldungeon.levels.rooms.", "");
+
+					if (room1 instanceof MagicWellRoom || room1 instanceof SecretWellRoom) {
+				String wellstr;
+
+				if (room1.generatedWellWater == WaterOfAwareness.class) {
+					wellstr = " (awareness)";
+				} else if (room1.generatedWellWater == WaterOfHealth.class) {
+					wellstr = " (health)";
+				} else {
+					wellstr = " (?)";
+				}
+
+				roomstr += wellstr;
+			}
 
 			String roomType = "standard";
 
 			// remove Java object instance code
-			room = room.replaceAll("@[a-z0-9]{4,}", "");
+			roomstr = roomstr.replaceAll("@[a-z0-9]{4,}", "");
 
 			// turn camel case to normal text
-			room = room.replaceAll("([a-z])([A-Z])", "$1 $2").toLowerCase();
+			roomstr = roomstr.replaceAll("([a-z])([A-Z])", "$1 $2").toLowerCase();
 
-			if (room.contains("special")) {
-				room = room.replace("special.", "");
+			if (roomstr.contains("special")) {
+				roomstr = roomstr.replace("special.", "");
 				roomType = "special";
-			} else if (room.contains("secret")) {
-				room = room.replace("secret.", "");
+			} else if (roomstr.contains("secret")) {
+				roomstr = roomstr.replace("secret.", "");
 				roomType = "secret";
-			} else if (room.contains("entrance")) {
-				room = room.replace("entrance.", "");
-				room = room.replace("standard.", "");
+			} else if (roomstr.contains("entrance")) {
+				roomstr = roomstr.replace("entrance.", "");
+				roomstr = roomstr.replace("standard.", "");
 				roomType = "entrance";
-			} else if (room.contains("exit")) {
-				room = room.replace("exit.", "");
-				room = room.replace("standard.", "");
+			} else if (roomstr.contains("exit")) {
+				roomstr = roomstr.replace("exit.", "");
+				roomstr = roomstr.replace("standard.", "");
 				roomType = "exit";
-			} else if (room.contains("standard")) {
-				room = room.replace("standard.", "");
+			} else if (roomstr.contains("standard")) {
+				roomstr = roomstr.replace("standard.", "");
 				roomType = "standard";
 			}
 
 			String tabstring = "";
 			for (int j = 0; j < Math.max(1,
-					Options.infoSpacing - room.length()); j++) {
+					Options.infoSpacing - roomstr.length()); j++) {
 				tabstring += Options.spacingChar;
 			}
 
-			room += tabstring + roomType;
+			roomstr += tabstring + roomType;
 
-			rooms.add(room);
+			rooms.add(roomstr);
 		}
 
 		Collections.sort(rooms);

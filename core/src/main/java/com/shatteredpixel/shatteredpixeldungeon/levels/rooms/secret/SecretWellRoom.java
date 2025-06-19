@@ -64,6 +64,8 @@ public class SecretWellRoom extends SecretRoom {
 		@SuppressWarnings("unchecked")
 		Class<? extends WellWater> waterClass = (Class<? extends WellWater>) Random.element( WATERS );
 		
+		generatedWellWater = waterClass;
+
 		WellWater.seed(well.x + level.width() * well.y, 1, waterClass, level);
 		
 		entrance().set( Door.Type.HIDDEN );

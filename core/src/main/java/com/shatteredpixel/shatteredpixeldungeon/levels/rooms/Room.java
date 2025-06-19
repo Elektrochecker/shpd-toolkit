@@ -21,6 +21,7 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.levels.rooms;
 
+import com.shatteredpixel.shatteredpixeldungeon.actors.blobs.WellWater;
 import com.shatteredpixel.shatteredpixeldungeon.levels.Level;
 import com.shatteredpixel.shatteredpixeldungeon.levels.painters.Painter;
 import com.watabou.utils.Bundlable;
@@ -485,4 +486,6 @@ public abstract class Room extends Rect implements Graph.Node, Bundlable {
 			typeLocked = bundle.getBoolean("type_locked");
 		}
 	}
+
+	public Class<?extends WellWater> generatedWellWater = null;
 }

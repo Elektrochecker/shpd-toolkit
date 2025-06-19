@@ -51,6 +51,7 @@ public class MagicWellRoom extends SpecialRoom {
 			overrideWater :
 			(Class<? extends WellWater>)Random.element( WATERS );
 			
+		generatedWellWater = waterClass;
 		
 		WellWater.seed(c.x + level.width() * c.y, 1, waterClass, level);
 		
