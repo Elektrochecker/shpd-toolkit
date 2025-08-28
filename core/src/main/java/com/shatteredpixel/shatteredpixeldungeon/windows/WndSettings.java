@@ -503,9 +503,6 @@ public class WndSettings extends WndTabbed {
 		RenderedTextBlock title;
 		ColorBlock sep1;
 		CheckBox chkFullscreen;
-		OptionSlider optScale;
-		CheckBox chkSaver;
-		RedButton btnOrientation;
 		ColorBlock sep2;
 		OptionSlider optBrightness;
 		OptionSlider optVisGrid;
@@ -528,63 +525,13 @@ public class WndSettings extends WndTabbed {
 					SPDSettings.fullscreen(checked());
 				}
 			};
-			if (DeviceCompat.supportsFullScreen()){
+			if (Game.platform.supportsFullScreen()){
 				chkFullscreen.checked(SPDSettings.fullscreen());
 			} else {
 				chkFullscreen.checked(true);
 				chkFullscreen.enable(false);
 			}
 			add(chkFullscreen);
-
-			//power saver is being slowly phased out, only show it on old (4.3-) android devices
-			// this is being phased out as the setting is useless on all but very old devices anyway
-			// and support is going to be dropped for 4.3- in the forseeable future
-			if (DeviceCompat.isAndroid() && PixelScene.maxScreenZoom >= 2
-				&& (SPDSettings.powerSaver() || !DeviceCompat.supportsFullScreen())) {
-				chkSaver = new CheckBox(Messages.get(this, "saver")) {
-					@Override
-					protected void onClick() {
-						super.onClick();
-						if (checked()) {
-							checked(!checked());
-							ShatteredPixelDungeon.scene().add(new WndOptions(Icons.get(Icons.DISPLAY),
-									Messages.get(DisplayTab.class, "saver"),
-									Messages.get(DisplayTab.class, "saver_desc"),
-									Messages.get(DisplayTab.class, "okay"),
-									Messages.get(DisplayTab.class, "cancel")) {
-								@Override
-								protected void onSelect(int index) {
-									if (index == 0) {
-										checked(!checked());
-										SPDSettings.powerSaver(checked());
-									}
-								}
-							});
-						} else {
-							SPDSettings.powerSaver(checked());
-						}
-					}
-				};
-				chkSaver.checked( SPDSettings.powerSaver() );
-				add( chkSaver );
-			}
-
-			if (DeviceCompat.isAndroid()) {
-				Boolean landscape = SPDSettings.landscape();
-				if (landscape == null){
-					landscape = Game.width > Game.height;
-				}
-				Boolean finalLandscape = landscape;
-				btnOrientation = new RedButton(finalLandscape ?
-						Messages.get(this, "portrait")
-						: Messages.get(this, "landscape")) {
-					@Override
-					protected void onClick() {
-						SPDSettings.landscape(!finalLandscape);
-					}
-				};
-				add(btnOrientation);
-			}
 
 			sep2 = new ColorBlock(1, 1, 0xFF000000);
 			add(sep2);
@@ -642,29 +589,8 @@ public class WndSettings extends WndTabbed {
 
 			bottom = sep1.y + 1;
 
-			if (width > 200 && chkSaver != null) {
-				chkFullscreen.setRect(0, bottom + GAP, width/2-1, BTN_HEIGHT);
-				chkSaver.setRect(chkFullscreen.right()+ GAP, bottom + GAP, width/2-1, BTN_HEIGHT);
-				bottom = chkFullscreen.bottom();
-			} else {
-				chkFullscreen.setRect(0, bottom + GAP, width, BTN_HEIGHT);
-				bottom = chkFullscreen.bottom();
-
-				if (chkSaver != null) {
-					chkSaver.setRect(0, bottom + GAP, width, BTN_HEIGHT);
-					bottom = chkSaver.bottom();
-				}
-			}
-
-			if (btnOrientation != null) {
-				btnOrientation.setRect(0, bottom + GAP, width, BTN_HEIGHT);
-				bottom = btnOrientation.bottom();
-			}
-
-			if (optScale != null){
-				optScale.setRect(0, bottom + GAP, width, SLIDER_HEIGHT);
-				bottom = optScale.bottom();
-			}
+			chkFullscreen.setRect(0, bottom + GAP, width, BTN_HEIGHT);
+			bottom = chkFullscreen.bottom();
 
 			sep2.size(width, 1);
 			sep2.y = bottom + GAP;

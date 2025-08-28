@@ -24,7 +24,6 @@ package com.shatteredpixel.shatteredpixeldungeon.android;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -122,21 +121,8 @@ public class AndroidLauncher extends AndroidApplication {
 			});
 		}
 
-		//set desired orientation (if it exists) before initializing the app.
-		if (SPDSettings.landscape() != null) {
-			instance.setRequestedOrientation( SPDSettings.landscape() ?
-					ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE :
-					ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT );
-		}
-		
 		AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
 		config.depth = 0;
-		if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
-			//use rgb565 on ICS devices for better performance
-			config.r = 5;
-			config.g = 6;
-			config.b = 5;
-		}
 
 		//we manage this ourselves
 		config.useImmersiveMode = false;
@@ -164,11 +150,7 @@ public class AndroidLauncher extends AndroidApplication {
 	protected void onResume() {
 		//prevents weird rare cases where the app is running twice
 		if (instance != this){
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-				finishAndRemoveTask();
-			} else {
-				finish();
-			}
+			finishAndRemoveTask();
 		}
 		super.onResume();
 	}

@@ -23,41 +23,27 @@ package com.shatteredpixel.shatteredpixeldungeon.ios;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.backends.iosrobovm.DefaultIOSInput;
 import com.badlogic.gdx.backends.iosrobovm.custom.HWMachine;
 import com.badlogic.gdx.backends.iosrobovm.objectal.OALSimpleAudio;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.PixmapPacker;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
-import com.shatteredpixel.shatteredpixeldungeon.SPDSettings;
 import com.shatteredpixel.shatteredpixeldungeon.ShatteredPixelDungeon;
 import com.watabou.input.ControllerHandler;
 import com.watabou.noosa.Game;
 import com.watabou.utils.PlatformSupport;
 
 import org.robovm.apple.audiotoolbox.AudioServices;
-import org.robovm.apple.foundation.NSURL;
 import org.robovm.apple.systemconfiguration.SCNetworkReachability;
 import org.robovm.apple.systemconfiguration.SCNetworkReachabilityFlags;
 import org.robovm.apple.uikit.UIApplication;
-import org.robovm.apple.uikit.UIApplicationOpenURLOptions;
 
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class IOSPlatformSupport extends PlatformSupport {
-
-	@Override
-	public boolean openURI( String uri ){
-		//backported from libGDX 1.13.1, required for opening URLs on modern iOS
-		UIApplication uiApp = UIApplication.getSharedApplication();
-		NSURL url = new NSURL(uri);
-		if (uiApp.canOpenURL(url)) {
-			uiApp.openURL(url, new UIApplicationOpenURLOptions(), null);
-			return true;
-		}
-		return false;
-	}
 
 	@Override
 	public void updateDisplaySize() {
@@ -69,18 +55,12 @@ public class IOSPlatformSupport extends PlatformSupport {
 		} else {
 			UIApplication.getSharedApplication().setStatusBarHidden(true);
 		}
+	}
 
-		if (!SPDSettings.fullscreen()) {
-			int insetChange = Gdx.graphics.getSafeInsetBottom() - Game.bottomInset;
-			Game.bottomInset = Gdx.graphics.getSafeInsetBottom();
-			Game.height -= insetChange;
-			Game.dispHeight = Game.height;
-		} else {
-			Game.height += Game.bottomInset;
-			Game.dispHeight = Game.height;
-			Game.bottomInset = 0;
-		}
-		Gdx.gl.glViewport(0, Game.bottomInset, Game.width, Game.height);
+	@Override
+	public boolean supportsFullScreen() {
+		//fullscreen is always enabled on iOS
+		return false;
 	}
 
 	@Override
@@ -131,6 +111,12 @@ public class IOSPlatformSupport extends PlatformSupport {
 	@Override
 	public void setHonorSilentSwitch( boolean value ) {
 		OALSimpleAudio.sharedInstance().setHonorSilentSwitch(value);
+	}
+
+	public void setOnscreenKeyboardVisible(boolean value, boolean multiline){
+		//iOS keyboard says 'done' even with this change, but the behaviour is correct at least
+		((DefaultIOSInput)Gdx.input).setKeyboardCloseOnReturnKey(!multiline);
+		super.setOnscreenKeyboardVisible(value, multiline);
 	}
 
 	/* FONT SUPPORT */

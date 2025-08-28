@@ -583,6 +583,11 @@ abstract public class MissileWeapon extends Weapon {
 			m.durability = MAX_DURABILITY;
 			m.parent = this;
 			extraThrownLeft = m.extraThrownLeft = true;
+
+			//explosive durability is tracked only in the parent
+			if (m.enchantment instanceof Explosive){
+				((Explosive) m.enchantment).clear();
+			}
 		}
 		
 		return split;
@@ -630,7 +635,7 @@ abstract public class MissileWeapon extends Weapon {
 		}
 
 		if (enchantment != null && (cursedKnown || !enchantment.curse())){
-			info += "\n\n" + Messages.get(Weapon.class, "enchanted", enchantment.name());
+			info += "\n\n" + Messages.capitalize(Messages.get(Weapon.class, "enchanted", enchantment.name()));
 			if (enchantHardened) info += " " + Messages.get(Weapon.class, "enchant_hardened");
 			info += " " + enchantment.desc();
 		} else if (enchantHardened){
