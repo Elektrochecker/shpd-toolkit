@@ -175,8 +175,8 @@ public class SPDSettings extends GameSettings {
 
 	//Display
 	
-	public static final String KEY_FULLSCREEN	= "fullscreen";
-	public static final String KEY_LANDSCAPE	= "landscape";
+	public static final String KEY_FULLSCREEN	= "fullscreen"; //used to hide navbars on mobile
+	public static final String KEY_LANDSCAPE	= "force_landscape";
 	public static final String KEY_ZOOM			= "zoom";
 	public static final String KEY_BRIGHTNESS	= "brightness";
 	public static final String KEY_GRID 	    = "visual_grid";
@@ -191,6 +191,15 @@ public class SPDSettings extends GameSettings {
 	
 	public static boolean fullscreen() {
 		return getBoolean( KEY_FULLSCREEN, true );
+	}
+
+	public static void landscape( boolean value ){
+		put( KEY_LANDSCAPE, value );
+		((ShatteredPixelDungeon)ShatteredPixelDungeon.instance).updateDisplaySize();
+	}
+
+	public static boolean landscape(){
+		return getBoolean(KEY_LANDSCAPE, false);
 	}
 	
 	public static void zoom( int value ) {
@@ -562,8 +571,8 @@ public class SPDSettings extends GameSettings {
 	
 	public static Point windowResolution(){
 		return new Point(
-				1920,
-				1080
+				getInt( KEY_WINDOW_WIDTH, 800, 720, Integer.MAX_VALUE ),
+				getInt( KEY_WINDOW_HEIGHT, 600, 400, Integer.MAX_VALUE )
 		);
 	}
 	

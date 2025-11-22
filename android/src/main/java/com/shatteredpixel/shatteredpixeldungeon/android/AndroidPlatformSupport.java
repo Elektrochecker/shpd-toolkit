@@ -21,10 +21,12 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.android;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.pm.ActivityInfo;
+import android.graphics.Rect;
 import android.net.ConnectivityManager;
 import android.os.Build;
+import android.view.DisplayCutout;
 import android.view.View;
 import android.view.WindowInsets;
 import android.view.WindowManager;
@@ -34,7 +36,10 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.PixmapPacker;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.shatteredpixel.shatteredpixeldungeon.SPDSettings;
+import com.shatteredpixel.shatteredpixeldungeon.ShatteredPixelDungeon;
+import com.watabou.noosa.Game;
 import com.watabou.utils.PlatformSupport;
+import com.watabou.utils.RectF;
 
 import java.util.HashMap;
 import java.util.regex.Matcher;
@@ -43,24 +48,114 @@ import java.util.regex.Pattern;
 public class AndroidPlatformSupport extends PlatformSupport {
 	
 	public void updateDisplaySize(){
+		AndroidLauncher.instance.setRequestedOrientation( SPDSettings.landscape() ?
+				ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE :
+				ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED );
 
-		//TODO seem to be existing bugs with handling split screen here, should look into that
+		ShatteredPixelDungeon.seamlessResetScene();
 	}
 
 	public boolean supportsFullScreen(){
-		//Android supports hiding the navigation bar or gesture bar, if it is present
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+		//We support hiding the navigation bar or gesture bar, if it is present
+		// on Android 9+ we check for this, on earlier just assume it's present
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
 			WindowInsets insets = AndroidLauncher.instance.getApplicationWindow().getDecorView().getRootWindowInsets();
 			return insets != null && (insets.getStableInsetBottom() > 0 || insets.getStableInsetRight() > 0 || insets.getStableInsetLeft() > 0);
 		} else {
 			return true;
 		}
 	}
-	
+
+	@Override
+	public RectF getDisplayCutout() {
+		RectF cutoutRect = new RectF();
+
+		//some extra logic here is because cutouts can apparently be returned inverted
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+			DisplayCutout cutout = AndroidLauncher.instance.getApplicationWindow().getDecorView().getRootWindowInsets().getDisplayCutout();
+
+			Rect largest = null;
+			if (cutout != null) {
+				for (Rect r : cutout.getBoundingRects()) {
+					if (largest == null
+							|| Math.abs(r.height() * r.width()) > Math.abs(largest.height() * largest.width())) {
+						largest = r;
+					}
+				}
+			}
+
+			if (largest != null){
+				cutoutRect.left = Math.min(largest.left, largest.right);
+				cutoutRect.right = Math.max(largest.left, largest.right);
+				cutoutRect.top  = Math.min(largest.top, largest.bottom);
+				cutoutRect.bottom  = Math.max(largest.top, largest.bottom);
+			}
+		}
+
+		return cutoutRect;
+	}
+
+	@Override
+	public RectF getSafeInsets( int level ) {
+		RectF insets = new RectF();
+
+		//getting insets technically works down to 6.0 Marshmallow, but we let the device handle all of that prior to 9.0 Pie
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && !AndroidLauncher.instance.isInMultiWindowMode()) {
+			WindowInsets rootInsets = AndroidLauncher.instance.getApplicationWindow().getDecorView().getRootWindowInsets();
+			if (rootInsets != null) {
+
+				//Navigation bar (never on the top)
+				if (supportsFullScreen() && !SPDSettings.fullscreen()) {
+					insets.left = Math.max(insets.left, rootInsets.getStableInsetLeft());
+					insets.right = Math.max(insets.right, rootInsets.getStableInsetRight());
+					insets.bottom = Math.max(insets.bottom, rootInsets.getStableInsetBottom());
+				}
+
+				//display cutout
+				if (level > INSET_BLK) {
+					DisplayCutout cutout = rootInsets.getDisplayCutout();
+
+					if (cutout != null) {
+						boolean largeCutout = false;
+						boolean cutoutsPresent = false;
+
+						int screenSize = Game.width * Game.height;
+						for (Rect r : cutout.getBoundingRects()) {
+							//use abs as some cutouts can apparently be returned inverted
+							int cutoutSize = Math.abs(r.height() * r.width());
+							//display cutouts are considered large if they take up more than 0.75%
+							// of the screen/ in reality we want less than about 0.5%,
+							// but some cutouts over-report their size, Pixel devices especially =S
+							if (cutoutSize > 0){
+								cutoutsPresent = true;
+								if (cutoutSize * 133.33f >= screenSize) {
+									largeCutout = true;
+								}
+							}
+						}
+
+						if (!cutoutsPresent){
+							//if we get no cutouts reported, assume the device is lying to us
+							// and there actually is a cutout, which we must assume is large =S
+							largeCutout = true;
+						}
+
+						if (largeCutout || level == INSET_ALL) {
+							insets.left = Math.max(insets.left, cutout.getSafeInsetLeft());
+							insets.top = Math.max(insets.top, cutout.getSafeInsetTop());
+							insets.right = Math.max(insets.right, cutout.getSafeInsetRight());
+							insets.bottom = Math.max(insets.bottom, cutout.getSafeInsetBottom());
+						}
+					}
+				}
+			}
+		}
+		return insets;
+	}
+
 	public void updateSystemUI() {
 		
 		AndroidLauncher.instance.runOnUiThread(new Runnable() {
-			@SuppressLint("NewApi")
 			@Override
 			public void run() {
 				boolean fullscreen = Build.VERSION.SDK_INT < Build.VERSION_CODES.N
@@ -80,8 +175,9 @@ public class AndroidPlatformSupport extends PlatformSupport {
 									| View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN
 									| View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY );
 				} else {
+					//still want to hide the status bar and cutout void
 					AndroidLauncher.instance.getWindow().getDecorView().setSystemUiVisibility(
-							View.SYSTEM_UI_FLAG_LAYOUT_STABLE );
+							View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN );
 				}
 			}
 		});

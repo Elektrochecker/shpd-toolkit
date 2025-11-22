@@ -58,15 +58,6 @@ public class DeviceCompat {
 		Gdx.app.log( tag, message );
 	}
 
-	public static RectF getSafeInsets(){
-		RectF result = new RectF();
-		result.left =   Gdx.graphics.getSafeInsetLeft();
-		result.top =    Gdx.graphics.getSafeInsetTop();
-		result.right =  Gdx.graphics.getSafeInsetRight();
-		result.bottom = Gdx.graphics.getSafeInsetBottom();
-		return result;
-	}
-
 	//some devices (macOS mainly) report virtual pixels to Shattered, but sometimes we want real pixel precision
 	//this returns the number of real pixels per virtual pixel in the X dimension...
 	public static float getRealPixelScaleX(){
@@ -75,7 +66,7 @@ public class DeviceCompat {
 
 	//...and in the Y dimension
 	public static float getRealPixelScaleY(){
-		return ((Gdx.graphics.getBackBufferHeight()-Game.bottomInset) / (float)Game.height );
+		return (Gdx.graphics.getBackBufferHeight() / (float)Game.height );
 	}
 
 }
