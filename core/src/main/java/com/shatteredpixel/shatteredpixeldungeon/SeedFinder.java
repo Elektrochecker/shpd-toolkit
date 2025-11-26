@@ -117,16 +117,17 @@ public class SeedFinder {
 
 		Options.searchForDaily = false;
 
+		// TODO: retire useRooms option
 		Options.useRooms = SPDSettings.useRooms();
 
-		Options.logTrinkets = SPDSettings.logTrinkets() && !SPDSettings.useRooms();
-		Options.logEquipment = SPDSettings.logEquipment() && !SPDSettings.useRooms();
-		Options.logScrolls = SPDSettings.logScrolls() && !SPDSettings.useRooms();
-		Options.logPotions = SPDSettings.logPotions() && !SPDSettings.useRooms();
-		Options.logRings = SPDSettings.logRings() && !SPDSettings.useRooms();
-		Options.logWands = SPDSettings.logWands() && !SPDSettings.useRooms();
-		Options.logArtifacts = SPDSettings.logArtifacts() && !SPDSettings.useRooms();
-		Options.logOther = SPDSettings.logMisc() && !SPDSettings.useRooms();
+		Options.logTrinkets = SPDSettings.logTrinkets();
+		Options.logEquipment = SPDSettings.logEquipment();
+		Options.logScrolls = SPDSettings.logScrolls();
+		Options.logPotions = SPDSettings.logPotions();
+		Options.logRings = SPDSettings.logRings();
+		Options.logWands = SPDSettings.logWands();
+		Options.logArtifacts = SPDSettings.logArtifacts();
+		Options.logOther = SPDSettings.logMisc();
 
 		Options.ignoreBlacklist = SPDSettings.ignoreBlacklist();
 		Options.challenges = SPDSettings.challenges();
@@ -534,11 +535,14 @@ public class SeedFinder {
 		}
 	}
 
-	public String[] logSeedItems(String seed, int floors) {
+	public SeedfinderLogResult logSeedItems(String seed, int floors) {
+		SeedfinderLogResult result = new SeedfinderLogResult();
 		String[] log = new String[floors];
+		String[] log_roomsonly = new String[floors];
 
 		for (int i = 0; i < floors; i++) {
 			log[i] = "";
+			log_roomsonly[i] = "";
 		}
 
 		if (Options.searchForDaily) {
@@ -589,8 +593,6 @@ public class SeedFinder {
 			ArrayList<HeapItem> artifacts = new ArrayList<>();
 			ArrayList<HeapItem> wands = new ArrayList<>();
 			ArrayList<HeapItem> others = new ArrayList<>();
-
-			log[i] += ("floor " + Dungeon.depth + " (");
 
 			String feeling = l.feeling.toString();
 
@@ -643,19 +645,21 @@ public class SeedFinder {
 					break;
 			}
 
+			log[i] += ("floor " + Dungeon.depth + " (");
 			log[i] += (feeling + "):\n\n");
 
 			// list all rooms of level
-			if (Dungeon.depth % 5 != 0 && Dungeon.depth < 26 && Options.useRooms) {
+			if (Dungeon.depth % 5 != 0 && Dungeon.depth < 26) {
 				ArrayList<String> rooms = getRooms();
-				log[i] += ("Rooms: \n");
+				log_roomsonly[i] += ("Rooms: \n");
 
 				for (int k = 0; k < rooms.size(); k++) {
-					log[i] += ("- " + rooms.get(k) + "\n");
+					log_roomsonly[i] += ("- " + rooms.get(k) + "\n");
 				}
 
-				log[i] += ("\n");
+				log_roomsonly[i] += ("\n");
 			}
+
 
 			// list quest rewards
 			if (Ghost.Quest.armor != null) {
@@ -787,19 +791,26 @@ public class SeedFinder {
 			Dungeon.depth++;
 		}
 
-		return log;
+		result.main = log;
+		result.rooms = log_roomsonly;
+		return result;
 	}
 
 	// logging without arguments uses SHPDSettings
-	public String[] logSeedItemsSeededRun(Long seed) {
+	public SeedfinderLogResult logSeedItemsSeededRun(Long seed) {
 		loadConfig();
 		return logSeedItems(Long.toString(seed), SPDSettings.seedfinderFloors());
 	}
 
-	public String[] logSeedItemsDailyRunRun(int offset) {
+	public SeedfinderLogResult logSeedItemsDailyRunRun(int offset) {
 		loadConfig();
 		Options.searchForDaily = true;
 		Options.DailyOffset = offset;
 		return logSeedItems("0", SPDSettings.seedfinderFloors());
+	}
+
+	public class SeedfinderLogResult {
+		public String[] main;
+		public String[] rooms;
 	}
 }

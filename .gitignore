@@ -24,3 +24,8 @@ local.properties
 
 #vscode settings
 .vscode/
+
+# java lsp trash
+*.classpath
+*.project
+*.settings

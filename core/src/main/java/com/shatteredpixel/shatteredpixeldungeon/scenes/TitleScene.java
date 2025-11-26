@@ -23,6 +23,7 @@ package com.shatteredpixel.shatteredpixeldungeon.scenes;
 
 import com.shatteredpixel.shatteredpixeldungeon.SeedFinder;
 import com.shatteredpixel.shatteredpixeldungeon.SeedFinder.Options;
+import com.shatteredpixel.shatteredpixeldungeon.SeedFinder.SeedfinderLogResult;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Clipboard;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
@@ -140,12 +141,12 @@ public class TitleScene extends PixelScene {
 									text = DungeonSeed.formatText(text);
 									long seed = DungeonSeed.convertFromText(text);
 
-									String[] seedfinderOutputLog = new SeedFinder().logSeedItemsSeededRun(seed);
+									SeedfinderLogResult result = new SeedFinder().logSeedItemsSeededRun(seed);
 
 									ShatteredPixelDungeon.scene().addToFront(
 											new WndSeedfinderLog(Icons.get(Icons.BACKPACK),
 													"Items for seed " + DungeonSeed.convertToCode(Dungeon.seed),
-													seedfinderOutputLog));
+													result));
 								} else {
 									SPDSettings.seedinputText("");
 								}
@@ -181,12 +182,12 @@ public class TitleScene extends PixelScene {
 
 									long seed = DungeonSeed.convertFromText(foundSeed);
 
-									String[] seedfinderOutputLog = new SeedFinder().logSeedItemsSeededRun(seed);
+									SeedfinderLogResult result = new SeedFinder().logSeedItemsSeededRun(seed);
 
 									ShatteredPixelDungeon.scene().addToFront(
 											new WndSeedfinderLog(Icons.get(Icons.BACKPACK),
 													"Found seed " + DungeonSeed.convertToCode(Dungeon.seed),
-													seedfinderOutputLog));
+													result));
 
 								} else {
 									SPDSettings.seeditemsText("");
@@ -201,7 +202,7 @@ public class TitleScene extends PixelScene {
 		StyledButton btnScoutDaily = new StyledButton(GREY_TR, Messages.get(this, "scout_daily")) {
 			@Override
 			protected void onClick() {
-				String[] seedfinderOutputLog = new SeedFinder().logSeedItemsDailyRunRun(0);
+				SeedfinderLogResult result = new SeedFinder().logSeedItemsDailyRunRun(0);
 
 			long DAY = 1000 * 60 * 60 * 24;
 			long currentDay = (long) Math.floor(Game.realTime / DAY) + Options.DailyOffset;
@@ -213,7 +214,7 @@ public class TitleScene extends PixelScene {
 				ShatteredPixelDungeon.scene().addToFront(
 						new WndSeedfinderLog(Icons.get(Icons.BACKPACK),
 								"Items for daily run " + date,
-								seedfinderOutputLog));
+								result));
 			}
 		};
 		btnScoutDaily.icon(Icons.get(Icons.ENTER));
