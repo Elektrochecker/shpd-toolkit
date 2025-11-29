@@ -37,11 +37,15 @@ The max. depth slider in the settings controls until which floor the condition h
 
 Upon starting the seedfinder the app will loop through different seeds until it finds a fitting one. The app will appear frozen until a seed is found. When entering an invalid, impossible or sufficiently unlikeley combination of items, the app will lock up and has to be forcefully closed.
 
-### Item catalog
-The item catalog can be used to check/confirm the names of different items. After finding or scouting a seed, the consumables in the catalog will have the types of the ones in this seed.
+### Configuration
+The number of floors and which categories of items are searched are adjustable in the "Settings" Tab.
+One can also change the currently active challenges, the mode of the Seedfinder and the font size of the results window in the settings.
 
 ### Challenges
 Some challenges such as "forbidden runes" change level generation. The challenges the seedfinder uses can be changed in the settings.
+
+### Item catalog
+The item catalog can be used to check/confirm the names of different items. After finding or scouting a seed, the consumables in the catalog will have the types of the ones in this seed.
 
 # Building
 SHPD Toolkit can be compiled exactly like [Shattered Pixel Dungeon](https://github.com/00-Evan/shattered-pixel-dungeon).
