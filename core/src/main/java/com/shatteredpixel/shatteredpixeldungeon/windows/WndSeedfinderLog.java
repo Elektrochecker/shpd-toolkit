@@ -22,6 +22,7 @@
 package com.shatteredpixel.shatteredpixeldungeon.windows;
 
 import com.shatteredpixel.shatteredpixeldungeon.scenes.PixelScene;
+import com.shatteredpixel.shatteredpixeldungeon.SPDSettings;
 import com.shatteredpixel.shatteredpixeldungeon.ui.RenderedTextBlock;
 import com.watabou.input.PointerEvent;
 import com.watabou.noosa.Image;
@@ -37,7 +38,7 @@ public class WndSeedfinderLog extends WndTabbedCategories {
 	protected static final int WIDTH_MIN = 120;
 	protected static final int WIDTH_MAX = 280;
 	protected static final int GAP = 1;
-	private final int text_size = 4;
+	private final int text_size = SPDSettings.seedfinderFontSize();
 
 	private ArrayList<RenderedTextBlock> item_texts = new ArrayList<>();
 	private ArrayList<RenderedTextBlock> room_texts = new ArrayList<>();

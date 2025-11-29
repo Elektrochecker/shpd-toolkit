@@ -74,13 +74,13 @@ public class WndSettings extends WndTabbed {
 	public WndSettings() {
 		super();
 
-		float height;
+		float height = 0;
 
 		int width = PixelScene.landscape() ? WIDTH_L : WIDTH_P;
 
 		seedfinder = new SeedfinderTab();
 		seedfinder.setSize(width, 0);
-		height = seedfinder.height();
+		height = Math.max(height, seedfinder.height());
 		add( seedfinder );
 
 		add( new IconTab(Icons.get(Icons.PREFS)){
@@ -94,7 +94,7 @@ public class WndSettings extends WndTabbed {
 
 		display = new DisplayTab();
 		display.setSize(width, 0);
-		height = display.height();
+		height = Math.max(height, display.height());
 		add( display );
 
 		add( new IconTab(Icons.get(Icons.DISPLAY)){
@@ -236,13 +236,14 @@ public class WndSettings extends WndTabbed {
 		RedButton btnLoggingSettings;
 		RedButton btnChallenges;
 		RedButton btnMode;
+		OptionSlider fontSize;
 
 		@Override
 		protected void createChildren() {
 			title = PixelScene.renderTextBlock(Messages.get(this, "title"), 9);
 			title.hardlight(TITLE_COLOR);
 			add(title);
-			
+
 			numFloors = new OptionSlider(Messages.get(this, "floors_slider") + " (" + SPDSettings.seedfinderFloors() + ")",
 			"1", "24", 1, 24) {
 				@Override
@@ -264,6 +265,28 @@ public class WndSettings extends WndTabbed {
 			};
 			numFloors.setSelectedValue(SPDSettings.seedfinderFloors());
 			add(numFloors);
+
+			fontSize = new OptionSlider(Messages.get(this, "font_slider") + " (" + SPDSettings.seedfinderFontSize() + ")",
+			"3", "6", 3, 6) {
+				@Override
+				protected void onChange() {
+					SPDSettings.seedfinderFontSize(getSelectedValue());
+
+					// reload scene for desc
+					ShatteredPixelDungeon.seamlessResetScene(new Game.SceneChangeCallback() {
+						@Override
+						public void beforeCreate() {
+						}
+
+						@Override
+						public void afterCreate() {
+							//do nothing
+						}
+					});
+				}
+			};
+			fontSize.setSelectedValue(SPDSettings.seedfinderFontSize());
+			add(fontSize);
 
 			sep1 = new ColorBlock(1, 1, 0xFF000000);
 			add(sep1);
@@ -387,7 +410,7 @@ public class WndSettings extends WndTabbed {
 							};
 							chkRooms.checked(SPDSettings.useRooms());
 							add(chkRooms);
-				
+
 							chkBlacklist = new CheckBox(Messages.get(WndSettings.SeedfinderTab.this, "blacklist")){
 								@Override
 								protected void onClick() {
@@ -442,7 +465,7 @@ public class WndSettings extends WndTabbed {
 								@Override
 								public void beforeCreate() {
 								}
-		
+
 								@Override
 								public void afterCreate() {
 									//do nothing
@@ -494,8 +517,10 @@ public class WndSettings extends WndTabbed {
 
 			btnChallenges.setRect(0, btnLoggingSettings.bottom() + GAP, width / 2 - 1, BTN_HEIGHT);
 			btnMode.setRect(width/2 + 1, btnLoggingSettings.bottom() + GAP, width / 2, BTN_HEIGHT);
-		}
+			fontSize.setRect(0, btnMode.bottom() + GAP, width, SLIDER_HEIGHT);
 
+			height = fontSize.bottom();
+		}
 	}
 
 	private static class DisplayTab extends Component {
@@ -576,7 +601,7 @@ public class WndSettings extends WndTabbed {
 				}
 			};
 			optVisGrid.setSelectedValue(SPDSettings.visualGrid());
-			add(optVisGrid);
+			// add(optVisGrid);
 
 			optFollowIntensity = new OptionSlider(Messages.get(this, "camera_follow"),
 					Messages.get(this, "low"), Messages.get(this, "high"), 1, 4) {
@@ -586,7 +611,7 @@ public class WndSettings extends WndTabbed {
 				}
 			};
 			optFollowIntensity.setSelectedValue(SPDSettings.cameraFollow());
-			add(optFollowIntensity);
+			// add(optFollowIntensity);
 
 			optScreenShake = new OptionSlider(Messages.get(this, "screenshake"),
 					Messages.get(this, "off"), Messages.get(this, "high"), 0, 4) {
@@ -596,7 +621,7 @@ public class WndSettings extends WndTabbed {
 				}
 			};
 			optScreenShake.setSelectedValue(SPDSettings.screenShake());
-			add(optScreenShake);
+			// add(optScreenShake);
 
 		}
 

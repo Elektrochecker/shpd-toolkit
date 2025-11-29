@@ -66,6 +66,8 @@ public class SPDSettings extends GameSettings {
 	public static final String KEY_SEEDINPUT_TEXT= "remember_seedinput_text";
 	public static final String KEY_CONDITION= "seedfinder_condition";
 
+	public static final String KEY_FONTSIZE= "seedfinder_fontsize";
+
 	public static void seedfinderFloors( int value ) {
 		put( KEY_FLOORS, value );
 	}
@@ -171,6 +173,14 @@ public class SPDSettings extends GameSettings {
 	
 	public static boolean logMisc() {
 		return getBoolean( KEY_LOGMISC, false );
+	}
+
+	public static void seedfinderFontSize( int value ) {
+		put( KEY_FONTSIZE, value );
+	}
+
+	public static int seedfinderFontSize() {
+		return getInt( KEY_FONTSIZE, 4, 3, 6 );
 	}
 
 	//Display

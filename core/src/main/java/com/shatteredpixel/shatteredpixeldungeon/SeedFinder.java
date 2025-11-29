@@ -118,6 +118,7 @@ public class SeedFinder {
 		Options.searchForDaily = false;
 
 		// TODO: retire useRooms option
+		// the option still controls matching of rooms when finding seeds, even though rooms are always displayed
 		Options.useRooms = SPDSettings.useRooms();
 
 		Options.logTrinkets = SPDSettings.logTrinkets();

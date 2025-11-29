@@ -145,7 +145,7 @@ public class WndTabbedCategories extends Window {
 			width + chrome.marginHor(),
 			height + chrome.marginVer() );
 
-		camera.resize( (int)chrome.width, chrome.marginTop() + height + 2 * tabHeight() );
+		camera.resize( (int)chrome.width, chrome.marginTop() + height + 2 * (new Tab()).height );
 		camera.x = (int)(Game.width - camera.screenWidth()) / 2;
 		camera.y = (int)(Game.height - camera.screenHeight()) / 2;
 		camera.y += yOffset * camera.zoom;
@@ -174,70 +174,70 @@ public class WndTabbedCategories extends Window {
 		float numTabs = tabs_main.size();
 		float tabWidth = (fullWidth - (numTabs-1))/numTabs;
 
+		// first row of (main) tabs
 		float pos = -chrome.marginLeft() + 1;
 		for (Tab tab : tabs_main){
-			tab.setSize(tabWidth, tabHeight());
+			tab.setSize(tabWidth, tab.height);
 			tab.setPos(pos, height);
 			pos = tab.right() + 1;
 			PixelScene.align(tab);
 		}
 
+		// second row of (category) tabs
 		numTabs = tabs_categories.size();
 		tabWidth = (fullWidth - (numTabs-1))/numTabs;
 		pos = -chrome.marginLeft() + 1;
 		for (Tab tab : tabs_categories){
-			tab.setSize(tabWidth, tabHeight());
-			tab.setPos(pos, height + tabHeight()-8);
+			tab.setSize(tabWidth, tab.height);
+			tab.setPos(pos, height + tab.height-8);
 			pos = tab.right() + 1;
 			PixelScene.align(tab);
 		}
 	}
-	
-	protected int tabHeight() {
-		return 25;
-	}
-	
+
 	protected void onClick( Tab tab ) {
 		select( tab );
 	}
-	
+
 	protected class Tab extends Button {
-		
+
 		protected final int CUT = 5;
-		
+
+		protected int height = 25;
+
 		protected boolean selected;
-		
+
 		protected NinePatch bg;
 
 		protected TabType type;
-		
+
 		@Override
 		protected void layout() {
 			super.layout();
-			
+
 			if (bg != null) {
 				bg.x = x;
 				bg.y = y;
 				bg.size( width, height );
 			}
 		}
-		
+
 		protected void select( boolean value ) {
-			
+
 			selected = value;
-			
+
 			if (bg != null) {
 				remove( bg );
 			}
-			
+
 			bg = Chrome.get( selected ?
 				Chrome.Type.TAB_SELECTED :
 				Chrome.Type.TAB_UNSELECTED );
 			addToBack( bg );
-			
+
 			layout();
 		}
-		
+
 		@Override
 		protected void onClick() {
 			if (!selected) {
@@ -246,68 +246,68 @@ public class WndTabbedCategories extends Window {
 			}
 		}
 	}
-	
+
 	protected class LabeledTab extends Tab {
-		
+
 		private RenderedTextBlock btLabel;
-		
+
 		public LabeledTab( String label ) {
-			
+
 			super();
-			
+
 			btLabel.text( label );
 		}
-		
+
 		@Override
 		protected void createChildren() {
 			super.createChildren();
-			
+
 			btLabel = PixelScene.renderTextBlock( 6 );
 			add( btLabel );
 		}
-		
+
 		@Override
 		protected void layout() {
 			super.layout();
-			
+
 			btLabel.setPos(
 					x + (width - btLabel.width()) / 2,
 					y + (height - btLabel.height()) / 2 - (selected ? 1 : 3)
 			);
 			PixelScene.align(btLabel);
 		}
-		
+
 		@Override
 		protected void select( boolean value ) {
 			super.select( value );
 			btLabel.alpha( selected ? 1.0f : 0.6f );
 		}
 	}
-	
+
 	protected class IconTab extends Tab {
-		
+
 		protected Image icon;
 		private RectF defaultFrame;
-		
+
 		public IconTab( Image icon ){
 			super();
-			
+
 			this.icon.copy(icon);
 			this.defaultFrame = icon.frame();
 		}
-		
+
 		@Override
 		protected void createChildren() {
 			super.createChildren();
-			
+
 			icon = new Image();
 			add( icon );
 		}
-		
+
 		@Override
 		protected void layout() {
 			super.layout();
-			
+
 			icon.frame(defaultFrame);
 			icon.x = x + (width - icon.width) / 2;
 			icon.y = y + (height - icon.height) / 2 - 1;
