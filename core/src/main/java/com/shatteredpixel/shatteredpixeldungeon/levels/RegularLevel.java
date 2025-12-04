@@ -50,6 +50,7 @@ import com.shatteredpixel.shatteredpixeldungeon.items.journal.RegionLorePage;
 import com.shatteredpixel.shatteredpixeldungeon.items.keys.CrystalKey;
 import com.shatteredpixel.shatteredpixeldungeon.items.keys.GoldenKey;
 import com.shatteredpixel.shatteredpixeldungeon.items.keys.Key;
+import com.shatteredpixel.shatteredpixeldungeon.items.trinkets.CrackedSpyglass;
 import com.shatteredpixel.shatteredpixeldungeon.items.trinkets.MimicTooth;
 import com.shatteredpixel.shatteredpixeldungeon.items.trinkets.TrinketCatalyst;
 import com.shatteredpixel.shatteredpixeldungeon.journal.Document;
@@ -678,6 +679,19 @@ public abstract class RegularLevel extends Level {
 			}
 		Random.popGenerator();
 
+		//extra spyglass loot
+		Random.pushGenerator(Random.Long());
+			int items = (int)(Random.Float() + CrackedSpyglass.extraLootChance());
+			for (int i = 0; i < items; i++){
+				int cell = randomDropCell();
+				if (map[cell] == Terrain.HIGH_GRASS || map[cell] == Terrain.FURROWED_GRASS) {
+					map[cell] = Terrain.GRASS;
+					losBlocking[cell] = false;
+				}
+				drop( Generator.randomUsingDefaults(), cell).hidden = true;
+			}
+		Random.popGenerator();
+
 	}
 
 	private static HashMap<Document, Dungeon.LimitedDrops> limitedDocs = new HashMap<>();
@@ -822,7 +836,7 @@ public abstract class RegularLevel extends Level {
 			}
 		}
 
-		//it contains a barricade, locked door, or hidden door
+		//it contains a barricade, locked door (player locked doors are fine though), or hidden door
 		for (int i = 0; i < length; i++){
 			if (map[i] == Terrain.BARRICADE || map[i] == Terrain.LOCKED_DOOR || map[i] == Terrain.SECRET_DOOR){
 				//we use adjacent cells to find the room this is connected to

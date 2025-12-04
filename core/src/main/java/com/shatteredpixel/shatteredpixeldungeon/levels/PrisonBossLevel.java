@@ -317,14 +317,6 @@ public class PrisonBossLevel extends Level {
 			cell += width();
 		}
 
-		//pre-2.5.1 saves, if exit wasn't already added
-		if (exit() == entrance()) {
-			LevelTransition exit = new LevelTransition(this, pointToCell(levelExit), LevelTransition.Type.REGULAR_EXIT);
-			exit.right += 2;
-			exit.bottom += 3;
-			transitions.add(exit);
-		}
-
 		addCagesToCells();
 	}
 	
@@ -377,7 +369,7 @@ public class PrisonBossLevel extends Level {
 		addVisuals(); //this also resets existing visuals
 		traps.clear();
 
-		for (CustomTilemap t : customTiles){
+		for (CustomTilemap t : customTiles.toArray(new CustomTilemap[0])){
 			if (t instanceof FadingTraps){
 				((FadingTraps) t).remove();
 			}
@@ -448,7 +440,7 @@ public class PrisonBossLevel extends Level {
 				
 				tengu.state = tengu.HUNTING;
 				tengu.pos = tenguPos;
-				GameScene.add( tengu );
+				GameScene.add( tengu, 1 );
 				tengu.notice();
 
 				CellEmitter.get( tengu.pos ).burst( Speck.factory( Speck.WOOL ), 6 );
@@ -474,6 +466,7 @@ public class PrisonBossLevel extends Level {
 				Doom d = tengu.buff(Doom.class);
 				Actor.remove(tengu);
 				mobs.remove(tengu);
+				tengu.clearTime();
 				TargetHealthIndicator.instance.target(null);
 				tengu.sprite.kill();
 				if (d != null) tengu.add(d);
@@ -495,8 +488,7 @@ public class PrisonBossLevel extends Level {
 				
 				tengu.state = tengu.HUNTING;
 				tengu.pos = (arena.left + arena.width()/2) + width()*(arena.top+2);
-				GameScene.add(tengu);
-				tengu.timeToNow();
+				GameScene.add( tengu, 1 );
 				tengu.notice();
 
 				CellEmitter.get( tengu.pos ).burst( Speck.factory( Speck.WOOL ), 6 );
@@ -657,7 +649,7 @@ public class PrisonBossLevel extends Level {
 		Painter.fill(this, tenguCell, 1, Terrain.EMPTY);
 		buildFlagMaps();
 
-		for (CustomTilemap vis : customTiles){
+		for (CustomTilemap vis : customTiles.toArray(new CustomTilemap[0])){
 			if (vis instanceof FadingTraps){
 				((FadingTraps) vis).remove();
 			}

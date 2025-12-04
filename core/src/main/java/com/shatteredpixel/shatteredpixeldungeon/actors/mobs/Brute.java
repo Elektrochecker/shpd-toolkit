@@ -80,21 +80,30 @@ public class Brute extends Mob {
 		}
 	}
 
+	//cache this buff to prevent having to call buff(...) a bunch in isAlive
+	private BruteRage rage;
+
 	@Override
-	public synchronized boolean isAlive() {
+	public boolean isAlive() {
 		if (super.isAlive()){
 			return true;
 		} else {
 			if (!hasRaged){
 				triggerEnrage();
 			}
-			return !buffs(BruteRage.class).isEmpty();
+			if (rage == null){
+				for (BruteRage b : buffs(BruteRage.class)){
+					rage = b;
+				}
+			}
+			return rage != null && rage.shielding() > 0;
 		}
 	}
 	
 	protected void triggerEnrage(){
-		Buff.affect(this, BruteRage.class).setShield(HT/2 + 4);
-		sprite.showStatusWithIcon( CharSprite.POSITIVE, Integer.toString(HT/2 + 4), FloatingText.SHIELDING );
+		rage = Buff.affect(this, BruteRage.class);
+		rage.setShield(HT/2 + 4);
+		sprite.showStatusWithIcon( CharSprite.POSITIVE, Integer.toString(HT/2), FloatingText.SHIELDING );
 		if (Dungeon.level.heroFOV[pos]) {
 			SpellSprite.show( this, SpellSprite.BERSERK);
 		}
@@ -141,6 +150,12 @@ public class Brute extends Mob {
 			return true;
 		}
 		
+		@Override
+		public void detach() {
+			super.detach();
+			decShield(shielding()); //clear shielding to track that this was detached
+		}
+
 		@Override
 		public int icon () {
 			return BuffIndicator.FURY;

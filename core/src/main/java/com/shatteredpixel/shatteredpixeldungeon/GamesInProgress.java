@@ -42,6 +42,7 @@ public class GamesInProgress {
 	public static int curSlot;
 	
 	public static HeroClass selectedClass;
+	public static boolean randomizedClass = false;
 	
 	private static final String GAME_FOLDER = "game%d";
 	private static final String GAME_FILE	= "game.dat";
@@ -112,7 +113,7 @@ public class GamesInProgress {
 				
 				Bundle bundle = FileUtils.bundleFromFile(gameFile(slot));
 
-				if (bundle.getInt( "version" ) < ShatteredPixelDungeon.v2_4_2) {
+				if (bundle.getInt( "version" ) < ShatteredPixelDungeon.v2_5_4) {
 					info = null;
 				} else {
 

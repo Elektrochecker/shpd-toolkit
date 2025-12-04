@@ -184,8 +184,8 @@ public abstract class Level implements Bundlable {
 	public HashMap<Class<? extends Blob>,Blob> blobs;
 	public SparseArray<Plant> plants;
 	public SparseArray<Trap> traps;
-	public HashSet<CustomTilemap> customTiles;
-	public HashSet<CustomTilemap> customWalls;
+	public ArrayList<CustomTilemap> customTiles;
+	public ArrayList<CustomTilemap> customWalls;
 	
 	protected ArrayList<Item> itemsToSpawn = new ArrayList<>();
 
@@ -304,8 +304,8 @@ public abstract class Level implements Bundlable {
 			blobs = new HashMap<>();
 			plants = new SparseArray<>();
 			traps = new SparseArray<>();
-			customTiles = new HashSet<>();
-			customWalls = new HashSet<>();
+			customTiles = new ArrayList<>();
+			customWalls = new ArrayList<>();
 			
 		} while (!build());
 		
@@ -365,8 +365,8 @@ public abstract class Level implements Bundlable {
 
 		version = bundle.getInt( VERSION );
 		
-		//saves from before v2.3.2 are not supported
-		if (version < ShatteredPixelDungeon.v2_4_2){
+		//saves from before v2.5.4 are not supported
+		if (version < ShatteredPixelDungeon.v2_5_4){
 			throw new RuntimeException("old save");
 		}
 
@@ -377,8 +377,8 @@ public abstract class Level implements Bundlable {
 		blobs = new HashMap<>();
 		plants = new SparseArray<>();
 		traps = new SparseArray<>();
-		customTiles = new HashSet<>();
-		customWalls = new HashSet<>();
+		customTiles = new ArrayList<>();
+		customWalls = new ArrayList<>();
 		
 		map		= bundle.getIntArray( MAP );
 
@@ -1570,6 +1570,7 @@ public abstract class Level implements Bundlable {
 			case Terrain.FURROWED_GRASS:
 				return Messages.get(Level.class, "furrowed_grass_name");
 			case Terrain.LOCKED_DOOR:
+			case Terrain.HERO_LKD_DR:
 				return Messages.get(Level.class, "locked_door_name");
 			case Terrain.CRYSTAL_DOOR:
 				return Messages.get(Level.class, "crystal_door_name");
@@ -1620,6 +1621,7 @@ public abstract class Level implements Bundlable {
 			case Terrain.FURROWED_GRASS:
 				return Messages.get(Level.class, "high_grass_desc");
 			case Terrain.LOCKED_DOOR:
+			case Terrain.HERO_LKD_DR:
 				return Messages.get(Level.class, "locked_door_desc");
 			case Terrain.CRYSTAL_DOOR:
 				return Messages.get(Level.class, "crystal_door_desc");

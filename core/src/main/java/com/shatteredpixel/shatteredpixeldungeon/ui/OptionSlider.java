@@ -87,6 +87,14 @@ public abstract class OptionSlider extends Component {
 		PixelScene.align(sliderNode);
 	}
 
+	public void enable( boolean value ) {
+		active = value;
+		title.alpha( value ? 1.0f : 0.3f );
+		minTxt.alpha( value ? 1.0f : 0.3f );
+		maxTxt.alpha( value ? 1.0f : 0.3f );
+		sliderNode.alpha( value ? 1.0f : 0.3f );
+	}
+
 	@Override
 	protected void createChildren() {
 		super.createChildren();
@@ -144,7 +152,7 @@ public abstract class OptionSlider extends Component {
 	@Override
 	protected void layout() {
 
-		if (title.width() > 0.7f*width){
+		if (title.width() > 0.6f*width){
 			String titleText = title.text;
 			remove(title);
 			title = PixelScene.renderTextBlock(6);
