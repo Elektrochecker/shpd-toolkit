@@ -23,6 +23,7 @@ package com.watabou.noosa;
 
 import com.badlogic.gdx.Files;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -141,13 +142,13 @@ public class TextInput extends Component {
 		textField.setOnscreenKeyboard(new TextField.OnscreenKeyboard() {
 			@Override
 			public void show(boolean visible) {
-				Game.platform.setOnscreenKeyboardVisible(visible, multiline);
+				Gdx.input.setOnscreenKeyboardVisible(visible, Input.OnscreenKeyboardType.Email);
 			}
 		});
 
 		container.setActor(textField);
 		stage.setKeyboardFocus(textField);
-		Game.platform.setOnscreenKeyboardVisible(true, multiline);
+		Gdx.input.setOnscreenKeyboardVisible(true, Input.OnscreenKeyboardType.Email);
 	}
 
 	public void enterPressed(){
