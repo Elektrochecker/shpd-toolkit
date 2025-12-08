@@ -176,11 +176,11 @@ public class TitleScene extends PixelScene {
 									final Thread[] searchThread = new Thread[1];
 									final WndOptions[] progressWnd = new WndOptions[1];
 
-									// 在子线程中激活种子查找器以避免UI卡顿
+									// run the seedfinder in a new thread
 									searchThread[0] = new Thread(() -> {
 										final String foundSeed = new SeedFinder().find_seed(seeditems_userInput);
 
-										// 在主线程上处理结果
+										// process results in the rendering thread
 										Gdx.app.postRunnable(() -> {
 											if (progressWnd[0].parent == null) {
 												// Window was removed, so search was cancelled.
@@ -194,7 +194,7 @@ public class TitleScene extends PixelScene {
 												return;
 											}
 
-											// 成功后将种子复制到剪贴板
+											// copy seed to clipboard on success
 											Clipboard clipboard = Gdx.app.getClipboard();
 											clipboard.setContents(foundSeed);
 
