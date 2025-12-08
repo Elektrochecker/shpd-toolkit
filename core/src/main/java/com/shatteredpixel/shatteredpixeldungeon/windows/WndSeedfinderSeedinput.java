@@ -43,6 +43,8 @@ public class WndSeedfinderSeedinput extends Window {
 	protected RedButton btnCopy;
 	protected RedButton btnPaste;
 
+	private String lastText;
+
 	public WndSeedfinderSeedinput(final String title, final String body, final String initialValue, final int maxLength,
 			final boolean multiLine, final String posTxt, final String negTxt) {
 		super();
@@ -91,8 +93,10 @@ public class WndSeedfinderSeedinput extends Window {
 				hide();
 			}
 		};
-		if (initialValue != null)
+		if (initialValue != null) {
 			textBox.setText(initialValue);
+			lastText = initialValue;
+		}
 		textBox.setMaxLength(maxLength);
 
 		// sets different height depending on whether this is a single or multi line
@@ -208,6 +212,10 @@ public class WndSeedfinderSeedinput extends Window {
 		super.update();
 		btnCopy.enable(!textBox.getText().isEmpty());
 		btnPaste.enable(Gdx.app.getClipboard().hasContents());
+		if (!textBox.getText().equals(lastText)) {
+			lastText = textBox.getText();
+			onTextChange(lastText);
+		}
 	}
 
 	@Override
@@ -221,8 +229,6 @@ public class WndSeedfinderSeedinput extends Window {
 	public void onSelect(boolean positive, String text) {
 	}
 
-	@Override
-	public void onBackPressed() {
-		// Do nothing, prevents accidentally losing writing
+	public void onTextChange(String text) {
 	}
 }
