@@ -185,21 +185,65 @@ public class TitleScene extends PixelScene {
 								if (positive) {
 									SPDSettings.seeditemsText(seeditems_userInput);
 
-									//activate the seedfinder. this one takes a while
-									String foundSeed = new SeedFinder().find_seed(seeditems_userInput);
+									final Thread[] searchThread = new Thread[1];
+									final WndOptions[] progressWnd = new WndOptions[1];
 
-									//copy seed to clipboard on success
-									Clipboard clipboard = Gdx.app.getClipboard();
-									clipboard.setContents(foundSeed);
+									// 在子线程中激活种子查找器以避免UI卡顿
+									searchThread[0] = new Thread(() -> {
+										final String foundSeed = new SeedFinder().find_seed(seeditems_userInput);
 
-									long seed = DungeonSeed.convertFromText(foundSeed);
+										// 在主线程上处理结果
+										Gdx.app.postRunnable(() -> {
+											if (progressWnd[0].parent == null) {
+												// Window was removed, so search was cancelled.
+												return;
+											}
+											progressWnd[0].hide();
 
-									SeedfinderLogResult result = new SeedFinder().logSeedItemsSeededRun(seed);
+											if (foundSeed == null || foundSeed.startsWith("error")) {
+												ShatteredPixelDungeon.scene().addToFront(new com.shatteredpixel.shatteredpixeldungeon.windows.WndMessage(
+														foundSeed != null ? foundSeed : "Error: seed not found."));
+												return;
+											}
 
-									ShatteredPixelDungeon.scene().addToFront(
-											new WndSeedfinderLog(Icons.get(Icons.BACKPACK),
-													"Found seed " + DungeonSeed.convertToCode(Dungeon.seed),
-													result));
+											// 成功后将种子复制到剪贴板
+											Clipboard clipboard = Gdx.app.getClipboard();
+											clipboard.setContents(foundSeed);
+
+											long seed = DungeonSeed.convertFromText(foundSeed);
+
+											SeedfinderLogResult result = new SeedFinder().logSeedItemsSeededRun(seed);
+
+											ShatteredPixelDungeon.scene().addToFront(
+													new WndSeedfinderLog(Icons.get(Icons.BACKPACK),
+															"Found seed " + DungeonSeed.convertToCode(Dungeon.seed),
+															result));
+										});
+									});
+
+									progressWnd[0] = new WndOptions(
+											Icons.get(Icons.MAGNIFY),
+											Messages.get(TitleScene.class, "seedfinder_searching_title"),
+											Messages.get(TitleScene.class, "seedfinder_searching_text"),
+											Messages.get(TitleScene.class, "seedfinder_searching_cancel")
+									) {
+										@Override
+										protected void onSelect(int index) {
+											if (index == 0) {
+												searchThread[0].interrupt();
+												hide();
+											}
+										}
+
+										@Override
+										public void onBackPressed() {
+											searchThread[0].interrupt();
+											super.onBackPressed();
+										}
+									};
+
+									ShatteredPixelDungeon.scene().addToFront(progressWnd[0]);
+									searchThread[0].start();
 
 								} else {
 									SPDSettings.seeditemsText("");
