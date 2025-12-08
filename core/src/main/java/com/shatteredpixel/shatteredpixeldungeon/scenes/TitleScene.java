@@ -151,6 +151,11 @@ public class TitleScene extends PixelScene {
 									SPDSettings.seedinputText("");
 								}
 							}
+
+							@Override
+							public void onTextChange(String text) {
+								SPDSettings.seedinputText(text);
+							}
 						});
 			}
 		};
@@ -236,6 +241,11 @@ public class TitleScene extends PixelScene {
 								} else {
 									SPDSettings.seeditemsText("");
 								}
+							}
+
+							@Override
+							public void onTextChange(String text) {
+								SPDSettings.seeditemsText(text);
 							}
 						});
 			}
