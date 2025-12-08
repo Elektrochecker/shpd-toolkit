@@ -104,7 +104,31 @@ public enum Languages {
 	}
 
 	public static Languages matchCode(String code){
-		return ENGLISH;
+		switch (code){
+			case "zh": return Languages.CHI_SMPL;
+			case "zh-hant": return Languages.CHI_TRAD;
+			case "ko": return Languages.KOREAN;
+			case "ru": return Languages.RUSSIAN;
+			case "es": return Languages.SPANISH;
+			case "pt": return Languages.PORTUGUESE;
+			case "de": return Languages.GERMAN;
+			case "fr": return Languages.FRENCH;
+			case "ja": return Languages.JAPANESE;
+			case "pl": return Languages.POLISH;
+			case "vi": return Languages.VIETNAMESE;
+			case "tr": return Languages.TURKISH;
+			case "it": return Languages.ITALIAN;
+			case "uk": return Languages.UKRANIAN;
+			case "cs": return Languages.CZECH;
+			case "hu": return Languages.HUNGARIAN;
+			case "nl": return Languages.DUTCH;
+			case "sv": return Languages.SWEDISH;
+			case "el": return Languages.GREEK;
+			case "be": return Languages.BELARUSIAN;
+			case "eo": return Languages.ESPERANTO;
+			case "in": return Languages.INDONESIAN;
+			default: return Languages.ENGLISH;
+		}
 	}
 
 }
