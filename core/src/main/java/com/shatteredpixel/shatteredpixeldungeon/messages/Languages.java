@@ -131,4 +131,12 @@ public enum Languages {
 		}
 	}
 
+	public static boolean isSupported(String code) {
+		for (Languages lang : values()) {
+			if (lang.code().equals(code)) {
+				return true;
+			}
+		}
+		return false;
+	}
 }

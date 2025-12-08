@@ -68,10 +68,22 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 public class TitleScene extends PixelScene {
+	private static boolean languageChecked = false;
 
 	@Override
 	public void create() {
+		if (!languageChecked) {
+			languageChecked = true;
 
+			if (!SPDSettings.languageUserSet()) {
+				String systemLang = Locale.getDefault().getLanguage();
+				if (Languages.isSupported(systemLang) && !systemLang.equals(SPDSettings.language())) {
+					Messages.setLanguage(systemLang);
+					ShatteredPixelDungeon.switchScene(TitleScene.class);
+					return;
+				}
+			}
+		}
 		super.create();
 
 		Music.INSTANCE.playTracks(

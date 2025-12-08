@@ -1394,6 +1394,7 @@ public class WndSettings extends WndTabbed {
 					protected void onClick() {
 						super.onClick();
 						Messages.setup(langs.get(langIndex));
+						SPDSettings.languageUserSet(true);
 						ShatteredPixelDungeon.seamlessResetScene(new Game.SceneChangeCallback() {
 							@Override
 							public void beforeCreate() {

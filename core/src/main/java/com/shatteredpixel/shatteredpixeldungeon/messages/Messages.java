@@ -220,4 +220,11 @@ public class Messages {
 	public static String lowerCase( String str ){
 		return str.toLowerCase(locale);
 	}
+
+	public static void setLanguage(String code) {
+		SPDSettings.language(Languages.matchCode(code));
+		lang = Languages.matchCode(code);
+		locale = new Locale(code);
+		setup(SPDSettings.language());
+	}
 }

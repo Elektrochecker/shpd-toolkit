@@ -601,4 +601,14 @@ public class SPDSettings extends GameSettings {
 	public static int fulLScreenMonitor(){
 		return getInt( KEY_FULLSCREEN_MONITOR, 0 );
 	}
+
+	public static final String KEY_LANG_USER_SET = "language_user_set";
+
+	public static void languageUserSet(boolean value) {
+		put(KEY_LANG_USER_SET, value);
+	}
+
+	public static boolean languageUserSet() {
+		return getBoolean(KEY_LANG_USER_SET, false);
+	}
 }
