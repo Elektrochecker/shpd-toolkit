@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import com.badlogic.gdx.Gdx;
 import com.shatteredpixel.shatteredpixeldungeon.actors.blobs.WaterOfAwareness;
 import com.shatteredpixel.shatteredpixeldungeon.actors.blobs.WaterOfHealth;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.HeroClass;
@@ -242,37 +243,63 @@ public class SeedFinder {
 		loadConfig();
 		itemList = getItemList(items);
 
-		// only generate natural seeds, currently not available in shpd toolkit
-		if (Options.trueRandom) {
-			for (int i = 0; i < DungeonSeed.TOTAL_SEEDS; i++) {
-				long seed = DungeonSeed.randomSeed();
-				if (testSeed(Long.toString(seed), Options.floors)) {
-					ShatteredPixelDungeon.scene()
-							.addToFront(new WndMessage("searched through _" + Long.toString(i) + "_ seeds."));
+		try {
+			// only generate natural seeds, currently not available in shpd toolkit
+			if (Options.trueRandom) {
+				for (int i = 0; i < DungeonSeed.TOTAL_SEEDS; i++) {
+					if (Thread.currentThread().isInterrupted())
+						throw new InterruptedException();
+					final int finalI = i;
+					Gdx.app.postRunnable(new Runnable() {
+						@Override
+						public void run() {
+							ShatteredPixelDungeon.scene()
+									.addToFront(new WndMessage("searched through _" + Long.toString(finalI) + "_ seeds."));
+						}
+					});
 					return DungeonSeed.convertToCode(Dungeon.seed);
 				}
-			}
 
 			// sequential mode: start at 0, currently not available in shpd toolkit
-		} else if (Options.sequentialMode) {
-			for (long i = Options.startingSeed; i < DungeonSeed.TOTAL_SEEDS; i++) {
-				if (testSeed(Long.toString(i), Options.floors)) {
-					ShatteredPixelDungeon.scene().addToFront(new WndMessage(
-							"searched through _" + Long.toString(i - Options.startingSeed) + "_ seeds."));
-					return DungeonSeed.convertToCode(Dungeon.seed);
+			} else if (Options.sequentialMode) {
+				for (long i = Options.startingSeed; i < DungeonSeed.TOTAL_SEEDS; i++) {
+					if (Thread.currentThread().isInterrupted())
+						throw new InterruptedException();
+					if (testSeed(Long.toString(i), Options.floors)) {
+						final long finalI = i;
+						Gdx.app.postRunnable(new Runnable() {
+							@Override
+							public void run() {
+								ShatteredPixelDungeon.scene().addToFront(new WndMessage(
+										"searched through _" + Long.toString(finalI - Options.startingSeed) + "_ seeds."));
+							}
+						});
+						return DungeonSeed.convertToCode(Dungeon.seed);
+					}
 				}
-			}
 
 			// default (random) mode
-		} else {
-			long start = Random.Long(DungeonSeed.TOTAL_SEEDS);
-			for (long i = start; i < DungeonSeed.TOTAL_SEEDS; i++) {
-				if (testSeed(Long.toString(i), Options.floors)) {
-					ShatteredPixelDungeon.scene()
-							.addToFront(new WndMessage("searched through _" + Long.toString(i - start) + "_ seeds."));
-					return DungeonSeed.convertToCode(Dungeon.seed);
+			} else {
+				long start = Random.Long(DungeonSeed.TOTAL_SEEDS);
+				for (long i = start; i < DungeonSeed.TOTAL_SEEDS; i++) {
+					if (Thread.currentThread().isInterrupted())
+						throw new InterruptedException();
+					if (testSeed(Long.toString(i), Options.floors)) {
+						final long finalI = i;
+						final long finalStart = start;
+						Gdx.app.postRunnable(new Runnable() {
+							@Override
+							public void run() {
+								ShatteredPixelDungeon.scene()
+										.addToFront(new WndMessage("searched through _" + Long.toString(finalI - finalStart) + "_ seeds."));
+							}
+						});
+						return DungeonSeed.convertToCode(Dungeon.seed);
+					}
 				}
 			}
+		} catch (InterruptedException e) {
+			return "error: search cancelled";
 		}
 
 		return "error: invalid finding mode";
@@ -402,7 +429,7 @@ public class SeedFinder {
 		return heaps;
 	}
 
-	private boolean testSeed(String seed, int floors) {
+	private boolean testSeed(String seed, int floors) throws InterruptedException {
 		SPDSettings.customSeed(seed);
 		Dungeon.initSeed();
 		SPDSettings.challenges(Options.challenges);
@@ -428,6 +455,8 @@ public class SeedFinder {
 		}
 
 		for (int i = 0; i < floors; i++) {
+			if (Thread.currentThread().isInterrupted())
+				throw new InterruptedException();
 
 			Level l = Dungeon.newLevel();
 
