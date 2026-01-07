@@ -30,6 +30,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.MagicImmune;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Regeneration;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent;
 import com.shatteredpixel.shatteredpixeldungeon.effects.BlobEmitter;
 import com.shatteredpixel.shatteredpixeldungeon.effects.CellEmitter;
 import com.shatteredpixel.shatteredpixeldungeon.effects.Speck;
@@ -149,7 +150,7 @@ public class SkeletonKey extends Artifact {
 							return;
 						}
 						if (charge < 1){
-							GLog.i( Messages.get(this, "iron_charges") );
+							GLog.i( Messages.get(SkeletonKey.class, "iron_charges") );
 							return;
 						}
 						Sample.INSTANCE.play(Assets.Sounds.UNLOCK);
@@ -161,6 +162,7 @@ public class SkeletonKey extends Artifact {
 								GameScene.updateMap(target);
 								charge -= 1;
 								gainExp(2 + 1);
+								Talent.onArtifactUsed(Dungeon.hero);
 								curUser.spendAndNext(Actor.TICK);
 								curUser.sprite.idle();
 							}
@@ -176,7 +178,7 @@ public class SkeletonKey extends Artifact {
 							public void call() {
 								Level.set(target, Terrain.DOOR);
 								GameScene.updateMap(target);
-								//no charge cost
+								//no charge cost, no artifact on-use
 								curUser.spendAndNext(Actor.TICK);
 								curUser.sprite.idle();
 							}
@@ -198,10 +200,14 @@ public class SkeletonKey extends Artifact {
 								GameScene.updateMap(target);
 								charge -= 5;
 								gainExp(2 + 5);
+								Talent.onArtifactUsed(Dungeon.hero);
 								Sample.INSTANCE.play(Assets.Sounds.TELEPORT);
 								CellEmitter.get( target ).start( Speck.factory( Speck.DISCOVER ), 0.025f, 20 );
 								curUser.spendAndNext(Actor.TICK);
 								curUser.sprite.idle();
+
+								//if there is a distant well landmark above, remove it, as we just opened the door
+								Notes.remove(Notes.Landmark.DISTANT_WELL, Dungeon.depth-1);
 							}
 						});
 						curUser.busy();
@@ -233,6 +239,7 @@ public class SkeletonKey extends Artifact {
 							if (pushCell != -1 && !Char.hasProp(toMove, Char.Property.IMMOVABLE)){
 								Ballistica push = new Ballistica(target, pushCell, Ballistica.PROJECTILE);
 								WandOfBlastWave.throwChar(toMove, push, 1, false, false, this);
+								artifactProc(toMove, visiblyUpgraded(), 2);
 							} else {
 								GLog.w(Messages.get(SkeletonKey.class, "lock_no_space"));
 								return;
@@ -247,6 +254,7 @@ public class SkeletonKey extends Artifact {
 								GameScene.updateMap(target);
 								charge -= 2;
 								gainExp(2);
+								Talent.onArtifactUsed(Dungeon.hero);
 								curUser.spendAndNext(Actor.TICK);
 								curUser.sprite.idle();
 
@@ -283,6 +291,7 @@ public class SkeletonKey extends Artifact {
 								Dungeon.level.heaps.get(target).open(curUser);
 								charge -= 2;
 								gainExp(2 + 2);
+								Talent.onArtifactUsed(Dungeon.hero);
 								curUser.spendAndNext(Actor.TICK);
 								curUser.sprite.idle();
 							}
@@ -303,6 +312,7 @@ public class SkeletonKey extends Artifact {
 								Dungeon.level.heaps.get(target).open(curUser);
 								charge -= 5;
 								gainExp(2 + 5);
+								Talent.onArtifactUsed(Dungeon.hero);
 								curUser.spendAndNext(Actor.TICK);
 								curUser.sprite.idle();
 							}
@@ -358,6 +368,7 @@ public class SkeletonKey extends Artifact {
 						GameScene.updateFog();
 						Sample.INSTANCE.play(Assets.Sounds.TELEPORT);
 
+						Talent.onArtifactUsed(Dungeon.hero);
 						curUser.spendAndNext(Actor.TICK);
 						curUser.sprite.idle();
 					}
@@ -453,6 +464,7 @@ public class SkeletonKey extends Artifact {
 			Char ch = Actor.findChar(pos);
 			if (ch != null && ch.alignment == Char.Alignment.ENEMY){
 				WandOfBlastWave.throwChar(ch, new Ballistica(pos, pos+knockbackDIR, Ballistica.PROJECTILE), 1, false, false, this);
+				artifactProc(ch, visiblyUpgraded(), 2);
 			}
 		}
 	}
@@ -581,6 +593,13 @@ public class SkeletonKey extends Artifact {
 					crystalKeysNeeded[Dungeon.depth]++;
 				}
 			}
+		}
+
+		//used if a level was reset, e.g. via unblessed ankh vs. boss
+		public void clearDepth(){
+			ironKeysNeeded[Dungeon.depth] = -1;
+			goldenKeysNeeded[Dungeon.depth] = -1;
+			crystalKeysNeeded[Dungeon.depth] = -1;
 		}
 
 		public void processIronLockOpened(){
