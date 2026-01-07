@@ -688,6 +688,28 @@ public class SeedFinder {
 				}
 
 				log_roomsonly[i] += ("\n");
+			} else if (Dungeon.depth % 5 == 0) {
+				switch (Dungeon.depth) {
+				case 5:
+					log_roomsonly[i] += "goo";
+					break;
+
+				case 10:
+					log_roomsonly[i] += "tengu";
+					break;
+
+				case 15:
+					log_roomsonly[i] += "DM-300";
+					break;
+
+				case 20:
+					log_roomsonly[i] += "dwarven king";
+					break;
+
+				case 25:
+					log_roomsonly[i] += "yog dzewa";
+					break;
+				}
 			}
 
 

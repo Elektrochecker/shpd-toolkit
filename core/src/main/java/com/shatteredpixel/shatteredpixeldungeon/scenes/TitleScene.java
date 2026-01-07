@@ -230,8 +230,10 @@ public class TitleScene extends PixelScene {
 
 										@Override
 										public void onBackPressed() {
-											searchThread[0].interrupt();
-											super.onBackPressed();
+											// stiky like the other seedfinder windows to prevent accidental cancellation
+
+											// searchThread[0].interrupt();
+											// super.onBackPressed();
 										}
 									};
 

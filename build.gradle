@@ -15,7 +15,7 @@ allprojects {
         appPackageName = 'com.elektrochecker.shatteredtoolkit'
 
         appVersionCode = 883
-        appVersionName = '3.3.0 - 1.4'
+        appVersionName = '3.3.0 - 1.5'
 
         appJavaCompatibility = JavaVersion.VERSION_11
 
