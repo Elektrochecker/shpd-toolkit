@@ -85,6 +85,69 @@ public class v3_X_Changes {
 		changes.hardlight(Window.TITLE_COLOR);
 		changeInfos.add(changes);
 
+		changes = new ChangeInfo("v3.3.5", false, null);
+		changes.hardlight(Window.TITLE_COLOR);
+		changeInfos.add(changes);
+
+		changes.addButton( new ChangeButton(new Image(new ImpSprite()), "Quest Tester Area Enemies",
+				"The quest tester area now has a tester hazard: Marsupial rats!\n" +
+				"\n" +
+				"The rats won't put up much of a fight of course, even with your gear removed, but you can use them to get an idea of how enemies will work in the vault. Enemy AI in the vault has been changed to be much more exploitable for stealth gameplay, including a new 'investigating' AI state and wandering enemies not being able to see very far behind themselves as they move.\n" +
+				"\n" +
+				"There's also a few new room types in the tester area, to demonstrate enemies in different situations.\n" +
+				"\n" +
+				"Expect to see more room layouts and tester hazards in future patches."));
+
+		changes.addButton(new ChangeButton(Icons.get(Icons.PREFS), Messages.get(ChangesScene.class, "misc"),
+				"**-** The in-game randomize buttons now blink white as a reminder if the player is currently qualified for the randomized victory badge and outside of the very start of a run.\n" +
+				"\n" +
+				"**-** Slightly improved the visual for the existing 'alerted' and 'target lost' thought bubbles.\n" +
+				"\n" +
+				"**-** The Gnoll Geomancer is now willing to switch targets if its current target isn't within attacking range.\n" +
+				"\n" +
+				"**-** Necromancers will now move their skeleton (instead of trying and failing to push) if they attempt to summon on top of an immobile enemy."));
+
+		changes.addButton(new ChangeButton(new Image(Assets.Sprites.SPINNER, 144, 0, 16, 16), Messages.get(ChangesScene.class, "bugfixes"),
+				"Fixed the following bugs:\n" +
+				"**Caused by v3.3:**\n" +
+				"**-** Rare freeze bugs when descending to the vault tester area\n" +
+				"**-** Rare crash bugs\n" +
+				"\n" +
+				"**Existed Prior to v3.3:**\n" +
+				"**-** Exploit where Warrior could refund his shield cooldown by unequipping armor at the right time\n" +
+				"**-** Exploit where Gladiator could cancel fury partway through, refunding remaining combo\n" +
+				"**-** Distortion traps never spawning certain rare enemies\n" +
+				"**-** Grass generated from ember after a garden room burns not being burnable until after save/load (speed of grass recovery has been adjusted to prevent permanent fires)\n" +
+				"**-** Rare cases where liquid metal could have a quantity of 0\n" +
+				"**-** Specific cases where helpful tipped darts could deal damage to allies"));
+
+		changes = new ChangeInfo("v3.3.4", false, null);
+		changes.hardlight(Window.TITLE_COLOR);
+		changeInfos.add(changes);
+
+		changes.addButton( new ChangeButton(new Image(new ImpSprite()), "Quest Tester Area Progress",
+				"I've made more improvements to level generation in the vault tester area. The layout is still pretty random, but the vault area now uses some basic new vault-specific rooms and the level builder it uses is now a lot more flexible.\n" +
+				"\n" +
+				"Now that these levelgen basics are down I'm going to start looking to add some more active details such as hazard testers (without any danger) and treasure rooms instead of spreading loot randomly."));
+
+		changes.addButton(new ChangeButton(Icons.get(Icons.PREFS), Messages.get(ChangesScene.class, "misc"),
+				"**-** The game scene now attempts to persist more item windows (item selection primarily) over scene reset. This should sharply reduce cases where things like rotating your device cause scrolls to be lost. Note that items can still be lost if the game is terminated while item selection windows are open.\n" +
+				"\n" +
+				"**-** Improved clarity on Skeleton Key's curse text\n" +
+				"**-** Updated translations"));
+
+		changes.addButton(new ChangeButton(new Image(Assets.Sprites.SPINNER, 144, 0, 16, 16), Messages.get(ChangesScene.class, "bugfixes"),
+				"Fixed the following bugs:\n" +
+				"**Caused by v3.3:**\n" +
+				"**-** Wand of regrowth appearing in vault tester area again\n" +
+				"**-** Vault tester area resetting charge count on Duelist's weapons\n" +
+				"\n" +
+				"**Existed Prior to v3.3:**\n" +
+				"**-** Slimes always taking damage in multiples of 8 when ascending\n" +
+				"**-** Rare cases where area effects that blocked terrain could persist forever for large enemies\n" +
+				"**-** Arcane Bomb particle fx persisting when they shouldn't in a bunch of specific cases\n" +
+				"**-** Thrown weapons not IDing properly in very specific cases"));
+
 		changes = new ChangeInfo("v3.3.3 & v3.3.2", false, null);
 		changes.hardlight(Window.TITLE_COLOR);
 		changeInfos.add(changes);
