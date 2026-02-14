@@ -212,10 +212,10 @@ public class WndSeedfinderSeedinput extends Window {
 		super.update();
 		btnCopy.enable(!textBox.getText().isEmpty());
 		btnPaste.enable(Gdx.app.getClipboard().hasContents());
-		if (!textBox.getText().equals(lastText)) {
-			lastText = textBox.getText();
-			onTextChange(lastText);
-		}
+		// if (!textBox.getText().equals(lastText)) {
+		// 	lastText = textBox.getText();
+		// 	onTextChange(lastText);
+		// }
 	}
 
 	@Override
