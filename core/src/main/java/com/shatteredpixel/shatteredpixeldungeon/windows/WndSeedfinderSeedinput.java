@@ -151,7 +151,11 @@ public class WndSeedfinderSeedinput extends Window {
 			@Override
 			protected void onClick() {
 				super.onClick();
-				textBox.pasteFromClipboard();
+				if (Gdx.app.getClipboard().hasContents()) {
+					textBox.pasteFromClipboard();
+				} else {
+					enable(false);
+				}
 			}
 
 		};
@@ -205,17 +209,6 @@ public class WndSeedfinderSeedinput extends Window {
 
 		PointerEvent.clearKeyboardThisPress = false;
 
-	}
-
-	@Override
-	public synchronized void update() {
-		super.update();
-		btnCopy.enable(!textBox.getText().isEmpty());
-		btnPaste.enable(Gdx.app.getClipboard().hasContents());
-		// if (!textBox.getText().equals(lastText)) {
-		// 	lastText = textBox.getText();
-		// 	onTextChange(lastText);
-		// }
 	}
 
 	@Override
