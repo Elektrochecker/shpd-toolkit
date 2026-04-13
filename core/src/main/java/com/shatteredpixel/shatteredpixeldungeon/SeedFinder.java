@@ -146,15 +146,20 @@ public class SeedFinder {
 	}
 
 	private ArrayList<String> getItemList(String text) {
-		ArrayList<String> itemList = new ArrayList<>();
+		if (text.contains("\r")) {
+			System.out.println("WARNING: Carriage return in seed input");
+			text = text.replace("\r\n", "\n");
+		}
+
+		ArrayList<String> result = new ArrayList<>();
 
 		if (text.isEmpty())
-			return itemList;
+			return result;
 
-		String[] itemList_s = text.toLowerCase().split(System.lineSeparator());
-		itemList = new ArrayList<String>(Arrays.asList(itemList_s));
+		String[] result_s = text.toLowerCase().split(System.lineSeparator());
+		result = new ArrayList<String>(Arrays.asList(result_s));
 
-		return itemList;
+		return result;
 	}
 
 	private void addTextItems(String caption, ArrayList<HeapItem> items, StringBuilder builder, String padding) {
@@ -244,42 +249,12 @@ public class SeedFinder {
 		itemList = getItemList(items);
 
 		try {
-			// only generate natural seeds, currently not available in shpd toolkit
 			if (Options.trueRandom) {
-				for (int i = 0; i < DungeonSeed.TOTAL_SEEDS; i++) {
-					if (Thread.currentThread().isInterrupted())
-						throw new InterruptedException();
-					final int finalI = i;
-					Gdx.app.postRunnable(new Runnable() {
-						@Override
-						public void run() {
-							ShatteredPixelDungeon.scene()
-									.addToFront(new WndMessage("searched through _" + Long.toString(finalI) + "_ seeds."));
-						}
-					});
-					return DungeonSeed.convertToCode(Dungeon.seed);
-				}
-
-			// sequential mode: start at 0, currently not available in shpd toolkit
+			// only generate natural seeds, currently not available in shpd toolkit
 			} else if (Options.sequentialMode) {
-				for (long i = Options.startingSeed; i < DungeonSeed.TOTAL_SEEDS; i++) {
-					if (Thread.currentThread().isInterrupted())
-						throw new InterruptedException();
-					if (testSeed(Long.toString(i), Options.floors)) {
-						final long finalI = i;
-						Gdx.app.postRunnable(new Runnable() {
-							@Override
-							public void run() {
-								ShatteredPixelDungeon.scene().addToFront(new WndMessage(
-										"searched through _" + Long.toString(finalI - Options.startingSeed) + "_ seeds."));
-							}
-						});
-						return DungeonSeed.convertToCode(Dungeon.seed);
-					}
-				}
-
-			// default (random) mode
+			// sequential mode: start at 0, currently not available in shpd toolkit
 			} else {
+			// default (random) mode
 				long start = Random.Long(DungeonSeed.TOTAL_SEEDS);
 				for (long i = start; i < DungeonSeed.TOTAL_SEEDS; i++) {
 					if (Thread.currentThread().isInterrupted())
