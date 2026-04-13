@@ -3,7 +3,7 @@
  * Copyright (C) 2012-2015 Oleg Dolya
  *
  * Shattered Pixel Dungeon
- * Copyright (C) 2014-2025 Evan Debenham
+ * Copyright (C) 2014-2026 Evan Debenham
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -131,7 +131,7 @@ public enum Icons {
 	ALEKS,
 	WATA,
 	CELESTI,
-	KRISTJAN,
+	LUMINE,
 	CUBE_CODE,
 	PURIGRO,
 	ARCNOR;
@@ -417,7 +417,7 @@ public enum Icons {
 				icon.frame( icon.texture.uvRectBySize( 32, 96, 32, 32 ) );
 				icon.scale.set(PixelScene.align(0.49f));
 				break;
-			case KRISTJAN:
+			case LUMINE:
 				icon.frame( icon.texture.uvRectBySize( 64, 96, 32, 32 ) );
 				icon.scale.set(PixelScene.align(0.49f));
 				break;

@@ -3,7 +3,7 @@
  * Copyright (C) 2012-2015 Oleg Dolya
  *
  * Shattered Pixel Dungeon
- * Copyright (C) 2014-2025 Evan Debenham
+ * Copyright (C) 2014-2026 Evan Debenham
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -91,6 +91,7 @@ public class Sunray extends TargetedClericSpell {
 
 		hero.sprite.parent.add(
 				new Beam.SunRay(hero.sprite.center(), DungeonTilemap.raisedTileCenterToWorld(aim.collisionPos)));
+		Sample.INSTANCE.play( Assets.Sounds.RAY );
 
 		Char ch = Actor.findChar( aim.collisionPos );
 		if (ch != null) {
@@ -104,9 +105,9 @@ public class Sunray extends TargetedClericSpell {
 				}
 			} else {
 				if (hero.pointsInTalent(Talent.SUNRAY) == 2) {
-					ch.damage(Random.NormalIntRange(6, 12), Sunray.this);
+					ch.damage(Hero.heroDamageIntRange(6, 12), Sunray.this);
 				} else {
-					ch.damage(Random.NormalIntRange(4, 8), Sunray.this);
+					ch.damage(Hero.heroDamageIntRange(4, 8), Sunray.this);
 				}
 			}
 

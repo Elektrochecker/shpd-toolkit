@@ -3,7 +3,7 @@
  * Copyright (C) 2012-2015 Oleg Dolya
  *
  * Shattered Pixel Dungeon
- * Copyright (C) 2014-2025 Evan Debenham
+ * Copyright (C) 2014-2026 Evan Debenham
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +29,9 @@ import com.shatteredpixel.shatteredpixeldungeon.ui.RedButton;
 import com.shatteredpixel.shatteredpixeldungeon.ui.RenderedTextBlock;
 import com.shatteredpixel.shatteredpixeldungeon.ui.Window;
 import com.watabou.input.PointerEvent;
+import com.watabou.noosa.Game;
 import com.watabou.noosa.TextInput;
+import com.watabou.utils.DeviceCompat;
 
 public class WndTextInput extends Window {
 
@@ -46,13 +48,6 @@ public class WndTextInput extends Window {
 	public WndTextInput(final String title, final String body, final String initialValue, final int maxLength,
 	                           final boolean multiLine, final String posTxt, final String negTxt) {
 		super();
-
-		//need to offset to give space for the soft keyboard
-		if (PixelScene.landscape()) {
-			offset(0, -45);
-		} else {
-			offset(0, multiLine ? -60 : -45);
-		}
 
 		final int width;
 		if (PixelScene.landscape() && (multiLine || body != null)) {
@@ -211,6 +206,12 @@ public class WndTextInput extends Window {
 
 		//need to resize first before laying out the text box, as it depends on the window's camera
 		resize(width, (int) pos);
+
+		//offset 50% up to give space for the soft keyboard
+		if (!DeviceCompat.hasHardKeyboard()) {
+			offset(0, -(int)(Game.height/(4*camera.zoom)));
+			boundOffsetWithMargin(0);
+		}
 
 		textBox.setRect(MARGIN, textBox.top(), textBoxWidth, inputHeight);
 

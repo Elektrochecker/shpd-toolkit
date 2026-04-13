@@ -3,7 +3,7 @@
  * Copyright (C) 2012-2015 Oleg Dolya
  *
  * Shattered Pixel Dungeon
- * Copyright (C) 2014-2025 Evan Debenham
+ * Copyright (C) 2014-2026 Evan Debenham
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -107,26 +107,26 @@ public class TelekineticGrab extends TargetedSpell {
 				GLog.w(Messages.get(this, "cant_grab"));
 				hero.spend(Actor.TICK);
 				h.sprite.drop();
-				return;
-			}
+			} else {
 
-			while (!h.isEmpty()) {
-				Item item = h.peek();
-				if (item.doPickUp(hero, h.pos)) {
-					h.pickUp();
-					totalpickupTime += item.pickupDelay();
-					GLog.i( Messages.capitalize(Messages.get(hero, "you_now_have", item.name())) );
+				while (!h.isEmpty()) {
+					Item item = h.peek();
+					if (item.doPickUp(hero, h.pos)) {
+						h.pickUp();
+						totalpickupTime += item.pickupDelay();
+						GLog.i(Messages.capitalize(Messages.get(hero, "you_now_have", item.name())));
 
-				} else {
-					GLog.w(Messages.get(this, "cant_grab"));
-					h.sprite.drop();
-					break;
+					} else {
+						GLog.w(Messages.get(this, "cant_grab"));
+						h.sprite.drop();
+						break;
+					}
 				}
-			}
 
-			//casting the spell takes at most 1 turn
-			if (totalpickupTime > 1){
-				hero.spend(-(totalpickupTime-1));
+				//casting the spell takes at most 1 turn
+				if (totalpickupTime > 1) {
+					hero.spend(-(totalpickupTime - 1));
+				}
 			}
 
 		} else {

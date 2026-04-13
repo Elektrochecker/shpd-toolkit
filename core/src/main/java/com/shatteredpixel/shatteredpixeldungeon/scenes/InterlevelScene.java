@@ -3,7 +3,7 @@
  * Copyright (C) 2012-2015 Oleg Dolya
  *
  * Shattered Pixel Dungeon
- * Copyright (C) 2014-2025 Evan Debenham
+ * Copyright (C) 2014-2026 Evan Debenham
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -140,7 +140,7 @@ public class InterlevelScene extends PixelScene {
 					fadeTime = SLOW_FADE;
 				} else {
 					if (curTransition != null)  loadingDepth = curTransition.destDepth;
-					else                        loadingDepth = Dungeon.depth+1;
+					else                        loadingDepth = Dungeon.depth;
 					if (Statistics.deepestFloor >= loadingDepth) {
 						fadeTime = FAST_FADE;
 					} else if (loadingDepth == 6 || loadingDepth == 11
@@ -150,12 +150,13 @@ public class InterlevelScene extends PixelScene {
 				}
 				break;
 			case FALL:
-				loadingDepth = Dungeon.depth+1;
+				//not accurate, but you can't ever fall into a new region
+				loadingDepth = Dungeon.depth;
 				break;
 			case ASCEND:
 				fadeTime = FAST_FADE;
 				if (curTransition != null)  loadingDepth = curTransition.destDepth;
-				else                        loadingDepth = Dungeon.depth-1;
+				else                        loadingDepth = Dungeon.depth;
 				break;
 			case RETURN:
 				loadingDepth = returnDepth;

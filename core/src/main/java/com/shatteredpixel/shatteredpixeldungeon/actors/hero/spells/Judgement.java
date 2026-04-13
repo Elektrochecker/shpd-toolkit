@@ -3,7 +3,7 @@
  * Copyright (C) 2012-2015 Oleg Dolya
  *
  * Shattered Pixel Dungeon
- * Copyright (C) 2014-2025 Evan Debenham
+ * Copyright (C) 2014-2026 Evan Debenham
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -73,7 +73,7 @@ public class Judgement extends ClericSpell {
 
 				for (Char ch : Actor.chars()){
 					if (ch.alignment != hero.alignment && Dungeon.level.heroFOV[ch.pos]){
-						ch.damage( Random.NormalIntRange(damageBase, 2*damageBase), Judgement.this);
+						ch.damage( Hero.heroDamageIntRange(damageBase, 2*damageBase), Judgement.this);
 						if (hero.subClass == HeroSubClass.PRIEST){
 							Buff.affect(ch, GuidingLight.Illuminated.class);
 						}

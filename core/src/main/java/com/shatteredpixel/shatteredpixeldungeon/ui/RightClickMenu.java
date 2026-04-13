@@ -3,7 +3,7 @@
  * Copyright (C) 2012-2015 Oleg Dolya
  *
  * Shattered Pixel Dungeon
- * Copyright (C) 2014-2025 Evan Debenham
+ * Copyright (C) 2014-2026 Evan Debenham
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@ import com.shatteredpixel.shatteredpixeldungeon.Chrome;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
+import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.PixelScene;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSprite;
 import com.watabou.input.PointerEvent;
@@ -36,6 +37,8 @@ import com.watabou.noosa.ui.Component;
 
 import java.util.ArrayList;
 
+import javax.swing.Icon;
+
 public class RightClickMenu extends Component {
 
 	private NinePatch bg;
@@ -44,6 +47,8 @@ public class RightClickMenu extends Component {
 	private Image icon;
 	private RenderedTextBlock titleText;
 	private ColorBlock separator;
+
+	private Button topRightButton;
 
 	private RedButton[] buttons;
 
@@ -94,6 +99,20 @@ public class RightClickMenu extends Component {
 		blocker.target = bg;
 		add(blocker);
 
+		if (item != null && Dungeon.hero.belongings.contains(item)){
+			topRightButton = new ItemJournalButton(item, null){
+				@Override
+				protected void onClick() {
+					RightClickMenu.this.destroy();
+					RightClickMenu.this.killAndErase();
+					GameScene.centerNextWndOnInvPane();
+					super.onClick();
+				}
+			};
+			topRightButton.setSize(16, 16);
+			add(topRightButton);
+		}
+
 		buttons = new RedButton[options.length];
 		for (int i = 0; i < options.length; i++){
 			int finalI = i;
@@ -130,13 +149,21 @@ public class RightClickMenu extends Component {
 	protected void layout() {
 		super.layout();
 
+		float topHeight = Math.max(icon.height(), titleText.height());
+		if (topRightButton != null){
+			topHeight = Math.max(topHeight, topRightButton.height());
+		}
+
 		height = 0;
 		height += bg.marginVer();
-		height += Math.max(icon.height(), titleText.height());
+		height += topHeight;
 		height += 2;
 		height += 13*buttons.length;
 
 		width = icon.width + 2 + titleText.width()+bg.marginVer();
+		if (topRightButton != null){
+			width += 2 + topRightButton.width();
+		}
 		for (RedButton button : buttons){
 			if (width < button.reqWidth()+bg.marginHor()){
 				width = button.reqWidth()+bg.marginHor();
@@ -154,12 +181,16 @@ public class RightClickMenu extends Component {
 		bg.y = y;
 
 		icon.x = x+bg.marginLeft();
-		icon.y = y+bg.marginTop();
+		icon.y = y+bg.marginTop() + (topHeight - icon.height())/2;
 
-		titleText.setPos(icon.x+icon.width()+2, icon.y + (icon.height()- titleText.height())/2);
+		titleText.setPos(icon.x+icon.width()+2, y+bg.marginTop() + (topHeight - titleText.height())/2);
+
+		if (topRightButton != null){
+			topRightButton.setPos(titleText.right() + 2, y+bg.marginTop() + (topHeight - topRightButton.height())/2);
+		}
 
 		separator.x = x+bg.marginLeft();
-		separator.y = Math.max(icon.y + icon.height(), titleText.bottom()) + 1;
+		separator.y = y+bg.marginTop()+topHeight+1;
 		separator.size(width - bg.marginHor(), 1);
 
 		float top = separator.y + 2;

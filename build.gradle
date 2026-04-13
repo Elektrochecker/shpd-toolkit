@@ -4,7 +4,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.13.2'
+        classpath 'com.android.tools.build:gradle:9.1.0'
     }
 }
 
@@ -14,14 +14,14 @@ allprojects {
         appName = 'SHPD toolkit'
         appPackageName = 'com.elektrochecker.shatteredtoolkit'
 
-        appVersionCode = 891
-        appVersionName = '3.3.6 - 1.6'
+        appVersionCode = 896
+        appVersionName = '3.3.8 - 1.6'
 
         appJavaCompatibility = JavaVersion.VERSION_11
 
-        appAndroidCompileSDK = 35   //Android 15
+        appAndroidCompileSDK = 36   //Android 15
         appAndroidMinSDK = 21       //Android 5.0
-        appAndroidTargetSDK = 35    //Android 15
+        appAndroidTargetSDK = 36    //Android 15
 
         gdxVersion = '1.14.0'
         gdxControllersVersion = '2.2.4'

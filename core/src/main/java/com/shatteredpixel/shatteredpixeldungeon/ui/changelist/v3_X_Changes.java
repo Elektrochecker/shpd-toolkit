@@ -3,7 +3,7 @@
  * Copyright (C) 2012-2015 Oleg Dolya
  *
  * Shattered Pixel Dungeon
- * Copyright (C) 2014-2025 Evan Debenham
+ * Copyright (C) 2014-2026 Evan Debenham
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,6 +35,8 @@ import com.shatteredpixel.shatteredpixeldungeon.sprites.HeroSprite;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.ImpSprite;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSprite;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSpriteSheet;
+import com.shatteredpixel.shatteredpixeldungeon.sprites.RatSprite;
+import com.shatteredpixel.shatteredpixeldungeon.sprites.WardSprite;
 import com.shatteredpixel.shatteredpixeldungeon.ui.Icons;
 import com.shatteredpixel.shatteredpixeldungeon.ui.TalentIcon;
 import com.shatteredpixel.shatteredpixeldungeon.ui.Window;
@@ -59,6 +61,7 @@ public class v3_X_Changes {
 		changeInfos.add(changes);
 
 		changes.addButton( new ChangeButton(Icons.get(Icons.SHPX), "Overview and ETA",
+				"(Note that this ETA is now a bit outdated, please look at dev commentary for v3.3.7 for the latest info)\n\n" +
 				"The next major Shattered update will be v3.4 or v4.0 (I haven't decided on a version number yet) and will, finally, feature an overhaul to the Ambitious Imp quest in the metropolis!\n" +
 				"\n" +
 				"While work has started on the new quest, I do still expect this update to take some time. You'll hear from me in patches to v3.3, and early in the new year with my usual year in review blog post. I expect I'll be able to give a more solid eta in one of those.\n" +
@@ -85,29 +88,67 @@ public class v3_X_Changes {
 		changes.hardlight(Window.TITLE_COLOR);
 		changeInfos.add(changes);
 
-		changes = new ChangeInfo("v3.3.6", false, null);
+		changes = new ChangeInfo("v3.3.8", false, null);
 		changes.hardlight(Window.TITLE_COLOR);
 		changeInfos.add(changes);
 
-		changes.addButton( new ChangeButton(new Image(new ImpSprite()), "Quest Tester Area Hazards",
-				"I've added three new static hazards to the quest tester area!\n" +
-				"\n" +
-				"There are now sentries which scan in a pattern, sentries that periodically fire lasers, and floor vents that periodically vent green flames. At the moment none of these hazards actually harm you, instead they just show '!!!' above your character if they hit you.\n" +
-				"\n" +
-				"I think these are enough hazards to cook with, so next I'm going to focus on more variety of room layouts and a better overall level layout (Currently room placement is mostly random). I expect there will be 1 or 2 more v3.3 patches and then I'll move onto making the new quest properly."));
+		changes.addButton(new ChangeButton(Icons.get(Icons.PREFS), Messages.get(ChangesScene.class, "misc"),
+				"**-** Updated various internal code libraries\n" +
+				"**-** Updated translations"));
 
 		changes.addButton(new ChangeButton(new Image(Assets.Sprites.SPINNER, 144, 0, 16, 16), Messages.get(ChangesScene.class, "bugfixes"),
 				"Fixed the following bugs:\n" +
-				"**Caused by v3.3.5:**\n" +
-				"**-** Gladiator's combo lasting much longer than intended after defeating an enemy\n" +
-				"**-** Rare enemies appearing much less frequently than intended\n" +
-				"**-** Some items in the quest tester area spawning as cursed"));
+				"**Existed Prior to v3.3:**\n" +
+				"**-** Fixed various cases of area-effects that affect terrain not applying properly\n" +
+				"**-** Fixed necromancers summoning skeletons into solid terrain in specific cases\n" +
+				"**-** Various rare crash bugs"));
 
-		changes = new ChangeInfo("v3.3.5", false, null);
+		changes = new ChangeInfo("v3.3.7", false, null);
 		changes.hardlight(Window.TITLE_COLOR);
 		changeInfos.add(changes);
 
-		changes.addButton( new ChangeButton(new Image(new ImpSprite()), "Quest Tester Area Enemies",
+		changes.addButton( new ChangeButton(Icons.get(Icons.SHPX), "Dev Commentary",
+				"(March 4th, 2026)\n" +
+				"\n" +
+				"Over the last ~2 months since the holidays I've added various details to the quest tester area, and now it's time to refine and expand on that until things start coming together into a new quest. Obviously it doesn't make sense to keep showcasing progress now that we're moving past a 'tester' phase, so v3.3.7 will likely be the last patch for v3.3.\n" +
+				"\n" +
+				"If all goes well you'll hear from me again in another couple of months, when the new quest will hopefully be ready for beta.\n" +
+				"\n" +
+				"**Please keep in mind that while I always try to keep to the ETAs I provide, they are just estimates. If you don’t hear from me by the ETA, it means I’m still busy with the update!**"));
+
+		changes.addButton( new ChangeButton(new Image(new ImpSprite()), "Quest Tester Area Progress",
+				"The quest tester area is now looking a lot more fully-featured! While everything is still unfinished, almost all of the ingredients for the quest are shown in the tester area in one form or another:\n" +
+				"\n" +
+				"**-** Treasure rooms have been added! These rooms contain various hazards and reward items at the end. There's no actual danger yet so the loot is pointless, but this should give an idea of how progression will work.\n" +
+				"**-** Items placed on the floor have been significantly changed. Random loot is reduced, no longer placed on top of hazards, and better weapons are now only found in treasure rooms.\n" +
+				"**-** Level generation has been improved significantly, with more variety in level shape and more interconnectedness\n" +
+				"**-** The existing hazards have had their behaviour and sfx tweaked based on feedback\n" +
+				"**-** Many existing rooms have been tweaked or refined"));
+
+		changes.addButton(new ChangeButton(Icons.get(Icons.PREFS), Messages.get(ChangesScene.class, "misc"),
+				"**- Necromancers** have received a change to their behaviour, and are now willing to teleport their skeleton in more cases, instead of effectively doing nothing. In compensation, skeleton teleporting now uses the same animation and delays as summoning a new skeleton.\n" +
+				"\n" +
+				"**-** Improved logic for text entry window offsetting to avoid software keyboards\n" +
+				"**-** Added a journal button to item right-click menus"));
+
+		changes.addButton(new ChangeButton(new Image(Assets.Sprites.SPINNER, 144, 0, 16, 16), Messages.get(ChangesScene.class, "bugfixes"),
+				"Fixed the following bugs:\n" +
+				"**Caused by v3.3:**\n" +
+				"**-** Freezes when using telekinetic grab on certain types of item pile\n" +
+				"**-** Rats getting placed into walls in specific cases in new vault tester area\n" +
+				"**-** Various rare crash bugs\n" +
+				"\n" +
+				"**Existed Prior to v3.3:**\n" +
+				"**-** Teleportation not triggering for dark/bright fist if they were hit to exactly half HP\n" +
+				"**-** Cases where Tengu's shocker abilities could become misaligned with their VFX\n" +
+				"**-** Item sell window being usable when hero is dead\n" +
+				"**-** 13 leaf clover not applying to cleric spells or battlemage on-hit effects"));
+
+		changes = new ChangeInfo("v3.3.5 & v3.3.6", false, null);
+		changes.hardlight(Window.TITLE_COLOR);
+		changeInfos.add(changes);
+
+		changes.addButton( new ChangeButton(new Image(new RatSprite()), "Quest Tester Area Enemies",
 				"The quest tester area now has a tester hazard: Marsupial rats!\n" +
 				"\n" +
 				"The rats won't put up much of a fight of course, even with your gear removed, but you can use them to get an idea of how enemies will work in the vault. Enemy AI in the vault has been changed to be much more exploitable for stealth gameplay, including a new 'investigating' AI state and wandering enemies not being able to see very far behind themselves as they move.\n" +
@@ -115,6 +156,15 @@ public class v3_X_Changes {
 				"There's also a few new room types in the tester area, to demonstrate enemies in different situations.\n" +
 				"\n" +
 				"Expect to see more room layouts and tester hazards in future patches."));
+
+		WardSprite sprite = new WardSprite();
+		sprite.updateTier(5);
+		changes.addButton( new ChangeButton(new Image(sprite), "Quest Tester Area Hazards",
+				"I've added three new static hazards to the quest tester area!\n" +
+				"\n" +
+				"There are now sentries which scan in a pattern, sentries that periodically fire lasers, and floor vents that periodically vent green flames. At the moment none of these hazards actually harm you, instead they just show '!!!' above your character if they hit you.\n" +
+				"\n" +
+				"I think these are enough hazards to cook with, so next I'm going to focus on more variety of room layouts and a better overall level layout (Currently room placement is mostly random). I expect there will be 1 or 2 more v3.3 patches and then I'll move onto making the new quest properly."));
 
 		changes.addButton(new ChangeButton(Icons.get(Icons.PREFS), Messages.get(ChangesScene.class, "misc"),
 				"**-** The in-game randomize buttons now blink white as a reminder if the player is currently qualified for the randomized victory badge and outside of the very start of a run.\n" +
@@ -139,48 +189,22 @@ public class v3_X_Changes {
 				"**-** Rare cases where liquid metal could have a quantity of 0\n" +
 				"**-** Specific cases where helpful tipped darts could deal damage to allies"));
 
-		changes = new ChangeInfo("v3.3.4", false, null);
-		changes.hardlight(Window.TITLE_COLOR);
-		changeInfos.add(changes);
-
-		changes.addButton( new ChangeButton(new Image(new ImpSprite()), "Quest Tester Area Progress",
-				"I've made more improvements to level generation in the vault tester area. The layout is still pretty random, but the vault area now uses some basic new vault-specific rooms and the level builder it uses is now a lot more flexible.\n" +
-				"\n" +
-				"Now that these levelgen basics are down I'm going to start looking to add some more active details such as hazard testers (without any danger) and treasure rooms instead of spreading loot randomly."));
-
-		changes.addButton(new ChangeButton(Icons.get(Icons.PREFS), Messages.get(ChangesScene.class, "misc"),
-				"**-** The game scene now attempts to persist more item windows (item selection primarily) over scene reset. This should sharply reduce cases where things like rotating your device cause scrolls to be lost. Note that items can still be lost if the game is terminated while item selection windows are open.\n" +
-				"\n" +
-				"**-** Improved clarity on Skeleton Key's curse text\n" +
-				"**-** Updated translations"));
-
-		changes.addButton(new ChangeButton(new Image(Assets.Sprites.SPINNER, 144, 0, 16, 16), Messages.get(ChangesScene.class, "bugfixes"),
-				"Fixed the following bugs:\n" +
-				"**Caused by v3.3:**\n" +
-				"**-** Wand of regrowth appearing in vault tester area again\n" +
-				"**-** Vault tester area resetting charge count on Duelist's weapons\n" +
-				"\n" +
-				"**Existed Prior to v3.3:**\n" +
-				"**-** Slimes always taking damage in multiples of 8 when ascending\n" +
-				"**-** Rare cases where area effects that blocked terrain could persist forever for large enemies\n" +
-				"**-** Arcane Bomb particle fx persisting when they shouldn't in a bunch of specific cases\n" +
-				"**-** Thrown weapons not IDing properly in very specific cases"));
-
-		changes = new ChangeInfo("v3.3.3 - v3.3.1", false, null);
+		changes = new ChangeInfo("v3.3.1 - v3.3.4", false, null);
 		changes.hardlight(Window.TITLE_COLOR);
 		changeInfos.add(changes);
 
 		changes.addButton( new ChangeButton(new Image(new ImpSprite()), "Quest Tester Area Progress",
 				"Happy New Year Everyone!\n\n" +
 				"I've made some progress over the holidays on the new quest tester area. It's now entirely generated by the game's levelgen system, whereas the previous iteration was mostly hardcoded.\n\n" +
+				"The vault area now uses some basic new vault-specific rooms and the level builder it uses is now a lot more flexible.\n\n" +
 				"There's still quite a bit I plan to do in future v3.3 patches though."));
 
 		changes.addButton(new ChangeButton(Icons.get(Icons.PREFS), Messages.get(ChangesScene.class, "misc"),
 				"**- Shocking Enchantment** now has a flat 1/3 chance to trigger (instead of (lvl+1)/(lvl+4)), but damage ratio increased to 50% from 40%. Previously shocking effectively scaled based on weapon level twice, which made it disproportionally powerful at high levels and/or with arcana ring.\n\n" +
 				"**- Glyph of Swiftness** now requires a distance of 2 tiles from an enemy, up from 1. This effectively reverts its power to what is was prior to v3.3's change to speed boost logic.\n\n" +
+				"**-** The game scene now attempts to persist more windows over scene reset. This should sharply reduce cases where things like rotating your device cause scrolls to be lost. Note that items can still be lost if the game is terminated while item selection windows are open.\n\n" +
 				"**-** The main target is now prioritized for sniper's mark if a force cube hits multiple enemies\n" +
-				"**-** Remains no longer appear in the vault tester level\n" +
-				"**-** Updated translations and translator credits"));
+				"**-** Improved clarity on Skeleton Key's curse text"));
 
 		changes.addButton(new ChangeButton(new Image(Assets.Sprites.SPINNER, 144, 0, 16, 16), Messages.get(ChangesScene.class, "bugfixes"),
 				"Fixed the following bugs:\n" +
@@ -189,7 +213,11 @@ public class v3_X_Changes {
 				"**-** Cases where the Steam version could hang on launch on Linux\n" +
 				"**-** Reclaim trap counting as being cast for talents even when it isn't consumed\n" +
 				"**-** Pickaxe being marked as seen before it is given to the player\n" +
-				"**-** Specific cases where ghost ally could regenerate past max HP"));
+				"**-** Specific cases where ghost ally could regenerate past max HP\n" +
+				"**-** Slimes always taking damage in multiples of 8 when ascending\n" +
+				"**-** Rare cases where area effects that blocked terrain could persist forever for large enemies\n" +
+				"**-** Arcane Bomb particle fx persisting when they shouldn't in a bunch of specific cases\n" +
+				"**-** Thrown weapons not IDing properly in very specific cases"));
 
 		changes = new ChangeInfo(Messages.get(ChangesScene.class, "new"), false, null);
 		changes.hardlight(Window.TITLE_COLOR);

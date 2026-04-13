@@ -3,7 +3,7 @@
  * Copyright (C) 2012-2015 Oleg Dolya
  *
  * Shattered Pixel Dungeon
- * Copyright (C) 2014-2025 Evan Debenham
+ * Copyright (C) 2014-2026 Evan Debenham
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -140,14 +140,14 @@ public class AboutScene extends PixelScene {
 		celesti.setRect(alex.right(), alex.top(), colWidth/2f, 0);
 		content.add(celesti);
 
-		CreditsBlock kristjan = new CreditsBlock(false, Window.SHPX_COLOR,
+		CreditsBlock lumine = new CreditsBlock(false, Window.SHPX_COLOR,
 				"Music:",
-				Icons.KRISTJAN.get(),
-				"Kristjan Haaristo",
-				"youtube.com/@kristjan...",
-				"https://www.youtube.com/@kristjanthomashaaristo");
-		kristjan.setRect(alex.right() - colWidth/4f, alex.bottom() + 5, colWidth/2f, 0);
-		content.add(kristjan);
+				Icons.LUMINE.get(),
+				"Lumine Haaristo",
+				"youtube.com/@Lumine...",
+				"https://www.youtube.com/@LumineThomasHaaristo");
+		lumine.setRect(alex.right() - colWidth/4f, alex.bottom() + 5, colWidth/2f, 0);
+		content.add(lumine);
 
 		//*** Pixel Dungeon Credits ***
 
@@ -159,9 +159,9 @@ public class AboutScene extends PixelScene {
 				"watabou.itch.io",
 				"https://watabou.itch.io/");
 		if (landscape()){
-			wata.setRect(shpx.left(), kristjan.bottom() + 8, colWidth, 0);
+			wata.setRect(shpx.left(), lumine.bottom() + 8, colWidth, 0);
 		} else {
-			wata.setRect(shpx.left(), kristjan.bottom() + 8, colWidth, 0);
+			wata.setRect(shpx.left(), lumine.bottom() + 8, colWidth, 0);
 		}
 		content.add(wata);
 

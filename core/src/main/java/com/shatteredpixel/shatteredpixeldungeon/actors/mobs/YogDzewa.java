@@ -3,7 +3,7 @@
  * Copyright (C) 2012-2015 Oleg Dolya
  *
  * Shattered Pixel Dungeon
- * Copyright (C) 2014-2025 Evan Debenham
+ * Copyright (C) 2014-2026 Evan Debenham
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -52,6 +52,7 @@ import com.shatteredpixel.shatteredpixeldungeon.ui.BossHealthBar;
 import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
 import com.watabou.noosa.Game;
 import com.watabou.noosa.audio.Music;
+import com.watabou.noosa.audio.Sample;
 import com.watabou.utils.Bundle;
 import com.watabou.utils.Callback;
 import com.watabou.utils.GameMath;
@@ -189,10 +190,10 @@ public class YogDzewa extends Mob {
 			return true;
 		} else {
 
-			boolean terrainAffected = false;
-			HashSet<Char> affected = new HashSet<>();
 			//delay fire on a rooted hero
-			if (!Dungeon.hero.rooted) {
+			if (!targetedCells.isEmpty() && !Dungeon.hero.rooted) {
+				boolean terrainAffected = false;
+				HashSet<Char> affected = new HashSet<>();
 				for (int i : targetedCells) {
 					Ballistica b = new Ballistica(pos, i, Ballistica.WONT_STOP);
 					//shoot beams
@@ -209,6 +210,7 @@ public class YogDzewa extends Mob {
 						}
 					}
 				}
+				Sample.INSTANCE.play( Assets.Sounds.RAY );
 				if (terrainAffected) {
 					Dungeon.observe();
 				}

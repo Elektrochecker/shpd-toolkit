@@ -3,7 +3,7 @@
  * Copyright (C) 2012-2015 Oleg Dolya
  *
  * Shattered Pixel Dungeon
- * Copyright (C) 2014-2025 Evan Debenham
+ * Copyright (C) 2014-2026 Evan Debenham
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,6 +22,13 @@
 package com.shatteredpixel.shatteredpixeldungeon.journal;
 
 import com.shatteredpixel.shatteredpixeldungeon.Badges;
+import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
+import com.shatteredpixel.shatteredpixeldungeon.items.Amulet;
+import com.shatteredpixel.shatteredpixeldungeon.items.Ankh;
+import com.shatteredpixel.shatteredpixeldungeon.items.ArcaneResin;
+import com.shatteredpixel.shatteredpixeldungeon.items.BrokenSeal;
+import com.shatteredpixel.shatteredpixeldungeon.items.Dewdrop;
+import com.shatteredpixel.shatteredpixeldungeon.items.EnergyCrystal;
 import com.shatteredpixel.shatteredpixeldungeon.items.Generator;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
 import com.watabou.utils.Bundle;
@@ -135,6 +142,30 @@ public enum Catalog {
 
 	private static final String CATALOG_ITEMS = "catalog_items";
 
+	// public static void countUse(Class<?> cls){
+	// 	countUses(cls, 1);
+	// }
+
+	// public static void countUses(Class<?> cls, int uses){
+	// 	//TODO currently uses of items in vault tester are don't count
+	// 	if (Dungeon.depth > 15 && Dungeon.branch > 0){
+	// 		return;
+	// 	}
+	// 	for (Catalog cat : values()) {
+	// 		if (cat.useCount.containsKey(cls) && cat.useCount.get(cls) != Integer.MAX_VALUE) {
+	// 			cat.useCount.put(cls, cat.useCount.get(cls)+uses);
+	// 			if (cat.useCount.get(cls) < -1_000_000_000){ //to catch cases of overflow
+	// 				cat.useCount.put(cls, Integer.MAX_VALUE);
+	// 			}
+	// 			Journal.saveNeeded = true;
+	// 		}
+	// 	}
+	// }
+
+	private static final String CATALOG_CLASSES = "catalog_classes";
+	private static final String CATALOG_SEEN    = "catalog_seen";
+	private static final String CATALOG_USES    = "catalog_uses";
+	
 	public static void store( Bundle bundle ){
 
 		Badges.loadGlobal();

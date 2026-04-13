@@ -3,7 +3,7 @@
  * Copyright (C) 2012-2015 Oleg Dolya
  *
  * Shattered Pixel Dungeon
- * Copyright (C) 2014-2025 Evan Debenham
+ * Copyright (C) 2014-2026 Evan Debenham
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -1363,7 +1363,7 @@ public class GameScene extends PixelScene {
 				if (lastOffset != null) {
 					offsetToInherit = lastOffset;
 				}
-				if (offsetToInherit != null) {
+				if (offsetToInherit != null && !offsetToInherit.isZero()) {
 					wnd.offset(offsetToInherit);
 					wnd.boundOffsetWithMargin(3);
 				}
@@ -1592,6 +1592,8 @@ public class GameScene extends PixelScene {
 
 	@Override
 	public synchronized void saveWindows() {
+		if (members == null) return;
+
 		super.saveWindows();
 		if (scene != null && scene.inventory != null && scene.inventory.getSelector() != null){
 			savedSelector = scene.inventory.getSelector();

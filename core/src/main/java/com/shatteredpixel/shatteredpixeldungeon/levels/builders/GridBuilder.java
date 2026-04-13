@@ -3,7 +3,7 @@
  * Copyright (C) 2012-2015 Oleg Dolya
  *
  * Shattered Pixel Dungeon
- * Copyright (C) 2014-2025 Evan Debenham
+ * Copyright (C) 2014-2026 Evan Debenham
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,8 +21,11 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.levels.builders;
 
+import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.levels.rooms.Room;
+import com.shatteredpixel.shatteredpixeldungeon.levels.rooms.quest.vault.treasure.VaultTreasureRoom;
 import com.watabou.utils.Point;
+import com.watabou.utils.PointF;
 import com.watabou.utils.Random;
 import com.watabou.utils.Rect;
 import com.watabou.utils.SparseArray;
@@ -61,7 +64,27 @@ public class GridBuilder extends Builder {
 		}
 		entrance.setPos(0, 0);
 
-		ArrayList<Room> toPlace = new ArrayList<>(rooms);
+		ArrayList<Room> toPlace = new ArrayList<>();
+
+		//we try to interleave things so we get though a few normal rooms for every special room
+		ArrayList<Room> multis = new ArrayList<>();
+		ArrayList<Room> singles = new ArrayList<>();
+		for (Room r : rooms){
+			if (r.maxConnections(Room.ALL) == 1){
+				singles.add(r);
+			} else {
+				multis.add(r);
+			}
+		}
+
+		if (!multis.isEmpty()) toPlace.add(multis.remove(0));
+		if (!multis.isEmpty()) toPlace.add(multis.remove(0));
+		while (!multis.isEmpty() || !singles.isEmpty()){
+			if (!multis.isEmpty()) toPlace.add(multis.remove(0));
+			if (!multis.isEmpty()) toPlace.add(multis.remove(0));
+			if (!multis.isEmpty()) toPlace.add(multis.remove(0));
+			if (!singles.isEmpty()) toPlace.add(singles.remove(0));
+		}
 		toPlace.remove(entrance);
 
 		//move the exit to the back
@@ -73,11 +96,15 @@ public class GridBuilder extends Builder {
 		ArrayList<Room> placed = new ArrayList<>();
 		placed.add(entrance);
 
+		PointF aimCenter = new PointF();
+		aimCenter.polar(Random.Float(PointF.PI2), Random.Float(2, 4));
+
 		//use a sparse array to track room positions, with a mapping of x + 1000*y = cell
 		// and an index offset of 100,100 (x=y=100) to ensure we aren't dealing with negative indexes
 		//this effectively puts a limit of -99 < x < 999 and -99 < y < inf. on level sizes in rooms
 		SparseArray<Room> gridCells = new SparseArray<>();
 		gridCells.put(100_100, entrance);
+		int roomPlacementFailures = 0;
 		while (!toPlace.isEmpty()) {
 			Room r = toPlace.remove(0);
 			int cellWidth = 1;
@@ -103,28 +130,60 @@ public class GridBuilder extends Builder {
 			do {
 				r.neigbours.clear();
 				tries++;
-				if (tries > 30) {
-					toPlace.add(r); //can't place for now, put it into the back of to place list
+				if (tries > 100) {
+					//can't place for now, put it back into the list
+					toPlace.add(Math.min(2, toPlace.size()), r);
+
+					//if we're consistently failing to place a room, then restart
+					roomPlacementFailures++;
+					if (roomPlacementFailures > 100){
+						return null;
+					}
 					break;
 				}
 				int[] keys = gridCells.keyArray();
 				int nIdx = keys[Random.Int(keys.length)];
 				Room n =  gridCells.get(nIdx, null);
 				int rIdx = nIdx;
-				//currently always pulls up and to the right
-				switch (Random.Int(10)){
-					case 0: case 4: case 5: case 6:
-						rIdx += 1;
-						break;
-					case 1: case 7: case 8: case 9:
-						rIdx -= 1000;
-						break;
-					case 2:
-						rIdx -= 1;
-						break;
-					case 3:
-						rIdx += 1000;
-						break;
+				float xDiff = aimCenter.x - ((rIdx % 1000) - 100);
+				float yDiff = aimCenter.y - ((rIdx / 1000) - 100);
+				float dist = (float) Math.sqrt(Math.pow(xDiff, 2) + Math.pow(yDiff, 2));
+				//farther out from the center = more likely to pull to center
+				// 67-100% chance to pull to center at 0-4 tiles of distance
+				//also always go toward center on first room placement
+				if (Random.Float(12) < 8+dist || (placed.size() == 1)){
+					if (Math.abs(xDiff) >= Math.abs(yDiff)){
+						if (xDiff > 0){
+							//move right
+							rIdx += 1;
+						} else {
+							//move left
+							rIdx -= 1;
+						}
+					} else {
+						if (yDiff > 0){
+							//move down
+							rIdx += 1000;
+						} else {
+							//move up
+							rIdx -= 1000;
+						}
+					}
+				} else {
+					switch (Random.Int(4)) {
+						case 0:
+							rIdx += 1;
+							break;
+						case 1:
+							rIdx -= 1000;
+							break;
+						case 2:
+							rIdx -= 1;
+							break;
+						case 3:
+							rIdx += 1000;
+							break;
+					}
 				}
 				//-100 to cancel offsets
 				int x = (rIdx % 1000) - 100;
