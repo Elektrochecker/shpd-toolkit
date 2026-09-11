@@ -156,7 +156,7 @@ public class SeedFinder {
 		if (text.isEmpty())
 			return result;
 
-		String[] result_s = text.toLowerCase().split(System.lineSeparator());
+		String[] result_s = text.toLowerCase().split("\n");
 		result = new ArrayList<String>(Arrays.asList(result_s));
 
 		return result;
