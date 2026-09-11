@@ -21,26 +21,20 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.levels.rooms.quest.vault;
 
-import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.VaultRat;
-import com.shatteredpixel.shatteredpixeldungeon.items.Generator;
+import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Elemental;
+import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob;
 import com.shatteredpixel.shatteredpixeldungeon.items.Heap;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
-import com.shatteredpixel.shatteredpixeldungeon.items.armor.Armor;
-import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.MeleeWeapon;
 import com.shatteredpixel.shatteredpixeldungeon.levels.Level;
 import com.shatteredpixel.shatteredpixeldungeon.levels.Terrain;
+import com.shatteredpixel.shatteredpixeldungeon.levels.VaultLevel;
 import com.shatteredpixel.shatteredpixeldungeon.levels.painters.Painter;
-import com.shatteredpixel.shatteredpixeldungeon.levels.rooms.Room;
-import com.shatteredpixel.shatteredpixeldungeon.levels.rooms.standard.StandardRoom;
 import com.watabou.utils.Point;
 import com.watabou.utils.Random;
 
-public class VaultSimpleEnemyTreasureRoom extends StandardRoom {
+import java.util.ArrayList;
 
-	@Override
-	public float[] sizeCatProbs() {
-		return new float[]{0, 1, 0};
-	}
+public class VaultSimpleEnemyTreasureRoom extends VaultRoom {
 
 	@Override
 	public void paint(Level level) {
@@ -48,7 +42,7 @@ public class VaultSimpleEnemyTreasureRoom extends StandardRoom {
 		Painter.fill( level, this, Terrain.WALL );
 		Painter.fill( level, this, 1 , Terrain.EMPTY );
 
-		int ratPos = 0;
+		int enemyPos = 0;
 		int treasurePos = 0;
 		switch (Random.Int(4)){
 			case 0:
@@ -56,7 +50,7 @@ public class VaultSimpleEnemyTreasureRoom extends StandardRoom {
 				Painter.fill(level, left+3, top+3, 4, 4, Terrain.EMPTY_SP );
 				Painter.fill(level, left+4, top+7, 2, 1, Terrain.EMPTY_SP );
 				Painter.fill(level, left+7, top+4, 1, 2, Terrain.EMPTY_SP );
-				ratPos = level.pointToCell(new Point(left+4, top+4));
+				enemyPos = level.pointToCell(new Point(left+4, top+4));
 				treasurePos = level.pointToCell(new Point(left+3, top+3));
 				break;
 			case 1:
@@ -64,7 +58,7 @@ public class VaultSimpleEnemyTreasureRoom extends StandardRoom {
 				Painter.fill(level, left+4, top+3, 4, 4, Terrain.EMPTY_SP );
 				Painter.fill(level, left+5, top+7, 2, 1, Terrain.EMPTY_SP );
 				Painter.fill(level, left+3, top+4, 1, 2, Terrain.EMPTY_SP );
-				ratPos = level.pointToCell(new Point(right-4, top+4));
+				enemyPos = level.pointToCell(new Point(right-4, top+4));
 				treasurePos = level.pointToCell(new Point(right-3, top+3));
 				break;
 			case 2:
@@ -72,7 +66,7 @@ public class VaultSimpleEnemyTreasureRoom extends StandardRoom {
 				Painter.fill(level, left+4, top+4, 4, 4, Terrain.EMPTY_SP );
 				Painter.fill(level, left+5, top+3, 2, 1, Terrain.EMPTY_SP );
 				Painter.fill(level, left+3, top+5, 1, 2, Terrain.EMPTY_SP );
-				ratPos = level.pointToCell(new Point(right-4, bottom-4));
+				enemyPos = level.pointToCell(new Point(right-4, bottom-4));
 				treasurePos = level.pointToCell(new Point(right-3, bottom-3));
 				break;
 			case 3:
@@ -80,40 +74,64 @@ public class VaultSimpleEnemyTreasureRoom extends StandardRoom {
 				Painter.fill(level, left+3, top+4, 4, 4, Terrain.EMPTY_SP );
 				Painter.fill(level, left+4, top+3, 2, 1, Terrain.EMPTY_SP );
 				Painter.fill(level, left+7, top+5, 1, 2, Terrain.EMPTY_SP );
-				ratPos = level.pointToCell(new Point(left+4, bottom-4));
+				enemyPos = level.pointToCell(new Point(left+4, bottom-4));
 				treasurePos = level.pointToCell(new Point(left+3, bottom-3));
 				break;
 		}
 
-		Item treasure = Generator.randomWeapon(true);
-		level.drop(treasure, treasurePos).type = Heap.Type.CHEST;
-		if (treasure.cursed){
-			treasure.cursed = false;
-			if (((MeleeWeapon) treasure).hasCurseEnchant()){
-				((MeleeWeapon) treasure).enchant(null);
+		//no T1 mobs, only T2+
+		Mob enemy;
+		ArrayList<Class<?extends Mob>> toReturn = new ArrayList<>();
+		boolean valid = true;
+		do {
+			enemy = level.createMob();
+			valid = true;
+			for (Class<?extends Mob> cls : VaultLevel.T1Mobs){
+				if (cls.equals(enemy.getClass())){
+					valid = false;
+					toReturn.add(enemy.getClass());
+				}
+			}
+		} while (!valid);
+		for (Class<?extends Mob> cls : toReturn){
+			((VaultLevel) level).returnMob(cls);
+		}
+
+		int tier = 2;
+		for (Class<?extends Mob> cls : VaultLevel.T2Mobs){
+			if (cls.equals(enemy.getClass())){
+				tier = 2;
 			}
 		}
-		//not true ID
-		treasure.levelKnown = treasure.cursedKnown = true;
+		for (Class<?extends Mob> cls : VaultLevel.T3Mobs){
+			if (cls.equals(enemy.getClass())){
+				tier = 3;
+			}
+		}
+		//special case for elementals
+		if (enemy instanceof Elemental){
+			tier = 3;
+		}
+
+		Item treasure = ((VaultLevel)level).createEquipment(tier);
+		level.drop(treasure, treasurePos).type = Heap.Type.CHEST;
 
 		for (Door door : connected.values()) {
 			door.set( Door.Type.REGULAR );
 		}
 
-		VaultRat rat = new VaultRat();
-		rat.pos = ratPos;
-		level.mobs.add(rat);
+		enemy.pos = enemyPos;
+		level.mobs.add(enemy);
 
 	}
 
 	@Override
-	public boolean canMerge(Level l, Room other, Point p, int mergeTerrain) {
-		return false;
-	}
-
-	@Override
+	//no random items in the center
 	public boolean canPlaceItem(Point p, Level l) {
-		return false;
+		Point c = center();
+		if (Math.abs(c.x - p.x) <= 2) return false;
+		if (Math.abs(c.y - p.y) <= 2) return false;
+		return super.canPlaceItem(p, l);
 	}
 
 }

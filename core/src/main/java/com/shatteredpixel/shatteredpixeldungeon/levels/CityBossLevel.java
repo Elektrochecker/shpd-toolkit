@@ -42,6 +42,7 @@ import com.shatteredpixel.shatteredpixeldungeon.tiles.CustomTilemap;
 import com.shatteredpixel.shatteredpixeldungeon.ui.BossHealthBar;
 import com.watabou.noosa.Game;
 import com.watabou.noosa.Group;
+import com.watabou.noosa.Image;
 import com.watabou.noosa.Tilemap;
 import com.watabou.noosa.audio.Music;
 import com.watabou.noosa.tweeners.AlphaTweener;
@@ -124,7 +125,7 @@ public class CityBossLevel extends Level {
 	public void restoreFromBundle( Bundle bundle ) {
 		super.restoreFromBundle( bundle );
 		impShop = (ImpShopRoom) bundle.get( IMP_SHOP );
-		if (map[topDoor] != Terrain.LOCKED_DOOR && Imp.Quest.isCompleted() && !impShop.shopSpawned()){
+		if (map[topDoor] != Terrain.LOCKED_DOOR && Imp.Quest.earnedShop() && !impShop.shopSpawned()){
 			spawnShop();
 		}
 	}
@@ -150,7 +151,7 @@ public class CityBossLevel extends Level {
 		Painter.fill(this, c.x-1, c.y-2, 3, 1, Terrain.STATUE);
 		Painter.fill(this, c.x-1, c.y, 3, 1, Terrain.STATUE);
 		Painter.fill(this, c.x-1, c.y+2, 3, 1, Terrain.STATUE);
-		Painter.fill(this, c.x, entry.top+1, 1, 6, Terrain.EMPTY_SP);
+		Painter.fill(this, c.x, entry.top+1, 1, 6, Terrain.CUSTOM_DECO_EMPTY);
 
 		Painter.set(this, c.x, entry.top, Terrain.DOOR);
 
@@ -161,7 +162,7 @@ public class CityBossLevel extends Level {
 		//DK's throne room
 		Painter.fillDiamond(this, arena, 1, Terrain.EMPTY);
 
-		Painter.fill(this, arena, 5, Terrain.EMPTY_SP);
+		Painter.fill(this, arena, 5, Terrain.CUSTOM_DECO_EMPTY);
 		Painter.fill(this, arena, 6, Terrain.CUSTOM_DECO);
 
 		c = arena.center();
@@ -174,6 +175,8 @@ public class CityBossLevel extends Level {
 		Painter.set(this, pedestals[1], Terrain.PEDESTAL);
 		Painter.set(this, pedestals[2], Terrain.PEDESTAL);
 		Painter.set(this, pedestals[3], Terrain.PEDESTAL);
+
+		Painter.fill(this, c.x, c.y+2, 1, 4, Terrain.CUSTOM_DECO_EMPTY);
 
 		Painter.set(this, c.x, arena.top, Terrain.LOCKED_DOOR);
 
@@ -214,6 +217,10 @@ public class CityBossLevel extends Level {
 		CustomTilemap customVisuals = new CustomGroundVisuals();
 		customVisuals.setRect(0, 0, width(), height());
 		customTiles.add(customVisuals);
+
+		customVisuals = new CustomTerrainVisuals();
+		customVisuals.setRect(0, 0, width(), height());
+		customTerrain.add(customVisuals);
 
 		customVisuals = new CustomWallVisuals();
 		customVisuals.setRect(0, 0, width(), height());
@@ -341,6 +348,14 @@ public class CityBossLevel extends Level {
 		GameScene.updateMap( bottomDoor );
 		Dungeon.observe();
 
+		Heap h = heaps.get(bottomDoor);
+		if (h != null){
+			for (Item i : h.items){
+				drop(i, bottomDoor-width()).sprite.drop(bottomDoor);
+			}
+			h.destroy();
+		}
+
 		Game.runOnRenderThread(new Callback() {
 			@Override
 			public void call() {
@@ -359,7 +374,7 @@ public class CityBossLevel extends Level {
 		set( topDoor, Terrain.DOOR );
 		GameScene.updateMap( topDoor );
 
-		if (Imp.Quest.isCompleted()) {
+		if (Imp.Quest.earnedShop()) {
 			spawnShop();
 		}
 		Dungeon.observe();
@@ -410,8 +425,6 @@ public class CityBossLevel extends Level {
 			case Terrain.WALL_DECO:
 			case Terrain.EMPTY_DECO:
 				return Messages.get(CityLevel.class, "deco_desc");
-			case Terrain.EMPTY_SP:
-				return Messages.get(CityLevel.class, "sp_desc");
 			case Terrain.STATUE:
 			case Terrain.STATUE_SP:
 				return Messages.get(CityLevel.class, "statue_desc");
@@ -533,14 +546,39 @@ public class CityBossLevel extends Level {
 				if (map[i] == Terrain.PEDESTAL){
 					data[i] = 13*8 + 4;
 
-				//statues that should face left instead of right
-				} else if (map[i] == Terrain.STATUE && i%tileW > 7) {
-					data[i] = 15 * 8 + 4;
+				//statues
+				} else if (map[i] == Terrain.STATUE) {
 
-				//carpet tiles
-				} else if (map[i] == Terrain.EMPTY_SP) {
+					//throne statues
+					if (i < tileW*32){
+						//facing left
+						if (i%tileW > 7) {
+							data[i] = 10 * 8 + 7;
+
+							i++;
+							data[i] = 11 * 8 + 7;
+
+						} else {
+							data[i] = 8 * 8 + 7;
+							i++;
+							data[i] = 9 * 8 + 7;
+						}
+					} else {
+
+						//regular statues facing left
+						if (i % tileW > 7) {
+							data[i] = 15 * 8 + 4;
+						} else {
+							data[i] = -1;
+						}
+
+					}
+
+				//carpet tiles, uses both terrain types for compatibility with pre-v4.0 saves
+				} else if (map[i] == Terrain.CUSTOM_DECO_EMPTY || map[i] == Terrain.EMPTY_SP) {
 					//top row of DK's throne
-					if (map[i + 1] == Terrain.EMPTY_SP && map[i + tileW] == Terrain.EMPTY_SP) {
+					if ((map[i + 1] == Terrain.CUSTOM_DECO_EMPTY && map[i + tileW] == Terrain.CUSTOM_DECO_EMPTY)
+						|| (map[i + 1] == Terrain.EMPTY_SP && map[i + tileW] == Terrain.EMPTY_SP)) {
 						data[i] = 13 * 8 + 1;
 						data[++i] = 13 * 8 + 2;
 						data[++i] = 13 * 8 + 3;
@@ -552,28 +590,42 @@ public class CityBossLevel extends Level {
 						data[++i] = 14 * 8 + 3;
 
 					//bottom row of DK's throne
-					} else if (map[i+1] == Terrain.EMPTY_SP && map[i-tileW] == Terrain.EMPTY_SP){
+					} else if ((map[i+1] == Terrain.CUSTOM_DECO_EMPTY && map[i-tileW] == Terrain.CUSTOM_DECO_EMPTY)
+						|| (map[i+1] == Terrain.EMPTY_SP && map[i-tileW] == Terrain.EMPTY_SP) ){
 						data[i] = 15*8 + 1;
 						data[++i] = 15*8 + 2;
 						data[++i] = 15*8 + 3;
 
-					//otherwise entrance carpet
-					} else if (map[i-tileW] != Terrain.EMPTY_SP){
+					//otherwise entrance carpets
+					} else if ((map[i-tileW] != Terrain.CUSTOM_DECO_EMPTY && map[i-tileW] != Terrain.EMPTY_SP) || map[i-2*tileW] == Terrain.CUSTOM_DECO){
 						data[i] = 13*8 + 0;
-					} else if (map[i+tileW] != Terrain.EMPTY_SP){
+					} else if (map[i+tileW] != Terrain.CUSTOM_DECO_EMPTY && map[i+tileW] != Terrain.EMPTY_SP){
 						data[i] = 15*8 + 0;
 					} else {
 						data[i] = 14*8 + 0;
 					}
 
-					//otherwise no tile here
+				//otherwise no tile here
 				} else {
+
 					data[i] = -1;
 				}
 			}
 
 			v.map( data, tileW );
 			return v;
+		}
+
+		@Override
+		public boolean allowWater(int tileX, int tileY) {
+			if (super.allowWater(tileX, tileY)){
+				return true;
+			} else {
+				//allow curtain tails
+				int i = tileX + tileY*tileH;
+				int[] map = Dungeon.level.map;
+				return !(i < tileW*32 && (map[i] == Terrain.EMPTY || map[i] == Terrain.EMPTY_DECO) && map[i-tileW] == Terrain.WALL_DECO);
+			}
 		}
 
 		@Override
@@ -586,7 +638,7 @@ public class CityBossLevel extends Level {
 					return Messages.get(HallsLevel.class, "statue_name");
 				}
 
-				//DK arena tiles
+			//DK arena tiles
 			} else {
 				if (Dungeon.level.map[cell] == Terrain.CUSTOM_DECO){
 					return Messages.get(CityBossLevel.class, "throne_name");
@@ -622,6 +674,82 @@ public class CityBossLevel extends Level {
 			}
 
 			return super.desc(tileX, tileY);
+		}
+	}
+
+	public static class CustomTerrainVisuals extends CustomTilemap {
+
+		{
+			texture = Assets.Environment.CITY_BOSS;
+			tileW = 15;
+			tileH = 48;
+		}
+
+		@Override
+		public Tilemap create() {
+			Tilemap v = super.create();
+			int[] data = new int[tileW*tileH];
+			int[] map = Dungeon.level.map;
+
+			//upper part of the level, skull statues
+			for (int i = tileW; i < tileW*22; i++){
+				if (map[i] == Terrain.STATUE) {
+					data[i] = 15*8 + 5;
+				} else {
+					data[i] = -1;
+				}
+			}
+
+			//lower part: statues and banners
+			for (int i = tileW*22; i < tileW * tileH; i++){
+
+				if (map[i] == Terrain.STATUE) {
+
+					//throne statues
+					if (i < tileW*32){
+						//facing left
+						if (i%tileW > 7) {
+							data[i] = 10 * 8 + 7;
+
+							i++;
+							data[i] = 11 * 8 + 7;
+
+						} else {
+							data[i] = 8 * 8 + 7;
+							i++;
+							data[i] = 9 * 8 + 7;
+						}
+					} else {
+
+						//regular statues facing left
+						if (i % tileW > 7) {
+							data[i] = 15 * 8 + 4;
+						} else {
+							data[i] = -1;
+						}
+
+					}
+
+				//banners along walls
+				} else if (i < tileW*32 && map[i] == Terrain.WALL_DECO && map[i+tileW] != Terrain.WALL) {
+					data[i] = 6*8 + 7;
+				} else if (i < tileW*32 && (map[i] == Terrain.EMPTY || map[i] == Terrain.EMPTY_DECO) && map[i-tileW] == Terrain.WALL_DECO) {
+					data[i] = 7*8 + 7;
+
+				//otherwise no tile here
+				} else {
+
+					data[i] = -1;
+				}
+			}
+
+			v.map( data, tileW );
+			return v;
+		}
+
+		@Override
+		public Image image(int tileX, int tileY) {
+			return null;
 		}
 	}
 

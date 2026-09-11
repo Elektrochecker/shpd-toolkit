@@ -22,25 +22,33 @@
 package com.shatteredpixel.shatteredpixeldungeon.actors.mobs.npcs;
 
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
+import com.shatteredpixel.shatteredpixeldungeon.Badges;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.ShatteredPixelDungeon;
+import com.shatteredpixel.shatteredpixeldungeon.Statistics;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
-import com.shatteredpixel.shatteredpixeldungeon.effects.CheckedCell;
-import com.shatteredpixel.shatteredpixeldungeon.effects.TargetedCell;
+import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.DM100;
+import com.shatteredpixel.shatteredpixeldungeon.effects.Lightning;
+import com.shatteredpixel.shatteredpixeldungeon.effects.particles.SparkParticle;
+import com.shatteredpixel.shatteredpixeldungeon.journal.Bestiary;
 import com.shatteredpixel.shatteredpixeldungeon.mechanics.Ballistica;
 import com.shatteredpixel.shatteredpixeldungeon.mechanics.ConeAOE;
+import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
-import com.shatteredpixel.shatteredpixeldungeon.sprites.CharSprite;
-import com.shatteredpixel.shatteredpixeldungeon.sprites.WardSprite;
+import com.shatteredpixel.shatteredpixeldungeon.sprites.SentrySprite;
+import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
 import com.watabou.noosa.audio.Sample;
+import com.watabou.noosa.particles.Emitter;
 import com.watabou.utils.Bundle;
 import com.watabou.utils.Random;
+
+import java.util.ArrayList;
 
 public class VaultSentry extends NPC {
 
 	{
-		spriteClass = WardSprite.class;
+		spriteClass = SentrySprite.VaultScan.class;
 
 		properties.add(Property.IMMOVABLE);
 	}
@@ -63,31 +71,89 @@ public class VaultSentry extends NPC {
 	//scan sentries will collectively play a SFX at most every 80 ms
 	private static long SFXLastPlayed = 0;
 
+	//to avoid many sentries calling setSeen every turn
+	private boolean seen = false;
+
+	private ArrayList<Integer> recentZaps = new ArrayList<>();
+
 	@Override
 	protected boolean act() {
+		if (!seen && Dungeon.level.heroFOV[pos]){
+			Bestiary.setSeen(getClass());
+			seen = true;
+		}
+
+		if (fieldOfView == null || fieldOfView.length != Dungeon.level.length()){
+			fieldOfView = new boolean[Dungeon.level.length()];
+		}
+		Dungeon.level.updateFieldOfView( this, fieldOfView );
 
 		curCooldown--;
+
+		ArrayList<Integer> curZaps = new ArrayList<>();
 
 		if (curCooldown <= 0) {
 			int[] scanDirsThisTurn = scanDirs[scanDirIdx];
 
 			boolean visible = false;
 			for (int scanDir : scanDirsThisTurn) {
+				Ballistica aim = new Ballistica(pos, scanDir, Ballistica.WONT_STOP);
 				ConeAOE scan = new ConeAOE(
-						new Ballistica(pos, scanDir, Ballistica.STOP_SOLID),
+						aim,
 						scanLength,
 						scanWidth,
 						Ballistica.STOP_SOLID | Ballistica.STOP_TARGET);
 
+				if (scan.cells.isEmpty() && aim.path.size() >= 2){
+					scan.cells.add(aim.path.get(1));
+				}
+
 				for (int cell : scan.cells) {
-					if (Actor.findChar(cell) == Dungeon.hero && Dungeon.hero.invisible == 0) {
-						Dungeon.hero.sprite.showStatus(CharSprite.NEGATIVE, "!!!");
-						Sample.INSTANCE.play(Assets.Sounds.ZAP);
-						SFXLastPlayed = ShatteredPixelDungeon.realTime;
-					}
-					if (Dungeon.level.heroFOV[cell]) {
-						GameScene.effect(new CheckedCell(cell, pos));
+					if (fieldOfView[cell] && Dungeon.level.heroFOV[cell]) {
 						visible = true;
+						break;
+					}
+				}
+				if (visible){
+					for (int cell : scan.cells) {
+						if (fieldOfView[cell]) {
+							Char ch = Actor.findChar(cell);
+							if (ch != null
+									&& ch.alignment == Alignment.ALLY
+									&& ch.invisible == 0) {
+								if (recentZaps.contains(ch.id())) {
+									ch.damage(Random.NormalIntRange(3, 6), new DM100.LightningBolt());
+								} else {
+									ch.damage(Random.NormalIntRange(6, 12), new DM100.LightningBolt());
+								}
+								curZaps.add(ch.id());
+								if (ch.sprite.visible || sprite.visible) {
+									Sample.INSTANCE.play(Assets.Sounds.LIGHTNING);
+									sprite.parent.add(new Lightning(sprite.center(), ch.sprite.destinationCenter(), null));
+									if (ch.sprite.visible) {
+										Emitter e = GameScene.emitter();
+										if (e != null) {
+											e.pos(ch.sprite.destinationCenter());
+											e.burst(SparkParticle.FACTORY, 3);
+										}
+										ch.sprite.flash();
+									}
+								}
+								if (ch == Dungeon.hero) {
+									if (Imp.Quest.hazardFreebies > 0){
+										Imp.Quest.hazardFreebies--;
+									} else {
+										Statistics.questScores[3] -= 100;
+									}
+									if (!ch.isAlive()) {
+										Badges.validateDeathFromEnemyMagic();
+										Dungeon.fail(this);
+										GLog.n(Messages.get(this, "ondeath"));
+									}
+								}
+							}
+							GameScene.checkedCell(cell, pos);
+						}
 					}
 				}
 			}
@@ -112,20 +178,39 @@ public class VaultSentry extends NPC {
 
 		}
 
+		recentZaps.clear();
+		recentZaps.addAll(curZaps);
+
 		if (curCooldown == 1 && giveWarning){
 			int[] scanDirsNextTurn = scanDirs[scanDirIdx];
 			for (int scanDir : scanDirsNextTurn) {
+				Ballistica aim = new Ballistica(pos, scanDir, Ballistica.WONT_STOP);
 				ConeAOE scan = new ConeAOE(
-						new Ballistica(pos, scanDir, Ballistica.STOP_SOLID),
+						aim,
 						scanLength,
 						scanWidth,
 						Ballistica.STOP_SOLID | Ballistica.STOP_TARGET);
 
+				if (scan.cells.isEmpty() && aim.path.size() >= 2){
+					scan.cells.add(aim.path.get(1));
+				}
+
+				boolean visible = false;
 				for (int cell : scan.cells) {
-					if (Dungeon.level.heroFOV[cell]) {
-						sprite.parent.add(new TargetedCell(cell, 0xFF0000));
+					if (Dungeon.level.heroFOV[cell] && fieldOfView[cell]) {
+						visible = true;
 					}
 				}
+				if (visible){
+					for (int cell : scan.cells) {
+						if (fieldOfView[cell]) {
+							//mainly to prevent the hero from auto-picking up items when targeted
+							Dungeon.hero.interrupt();
+							GameScene.targetedCell(cell, 0xFF0000, TICK);
+						}
+					}
+				}
+
 			}
 		}
 
@@ -169,6 +254,8 @@ public class VaultSentry extends NPC {
 
 	private static final String WARNING = "warning";
 
+	private static final String RECENT_ZAPS = "recent_zaps";
+
 	@Override
 	public void storeInBundle(Bundle bundle) {
 		super.storeInBundle(bundle);
@@ -185,6 +272,12 @@ public class VaultSentry extends NPC {
 		bundle.put(SCANS, scansAfterCooldown);
 		bundle.put(SCANS_MADE, scansMade);
 		bundle.put(WARNING, giveWarning);
+
+		int[] recent = new int[recentZaps.size()];
+		for (int i = 0; i < recent.length; i++){
+			recent[i] = recentZaps.get(i);
+		}
+		bundle.put(RECENT_ZAPS, recent);
 	}
 
 	@Override
@@ -206,13 +299,12 @@ public class VaultSentry extends NPC {
 			scansMade = bundle.getInt(SCANS_MADE);
 			giveWarning = bundle.getBoolean(WARNING);
 		}
-	}
-
-	@Override
-	public CharSprite sprite() {
-		WardSprite sprite = (WardSprite) super.sprite();
-		sprite.linkVisuals(this);
-		return sprite;
+		if (bundle.contains(RECENT_ZAPS)){
+			recentZaps.clear();
+			for (int i : bundle.getIntArray(RECENT_ZAPS)){
+				recentZaps.add(i);
+			}
+		}
 	}
 
 }

@@ -145,7 +145,7 @@ public class SkeletonKey extends Artifact {
 						return;
 					}
 					if (Dungeon.level.map[target] == Terrain.LOCKED_DOOR){
-						if (Dungeon.level.locked){
+						if (Dungeon.level.locked || Dungeon.branch != 0){
 							GLog.w(Messages.get(SkeletonKey.class, "wont_open"));
 							return;
 						}
@@ -225,14 +225,22 @@ public class SkeletonKey extends Artifact {
 							Char toMove = Actor.findChar(target);
 
 							int pushCell = -1;
-							//push to the closest open cell that's further than the door
-							for (int i : PathFinder.NEIGHBOURS8){
-								if (!Dungeon.level.solid[target+i]
-										&& Actor.findChar(target+i) == null
-										&& (Dungeon.level.openSpace[target+i] || !Char.hasProp(toMove, Char.Property.LARGE))
-										&& Dungeon.level.trueDistance(curUser.pos, target+i) > Dungeon.level.trueDistance(curUser.pos, target)
-										&& (pushCell == -1 || Dungeon.level.trueDistance(curUser.pos, pushCell) > Dungeon.level.trueDistance(curUser.pos, target + i))){
-									pushCell = target + i;
+
+							//try to push to the cell opposite the hero...
+							int oppositeCell = target + (target - curUser.pos);
+							if (!Dungeon.level.solid[oppositeCell]
+									&& Actor.findChar(oppositeCell) == null
+									&& (Dungeon.level.openSpace[oppositeCell] || !Char.hasProp(toMove, Char.Property.LARGE))){
+								pushCell = oppositeCell;
+							} else {
+								//otherwise push to the furthest open cell
+								for (int i : PathFinder.NEIGHBOURS8) {
+									if (!Dungeon.level.solid[target + i]
+											&& Actor.findChar(target + i) == null
+											&& (Dungeon.level.openSpace[target + i] || !Char.hasProp(toMove, Char.Property.LARGE))
+											&& (pushCell == -1 || Dungeon.level.trueDistance(curUser.pos, pushCell) < Dungeon.level.trueDistance(curUser.pos, target + i))) {
+										pushCell = target + i;
+									}
 								}
 							}
 
@@ -549,7 +557,7 @@ public class SkeletonKey extends Artifact {
 		@Override
 		public void use(BlobEmitter emitter) {
 			super.use( emitter );
-			emitter.pour(SpectralWallParticle.FACTORY, 0.02f );
+			emitter.pour(SpectralWallParticle.FACTORY, 0.05f );
 		}
 
 		@Override

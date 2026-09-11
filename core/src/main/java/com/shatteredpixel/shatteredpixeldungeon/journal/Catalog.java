@@ -107,16 +107,16 @@ public enum Catalog {
 
 	}
 
-	public static LinkedHashMap<Catalog, Badges.Badge> catalogBadges = new LinkedHashMap<>();
-	static {
-		catalogBadges.put(WEAPONS, Badges.Badge.ALL_WEAPONS_IDENTIFIED);
-		catalogBadges.put(ARMOR, Badges.Badge.ALL_ARMOR_IDENTIFIED);
-		catalogBadges.put(WANDS, Badges.Badge.ALL_WANDS_IDENTIFIED);
-		catalogBadges.put(RINGS, Badges.Badge.ALL_RINGS_IDENTIFIED);
-		catalogBadges.put(ARTIFACTS, Badges.Badge.ALL_ARTIFACTS_IDENTIFIED);
-		catalogBadges.put(POTIONS, Badges.Badge.ALL_POTIONS_IDENTIFIED);
-		catalogBadges.put(SCROLLS, Badges.Badge.ALL_SCROLLS_IDENTIFIED);
-	}
+	// public static LinkedHashMap<Catalog, Badges.Badge> catalogBadges = new LinkedHashMap<>();
+	// static {
+	// 	catalogBadges.put(WEAPONS, Badges.Badge.ALL_WEAPONS_IDENTIFIED);
+	// 	catalogBadges.put(ARMOR, Badges.Badge.ALL_ARMOR_IDENTIFIED);
+	// 	catalogBadges.put(WANDS, Badges.Badge.ALL_WANDS_IDENTIFIED);
+	// 	catalogBadges.put(RINGS, Badges.Badge.ALL_RINGS_IDENTIFIED);
+	// 	catalogBadges.put(ARTIFACTS, Badges.Badge.ALL_ARTIFACTS_IDENTIFIED);
+	// 	catalogBadges.put(POTIONS, Badges.Badge.ALL_POTIONS_IDENTIFIED);
+	// 	catalogBadges.put(SCROLLS, Badges.Badge.ALL_SCROLLS_IDENTIFIED);
+	// }
 
 	public static boolean isSeen(Class<? extends Item> itemClass){
 		for (Catalog cat : values()) {
@@ -165,23 +165,23 @@ public enum Catalog {
 	private static final String CATALOG_CLASSES = "catalog_classes";
 	private static final String CATALOG_SEEN    = "catalog_seen";
 	private static final String CATALOG_USES    = "catalog_uses";
-	
+
 	public static void store( Bundle bundle ){
 
 		Badges.loadGlobal();
 
 		ArrayList<Class> seen = new ArrayList<>();
 
-		//if we have identified all items of a set, we use the badge to keep track instead.
-		if (!Badges.isUnlocked(Badges.Badge.ALL_ITEMS_IDENTIFIED)) {
-			for (Catalog cat : values()) {
-				if (!Badges.isUnlocked(catalogBadges.get(cat))) {
-					for (Class<? extends Item> item : cat.items()) {
-						if (cat.seen.get(item)) seen.add(item);
-					}
-				}
-			}
-		}
+		// //if we have identified all items of a set, we use the badge to keep track instead.
+		// if (!Badges.isUnlocked(Badges.Badge.ALL_ITEMS_IDENTIFIED)) {
+		// 	for (Catalog cat : values()) {
+		// 		if (!Badges.isUnlocked(catalogBadges.get(cat))) {
+		// 			for (Class<? extends Item> item : cat.items()) {
+		// 				if (cat.seen.get(item)) seen.add(item);
+		// 			}
+		// 		}
+		// 	}
+		// }
 
 		bundle.put( CATALOG_ITEMS, seen.toArray(new Class[0]) );
 
@@ -189,26 +189,26 @@ public enum Catalog {
 
 	public static void restore( Bundle bundle ){
 
-		Badges.loadGlobal();
-
-		//logic for if we have all badges
-		if (Badges.isUnlocked(Badges.Badge.ALL_ITEMS_IDENTIFIED)){
-			for ( Catalog cat : values()){
-				for (Class<? extends Item> item : cat.items()){
-					cat.seen.put(item, true);
-				}
-			}
-			return;
-		}
-
-		//catalog-specific badge logic
-		for (Catalog cat : values()){
-			if (Badges.isUnlocked(catalogBadges.get(cat))){
-				for (Class<? extends Item> item : cat.items()){
-					cat.seen.put(item, true);
-				}
-			}
-		}
+		// Badges.loadGlobal();
+  //
+		// //logic for if we have all badges
+		// if (Badges.isUnlocked(Badges.Badge.ALL_ITEMS_IDENTIFIED)){
+		// 	for ( Catalog cat : values()){
+		// 		for (Class<? extends Item> item : cat.items()){
+		// 			cat.seen.put(item, true);
+		// 		}
+		// 	}
+		// 	return;
+		// }
+  //
+		// //catalog-specific badge logic
+		// for (Catalog cat : values()){
+		// 	if (Badges.isUnlocked(catalogBadges.get(cat))){
+		// 		for (Class<? extends Item> item : cat.items()){
+		// 			cat.seen.put(item, true);
+		// 		}
+		// 	}
+		// }
 
 		//general save/load
 		if (bundle.contains(CATALOG_ITEMS)) {

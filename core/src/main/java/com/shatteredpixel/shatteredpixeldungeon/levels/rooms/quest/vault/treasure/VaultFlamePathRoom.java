@@ -21,10 +21,9 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.levels.rooms.quest.vault.treasure;
 
-import com.shatteredpixel.shatteredpixeldungeon.items.Generator;
 import com.shatteredpixel.shatteredpixeldungeon.items.Heap;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
-import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.MeleeWeapon;
+import com.shatteredpixel.shatteredpixeldungeon.items.quest.DwarfToken;
 import com.shatteredpixel.shatteredpixeldungeon.levels.Level;
 import com.shatteredpixel.shatteredpixeldungeon.levels.Terrain;
 import com.shatteredpixel.shatteredpixeldungeon.levels.VaultLevel;
@@ -108,24 +107,22 @@ public class VaultFlamePathRoom extends VaultTreasureRoom {
 
 		Painter.fill(level, treasure.left, treasure.top, treasure.width()+1, treasure.height()+1, Terrain.EMPTY_SP);
 		int treasurePos = level.pointToCell(Random.element(treasure.getPoints()));
-		Item treasureItem = Generator.randomUsingDefaults(Generator.Category.WEP_T3);
-		if (treasureItem.cursed){
-			treasureItem.cursed = false;
-			if (((MeleeWeapon) treasureItem).hasCurseEnchant()){
-				((MeleeWeapon) treasureItem).enchant(null);
-			}
-		}
-		//not true ID
-		treasureItem.levelKnown = treasureItem.cursedKnown = true;
+		Item treasureItem = ((VaultLevel)level).createEquipment(1);
 		level.drop(treasureItem, treasurePos).type = Heap.Type.CHEST;
 
-		treasureItem = level.findPrizeItem();
-		if (treasureItem != null){
-			do {
-				treasurePos = level.pointToCell(Random.element(treasure.getPoints()));
-			} while (level.heaps.get(treasurePos) != null);
-			level.drop(treasureItem, treasurePos);
+		treasureItem = ((VaultLevel) level).findT2SolveItem();
+		if (treasureItem == null) {
+			treasureItem = ((VaultLevel) level).createConsumabe(1);
 		}
+		do {
+			treasurePos = level.pointToCell(Random.element(treasure.getPoints()));
+		} while (level.heaps.get(treasurePos) != null);
+		level.drop(treasureItem, treasurePos);
+
+		do {
+			treasurePos = level.pointToCell(Random.element(treasure.getPoints()));
+		} while (level.heaps.get(treasurePos) != null);
+		level.drop(new DwarfToken(), treasurePos);
 
 	}
 

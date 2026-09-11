@@ -25,6 +25,7 @@ import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.ShatteredPixelDungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Barkskin;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.HeroClass;
@@ -67,6 +68,9 @@ public class HighGrass {
 			
 		} else {
 			if (ch instanceof Hero && ((Hero) ch).heroClass == HeroClass.HUNTRESS){
+				if(((Hero) ch).hasTalent(Talent.BARKSKIN)){
+					Barkskin.conditionallyAppend(ch, (((Hero) ch).lvl* ((Hero) ch).pointsInTalent(Talent.BARKSKIN))/3, 1 );
+				}
 				Level.set(pos, Terrain.FURROWED_GRASS);
 				freezeTrample = true;
 			} else {
@@ -119,11 +123,6 @@ public class HighGrass {
 					&& Random.Int(3) != 0){
 				naturalismLevel = -1;
 			}
-
-			//grass gives no loot in vault tester area
-			if (Dungeon.level instanceof VaultLevel){
-				naturalismLevel = -1;
-			}
 			
 			if (naturalismLevel >= 0) {
 				// Seed, scales from 1/25 to 1/9
@@ -131,6 +130,11 @@ public class HighGrass {
 
 				// absolute max drop rate is ~1/6.5 with footwear of nature, ~1/18 without
 				lootChance *= PetrifiedSeed.grassLootMultiplier();
+
+				//vault level spawns significantly fewer seeds from grass
+				if (Dungeon.level instanceof VaultLevel){
+					lootChance /= 3;
+				}
 
 				if (Random.Float() < lootChance) {
 					if (Random.Float() < PetrifiedSeed.stoneInsteadOfSeedChance()) {

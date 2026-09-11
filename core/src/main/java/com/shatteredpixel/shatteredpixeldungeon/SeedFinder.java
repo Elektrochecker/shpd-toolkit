@@ -741,13 +741,13 @@ public class SeedFinder {
 				Blacksmith.Quest.type = 0;
 			}
 
-			if (Imp.Quest.reward != null) {
-				ArrayList<Item> rewards = new ArrayList<>();
-				rewards.add(Imp.Quest.reward.identify());
-				Imp.Quest.complete();
-
-				addTextQuest("Imp quest reward", rewards, builder);
-			}
+			// TODO imp quest
+			// if (Imp.Quest.reward != null) {
+			// 	ArrayList<Item> rewards = new ArrayList<>();
+			// 	rewards.add(Imp.Quest.reward.identify());
+			// 	Imp.Quest.complete();
+			// 	addTextQuest("Imp quest reward", rewards, builder);
+			// }
 
 			heaps.addAll(getMobDrops(l));
 

@@ -35,9 +35,9 @@ import com.shatteredpixel.shatteredpixeldungeon.journal.Document;
 import com.shatteredpixel.shatteredpixeldungeon.journal.Journal;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.ui.Icons;
-import com.shatteredpixel.shatteredpixeldungeon.ui.TitleBackground;
 import com.shatteredpixel.shatteredpixeldungeon.ui.RenderedTextBlock;
 import com.shatteredpixel.shatteredpixeldungeon.ui.StyledButton;
+import com.shatteredpixel.shatteredpixeldungeon.ui.TitleBackground;
 import com.shatteredpixel.shatteredpixeldungeon.windows.WndError;
 import com.shatteredpixel.shatteredpixeldungeon.windows.WndHardNotification;
 import com.watabou.glwrap.Blending;
@@ -54,7 +54,7 @@ import java.util.Collections;
 
 public class WelcomeScene extends PixelScene {
 
-	private static final int LATEST_UPDATE = ShatteredPixelDungeon.v3_3_0;
+	private static final int LATEST_UPDATE = ShatteredPixelDungeon.v4_0_0;
 
 	//used so that the game does not keep showing the window forever if cleaning fails
 	private static boolean triedCleaningTemp = false;
@@ -252,13 +252,6 @@ public class WelcomeScene extends PixelScene {
 
 			Badges.loadGlobal();
 			Journal.loadGlobal();
-
-			//pre-unlock Cleric for those who already have a win
-			if (previousVersion <= ShatteredPixelDungeon.v2_5_4){
-				if (Badges.isUnlocked(Badges.Badge.VICTORY) && !Badges.isUnlocked(Badges.Badge.UNLOCK_CLERIC)){
-					Badges.unlock(Badges.Badge.UNLOCK_CLERIC);
-				}
-			}
 
 			try {
 				Rankings.INSTANCE.load();

@@ -25,17 +25,10 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.npcs.VaultSentry;
 import com.shatteredpixel.shatteredpixeldungeon.levels.Level;
 import com.shatteredpixel.shatteredpixeldungeon.levels.Terrain;
 import com.shatteredpixel.shatteredpixeldungeon.levels.painters.Painter;
-import com.shatteredpixel.shatteredpixeldungeon.levels.rooms.Room;
-import com.shatteredpixel.shatteredpixeldungeon.levels.rooms.standard.StandardRoom;
 import com.watabou.utils.Point;
 import com.watabou.utils.Random;
 
-public class VaultCircleRoom extends StandardRoom {
-
-	@Override
-	public float[] sizeCatProbs() {
-		return new float[]{0, 1, 0};
-	}
+public class VaultCircleRoom extends VaultRoom {
 
 	@Override
 	public void paint(Level level) {
@@ -105,9 +98,8 @@ public class VaultCircleRoom extends StandardRoom {
 	}
 
 	@Override
-	public boolean canMerge(Level l, Room other, Point p, int mergeTerrain) {
+	public boolean canPlaceCharacter(Point p, Level l) {
 		return false;
 	}
-
 
 }

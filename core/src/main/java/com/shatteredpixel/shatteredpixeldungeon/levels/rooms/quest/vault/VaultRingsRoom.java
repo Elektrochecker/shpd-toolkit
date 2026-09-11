@@ -21,21 +21,18 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.levels.rooms.quest.vault;
 
-import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.VaultRat;
+import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
+import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob;
 import com.shatteredpixel.shatteredpixeldungeon.levels.Level;
 import com.shatteredpixel.shatteredpixeldungeon.levels.Terrain;
+import com.shatteredpixel.shatteredpixeldungeon.levels.VaultLevel;
 import com.shatteredpixel.shatteredpixeldungeon.levels.painters.Painter;
-import com.shatteredpixel.shatteredpixeldungeon.levels.rooms.Room;
-import com.shatteredpixel.shatteredpixeldungeon.levels.rooms.standard.StandardRoom;
 import com.watabou.utils.Point;
 import com.watabou.utils.Random;
 
-public class VaultRingsRoom extends StandardRoom {
+import java.util.ArrayList;
 
-	@Override
-	public float[] sizeCatProbs() {
-		return new float[]{0, 1, 0};
-	}
+public class VaultRingsRoom extends VaultRoom {
 
 	@Override
 	public void paint(Level level) {
@@ -51,14 +48,21 @@ public class VaultRingsRoom extends StandardRoom {
 			door.set( Door.Type.REGULAR );
 		}
 
-		VaultRat rat = new VaultRat();
+		Mob enemy;
+		ArrayList<Class<?extends Mob>> toReturn = new ArrayList<>();
 		do {
-			rat.pos = level.pointToCell(random(1));
-		} while (level.map[rat.pos] == Terrain.WALL);
-		rat.state = rat.WANDERING;
-		level.mobs.add(rat);
+			enemy = level.createMob();
+			if (Char.hasProp(enemy, Char.Property.LARGE)){
+				toReturn.add(enemy.getClass());
+			}
+		} while (Char.hasProp(enemy, Char.Property.LARGE));
+		do {
+			enemy.pos = level.pointToCell(random(1));
+		} while (level.map[enemy.pos] == Terrain.WALL);
+		enemy.state = enemy.WANDERING;
+		level.mobs.add(enemy);
 
-		rat.wanderPositions = new int[]{
+		int[] wanderPositions = new int[]{
 				level.pointToCell(new Point(left+1, top+1)),
 				level.pointToCell(new Point(left+1, top+5)),
 				level.pointToCell(new Point(left+1, top+9)),
@@ -69,13 +73,13 @@ public class VaultRingsRoom extends StandardRoom {
 				level.pointToCell(new Point(left+9, top+5)),
 				level.pointToCell(new Point(left+9, top+9))
 		};
-		Random.shuffle(rat.wanderPositions);
+		Random.shuffle(wanderPositions);
+		enemy.setupStealthGameplayWanderPositions(wanderPositions, 0);
 
-	}
+		for (Class<?extends Mob> cls : toReturn){
+			((VaultLevel) level).returnMob(cls);
+		}
 
-	@Override
-	public boolean canMerge(Level l, Room other, Point p, int mergeTerrain) {
-		return false;
 	}
 
 }

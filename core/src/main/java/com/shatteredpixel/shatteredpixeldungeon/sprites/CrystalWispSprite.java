@@ -144,11 +144,6 @@ public abstract class CrystalWispSprite extends MobSprite {
 	}
 
 	@Override
-	public void move(int from, int to) {
-		super.move(from, to);
-	}
-
-	@Override
 	public void update() {
 		super.update();
 

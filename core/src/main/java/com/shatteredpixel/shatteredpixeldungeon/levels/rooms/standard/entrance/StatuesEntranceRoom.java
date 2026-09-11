@@ -26,7 +26,10 @@ import com.shatteredpixel.shatteredpixeldungeon.levels.Terrain;
 import com.shatteredpixel.shatteredpixeldungeon.levels.features.LevelTransition;
 import com.shatteredpixel.shatteredpixeldungeon.levels.painters.Painter;
 import com.shatteredpixel.shatteredpixeldungeon.levels.rooms.standard.StatuesRoom;
+import com.shatteredpixel.shatteredpixeldungeon.tiles.custom.Carpet;
 import com.watabou.utils.PathFinder;
+import com.watabou.utils.Point;
+import com.watabou.utils.Rect;
 
 public class StatuesEntranceRoom extends StatuesRoom {
 
@@ -44,19 +47,45 @@ public class StatuesEntranceRoom extends StatuesRoom {
 	public void paint(Level level) {
 		super.paint(level);
 
-		int entrance = level.pointToCell(center());
-
-		if (width() <= 10 && height()<= 10){
-			Painter.fill(level, this, 3, Terrain.EMPTY_SP);
-		}
-
-		for (int i : PathFinder.NEIGHBOURS8){
-			if (level.map[entrance + i] != Terrain.STATUE_SP) {
-				Painter.set(level, entrance + i, Terrain.EMPTY_SP);
+		int entrance = -1;
+		if (width() >= 11 || height() >= 11){
+			Point c = center();
+			entrance = level.pointToCell(c);
+			for (int i : PathFinder.NEIGHBOURS8){
+				if (level.map[entrance + i] != Terrain.STATUE ){
+					Painter.set(level, entrance + i, Terrain.EMPTY_DECO);
+				}
+			}
+			Carpet carpet = new Carpet();
+			Rect carpetRect = new Rect(c.x-1, c.y-1, c.x+1, c.y+1);
+			if (width()%2 == 0){
+				if (c.x < (left+right)/2f){
+					carpetRect.right++;
+				} else {
+					carpetRect.left--;
+				}
+			}
+			if (height()%2 == 0){
+				if (c.y < (top+bottom)/2f){
+					carpetRect.bottom++;
+				} else {
+					carpetRect.top--;
+				}
+			}
+			carpet.setRect(carpetRect.left, carpetRect.top, carpetRect.width()+1, carpetRect.height()+1);
+			carpet.overrideTile(entrance, level, Carpet.CITY_ENTRANCE);
+			level.customTiles.add(0, carpet); //so other carpets are on top of it
+		} else {
+			//already have an entrance placed in this case
+			for ( Point p : getPoints()){
+				if (level.map[level.pointToCell(p)] == Terrain.ENTRANCE){
+					entrance = level.pointToCell(p);
+					break;
+				}
 			}
 		}
 
-		Painter.set( level, entrance, Terrain.ENTRANCE_SP );
+		Painter.set( level, entrance, Terrain.ENTRANCE );
 		level.transitions.add(new LevelTransition(level, entrance, LevelTransition.Type.REGULAR_ENTRANCE));
 
 	}

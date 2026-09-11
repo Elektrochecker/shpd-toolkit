@@ -22,6 +22,8 @@
 package com.shatteredpixel.shatteredpixeldungeon.tiles;
 
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
+import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.npcs.Blacksmith;
+import com.shatteredpixel.shatteredpixeldungeon.levels.MiningLevel;
 import com.shatteredpixel.shatteredpixeldungeon.levels.Terrain;
 import com.watabou.utils.Random;
 import com.watabou.utils.SparseArray;
@@ -54,11 +56,15 @@ public class DungeonTileSheet {
 	public static final int EMBERS          = GROUND +3;
 	public static final int FLOOR_SP        = GROUND +4;
 
+	public static final int MINE_FLOOR_DECO_HEAVY   = GROUND +5;
+
 	public static final int FLOOR_ALT_1     = GROUND +6;
 	public static final int FLOOR_DECO_ALT  = GROUND +7;
 	public static final int GRASS_ALT       = GROUND +8;
 	public static final int EMBERS_ALT      = GROUND +9;
 	public static final int FLOOR_SP_ALT    = GROUND +10;
+
+	public static final int MINE_FLOOR_DECO_HEAVY_ALT   = GROUND +11;
 
 	public static final int FLOOR_ALT_2     = GROUND +12;
 
@@ -308,9 +314,13 @@ public class DungeonTileSheet {
 	public static final int RAISED_REGION_DECO      = RAISED_OTHER+10;
 	public static final int RAISED_REGION_DECO_ALT  = RAISED_OTHER+11;
 
-	public static final int RAISED_MINE_CRYSTAL     = RAISED_OTHER+12;
-	public static final int RAISED_MINE_CRYSTAL_ALT = RAISED_OTHER+13;
-	public static final int RAISED_MINE_CRYSTAL_ALT_2=RAISED_OTHER+14;
+	public static final int RAISED_MINE_CRYSTAL_BLUE_1  = RAISED_OTHER+12; //blue1 is the default
+	public static final int RAISED_MINE_CRYSTAL_BLUE_2  = RAISED_OTHER+13;
+	public static final int RAISED_MINE_CRYSTAL_GREEN_1 = RAISED_OTHER+14;
+	public static final int RAISED_MINE_CRYSTAL_GREEN_2 = RAISED_OTHER+15;
+	public static final int RAISED_MINE_CRYSTAL_RED_1   = RAISED_OTHER+16;
+	public static final int RAISED_MINE_CRYSTAL_RED_2   = RAISED_OTHER+17;
+
 	public static final int RAISED_MINE_BOULDER     = RAISED_OTHER+12;
 	public static final int RAISED_MINE_BOULDER_ALT = RAISED_OTHER+13;
 	public static final int RAISED_MINE_BOULDER_ALT_2=RAISED_OTHER+14;
@@ -394,18 +404,12 @@ public class DungeonTileSheet {
 	public static final int REGION_DECO_OVERHANG        = OTHER_OVERHANG+10;
 	public static final int REGION_DECO_ALT_OVERHANG    = OTHER_OVERHANG+11;
 
-	public static final int MINE_CRYSTAL_OVERHANG       = OTHER_OVERHANG+12;
-	public static final int MINE_CRYSTAL_OVERHANG_ALT   = OTHER_OVERHANG+13;
-	public static final int MINE_CRYSTAL_OVERHANG_ALT_2 = OTHER_OVERHANG+14;
+	public static final int MINE_CRYSTAL_OVERHANG_BLUE  = OTHER_OVERHANG+12;
+	public static final int MINE_CRYSTAL_OVERHANG_GREEN = OTHER_OVERHANG+13;
+	public static final int MINE_CRYSTAL_OVERHANG_RED   = OTHER_OVERHANG+14;
 	public static final int MINE_BOULDER_OVERHANG       = OTHER_OVERHANG+12;
 	public static final int MINE_BOULDER_OVERHANG_ALT   = OTHER_OVERHANG+13;
 	public static final int MINE_BOULDER_OVERHANG_ALT_2 = OTHER_OVERHANG+14;
-
-	public static final int HIGH_GRASS_UNDERHANG        = OTHER_OVERHANG+18;
-	public static final int FURROWED_UNDERHANG          = OTHER_OVERHANG+19;
-
-	public static final int HIGH_GRASS_UNDERHANG_ALT    = OTHER_OVERHANG+21;
-	public static final int FURROWED_UNDERHANG_ALT      = OTHER_OVERHANG+22;
 
 	/**********************************************************************
 	 * Logic for the selection of tile visuals
@@ -429,7 +433,9 @@ public class DungeonTileSheet {
 		directVisuals.put(Terrain.INACTIVE_TRAP,    directVisuals.get(Terrain.EMPTY));
 		directVisuals.put(Terrain.CUSTOM_DECO,      directVisuals.get(Terrain.EMPTY));
 		directVisuals.put(Terrain.CUSTOM_DECO_EMPTY,directVisuals.get(Terrain.EMPTY));
+		directVisuals.put(Terrain.CUSTOM_DECO_WTR,  WATER);
 
+		directVisuals.put(Terrain.EMPTY_DECO,       FLOOR_DECO);
 		directVisuals.put(Terrain.EMPTY_DECO,       FLOOR_DECO);
 		directVisuals.put(Terrain.LOCKED_EXIT,      LOCKED_EXIT);
 		directVisuals.put(Terrain.UNLOCKED_EXIT,    UNLOCKED_EXIT);
@@ -480,60 +486,71 @@ public class DungeonTileSheet {
 			}
 
 		Random.popGenerator();
+		updateAltVariants();
 	}
 
-	//These alt visuals will trigger 50% of the time (45% of the time if a rare alt is also present)
-	public static SparseArray<Integer> commonAltVisuals = new SparseArray<>();
+	private static class tileAlt {
+		float[] chances;
+		int[] alts;
+		public tileAlt(float[] chances, int... alts){
+			this.chances = chances;
+			this.alts = alts;
+		}
+	}
+
+	private static SparseArray<tileAlt> tileAltVisuals = new SparseArray<>();
 	static {
-		commonAltVisuals.put(FLOOR,                 FLOOR_ALT_1);
-		commonAltVisuals.put(GRASS,                 GRASS_ALT);
-		commonAltVisuals.put(FLAT_WALL,             FLAT_WALL_ALT);
-		commonAltVisuals.put(EMBERS,                EMBERS_ALT);
-		commonAltVisuals.put(FLAT_WALL_DECO,        FLAT_WALL_DECO_ALT);
-		commonAltVisuals.put(FLOOR_SP,              FLOOR_SP_ALT);
-		commonAltVisuals.put(FLOOR_DECO,            FLOOR_DECO_ALT);
+		tileAltVisuals.put(FLOOR,           new tileAlt(new float[]{52.5f, 5f}, FLOOR_ALT_1, FLOOR_ALT_2));
+		tileAltVisuals.put(GRASS,           new tileAlt(new float[]{50f}, GRASS_ALT));
+		tileAltVisuals.put(FLAT_WALL,       new tileAlt(new float[]{50f}, FLAT_WALL_ALT));
+		tileAltVisuals.put(EMBERS,          new tileAlt(new float[]{50f}, EMBERS_ALT));
+		tileAltVisuals.put(FLAT_WALL_DECO,  new tileAlt(new float[]{50f}, FLAT_WALL_DECO_ALT));
+		tileAltVisuals.put(FLOOR_SP,        new tileAlt(new float[]{50f}, FLOOR_SP_ALT));
+		tileAltVisuals.put(FLOOR_DECO,      new tileAlt(new float[]{50f}, FLOOR_DECO_ALT));
+		tileAltVisuals.put(GRASS,           new tileAlt(new float[]{50f}, GRASS_ALT));
 
-		commonAltVisuals.put(FLAT_BOOKSHELF,        FLAT_BOOKSHELF_ALT);
-		commonAltVisuals.put(FLAT_HIGH_GRASS,       FLAT_HIGH_GRASS_ALT);
-		commonAltVisuals.put(FLAT_FURROWED_GRASS,   FLAT_FURROWED_ALT);
-		commonAltVisuals.put(FLAT_MINE_CRYSTAL,     FLAT_MINE_CRYSTAL_ALT);
-		commonAltVisuals.put(FLAT_MINE_BOULDER,     FLAT_MINE_BOULDER_ALT);
+		tileAltVisuals.put(FLAT_BOOKSHELF,      new tileAlt(new float[]{50f}, FLAT_BOOKSHELF_ALT));
+		tileAltVisuals.put(FLAT_HIGH_GRASS,     new tileAlt(new float[]{50f}, FLAT_HIGH_GRASS_ALT));
+		tileAltVisuals.put(FLAT_FURROWED_GRASS, new tileAlt(new float[]{50f}, FLAT_FURROWED_ALT));
 
-		commonAltVisuals.put(RAISED_WALL,           RAISED_WALL_ALT);
-		commonAltVisuals.put(RAISED_WALL_DECO,      RAISED_WALL_DECO_ALT);
-		commonAltVisuals.put(RAISED_WALL_BOOKSHELF, RAISED_WALL_BOOKSHELF_ALT);
+		tileAltVisuals.put(RAISED_WALL,             new tileAlt(new float[]{50f}, RAISED_WALL_ALT));
+		tileAltVisuals.put(RAISED_WALL_DECO,        new tileAlt(new float[]{50f}, RAISED_WALL_DECO_ALT));
+		tileAltVisuals.put(RAISED_WALL_BOOKSHELF,   new tileAlt(new float[]{50f}, RAISED_WALL_BOOKSHELF_ALT));
 
-		commonAltVisuals.put(RAISED_HIGH_GRASS,     RAISED_HIGH_GRASS_ALT);
-		commonAltVisuals.put(RAISED_FURROWED_GRASS, RAISED_FURROWED_ALT);
-		commonAltVisuals.put(HIGH_GRASS_OVERHANG,   HIGH_GRASS_OVERHANG_ALT);
-		commonAltVisuals.put(FURROWED_OVERHANG,     FURROWED_OVERHANG_ALT);
-		commonAltVisuals.put(RAISED_MINE_CRYSTAL,   RAISED_MINE_CRYSTAL_ALT);
-		commonAltVisuals.put(RAISED_MINE_BOULDER,   RAISED_MINE_BOULDER_ALT);
-		commonAltVisuals.put(HIGH_GRASS_UNDERHANG,  HIGH_GRASS_UNDERHANG_ALT);
-		commonAltVisuals.put(FURROWED_UNDERHANG,    FURROWED_UNDERHANG_ALT);
-		commonAltVisuals.put(MINE_CRYSTAL_OVERHANG, MINE_CRYSTAL_OVERHANG_ALT);
-		commonAltVisuals.put(MINE_BOULDER_OVERHANG, MINE_BOULDER_OVERHANG_ALT);
+		tileAltVisuals.put(RAISED_HIGH_GRASS,       new tileAlt(new float[]{50f}, RAISED_HIGH_GRASS_ALT));
+		tileAltVisuals.put(RAISED_FURROWED_GRASS,   new tileAlt(new float[]{50f}, RAISED_FURROWED_ALT));
+		tileAltVisuals.put(HIGH_GRASS_OVERHANG,     new tileAlt(new float[]{50f}, HIGH_GRASS_OVERHANG_ALT));
+		tileAltVisuals.put(FURROWED_OVERHANG,       new tileAlt(new float[]{50f}, FURROWED_OVERHANG_ALT));
 	}
 
-	//These alt visuals trigger 5% of the time (and also override common alts when they show up)
-	public static SparseArray<Integer> rareAltVisuals = new SparseArray<>();
-	static {
-		rareAltVisuals.put(FLOOR,                   FLOOR_ALT_2);
-		rareAltVisuals.put(FLAT_MINE_CRYSTAL,       FLAT_MINE_CRYSTAL_ALT_2);
-		rareAltVisuals.put(FLAT_MINE_BOULDER,       FLAT_MINE_BOULDER_ALT_2);
-		rareAltVisuals.put(RAISED_MINE_CRYSTAL,     RAISED_MINE_CRYSTAL_ALT_2);
-		rareAltVisuals.put(RAISED_MINE_BOULDER,     RAISED_MINE_BOULDER_ALT_2);
-		rareAltVisuals.put(MINE_CRYSTAL_OVERHANG,   MINE_CRYSTAL_OVERHANG_ALT_2);
-		rareAltVisuals.put(MINE_BOULDER_OVERHANG,   MINE_BOULDER_OVERHANG_ALT_2);
+	public static void updateAltVariants(){
+		if (Dungeon.level instanceof MiningLevel){
+			if (Blacksmith.Quest.Type() == Blacksmith.Quest.CRYSTAL){
+				tileAltVisuals.put(FLAT_MINE_CRYSTAL,       new tileAlt(new float[]{66.7f, 33.3f}, FLAT_MINE_CRYSTAL_ALT, FLAT_MINE_CRYSTAL_ALT_2));
+				tileAltVisuals.put(RAISED_MINE_CRYSTAL_BLUE_1,     new tileAlt(new float[]{83.3f, 66.7f, 50f, 33.3f, 16.7f},
+						RAISED_MINE_CRYSTAL_BLUE_2, RAISED_MINE_CRYSTAL_GREEN_1, RAISED_MINE_CRYSTAL_GREEN_2, RAISED_MINE_CRYSTAL_RED_1, RAISED_MINE_CRYSTAL_RED_2));
+				tileAltVisuals.put(MINE_CRYSTAL_OVERHANG_BLUE,   new tileAlt(new float[]{66.7f, 33.3f}, MINE_CRYSTAL_OVERHANG_GREEN, MINE_CRYSTAL_OVERHANG_RED));
+			} else if (Blacksmith.Quest.Type() == Blacksmith.Quest.GNOLL){
+				tileAltVisuals.put(MINE_FLOOR_DECO_HEAVY,   new tileAlt(new float[]{50f}, MINE_FLOOR_DECO_HEAVY_ALT));
+				tileAltVisuals.put(FLAT_MINE_BOULDER,       new tileAlt(new float[]{66.7f, 33.3f}, FLAT_MINE_BOULDER_ALT, FLAT_MINE_BOULDER_ALT_2));
+				tileAltVisuals.put(RAISED_MINE_BOULDER,     new tileAlt(new float[]{66.7f, 33.3f}, RAISED_MINE_BOULDER_ALT, RAISED_MINE_BOULDER_ALT_2));
+				tileAltVisuals.put(MINE_BOULDER_OVERHANG,   new tileAlt(new float[]{66.7f, 33.3f}, MINE_BOULDER_OVERHANG_ALT, MINE_BOULDER_OVERHANG_ALT_2));
+			}
+		}
 	}
 
+	//alt visual priority is back to front, so put lowest chance ones last
+	//e.g. a 67% and a 33% chance work out to 33% chance each with a 33% chance of no alt
 	public static int getVisualWithAlts(int visual, int pos){
-		if (tileVariance[pos] >= 95 && rareAltVisuals.containsKey(visual))
-			return rareAltVisuals.get(visual);
-		else if (tileVariance[pos] >= 50 && commonAltVisuals.containsKey(visual))
-			return commonAltVisuals.get(visual);
-		else
-			return visual;
+		if (tileAltVisuals.containsKey(visual)){
+			tileAlt alts = tileAltVisuals.get(visual);
+			for (int i = 0; i < alts.chances.length; i++){
+				if (tileVariance[pos] < alts.chances[i]){
+					visual = alts.alts[i];
+				}
+			}
+		}
+		return visual;
 	}
 
 }

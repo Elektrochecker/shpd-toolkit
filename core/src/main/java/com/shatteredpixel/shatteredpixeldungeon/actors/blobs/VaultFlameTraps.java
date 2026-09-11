@@ -24,14 +24,19 @@ package com.shatteredpixel.shatteredpixeldungeon.actors.blobs;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.ShatteredPixelDungeon;
+import com.shatteredpixel.shatteredpixeldungeon.Statistics;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Burning;
+import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.npcs.Imp;
 import com.shatteredpixel.shatteredpixeldungeon.effects.BlobEmitter;
 import com.shatteredpixel.shatteredpixeldungeon.effects.CellEmitter;
 import com.shatteredpixel.shatteredpixeldungeon.effects.particles.ElmoParticle;
+import com.shatteredpixel.shatteredpixeldungeon.items.Heap;
 import com.shatteredpixel.shatteredpixeldungeon.levels.Level;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
-import com.shatteredpixel.shatteredpixeldungeon.sprites.CharSprite;
+import com.shatteredpixel.shatteredpixeldungeon.plants.Plant;
 import com.watabou.noosa.audio.Sample;
 import com.watabou.utils.Bundle;
 
@@ -80,37 +85,39 @@ public class VaultFlameTraps extends Blob {
 				cell = i + j* Dungeon.level.width();
 				if (cur[cell] > 0) {
 
-					//similar to fire.burn(), but Tengu is immune, and hero loses score
 					Char ch = Actor.findChar( cell );
-					if (ch == Dungeon.hero){
-						Sample.INSTANCE.play(Assets.Sounds.BURNING);
-						SFXLastPlayed = ShatteredPixelDungeon.realTime;
-						ch.sprite.showStatus(CharSprite.NEGATIVE, "!!!");
+					if (ch != null && !ch.isImmune(getClass())) {
+						if (ch == Dungeon.hero) {
+							Sample.INSTANCE.play(Assets.Sounds.BURNING);
+							SFXLastPlayed = ShatteredPixelDungeon.realTime;
+							if (Imp.Quest.hazardFreebies > 0){
+								Imp.Quest.hazardFreebies--;
+							} else {
+								Statistics.questScores[3] -= 100;
+							}
+						}
+
+						if (!ch.isImmune(Fire.class)) {
+							Buff.affect( ch, Burning.class ).reignite( ch, 4 );
+						}
+
+						Heap heap = Dungeon.level.heaps.get( cell );
+						if (heap != null) {
+							heap.burn();
+						}
+
+						Plant plant = Dungeon.level.plants.get( cell );
+						if (plant != null){
+							plant.wither();
+						}
+
 					}
-					/*if (ch != null && !ch.isImmune(Fire.class)) {
-						Buff.affect( ch, Burning.class ).reignite( ch );
-					}
 
-					Heap heap = Dungeon.level.heaps.get( cell );
-					if (heap != null) {
-						heap.burn();
-					}
-
-					Plant plant = Dungeon.level.plants.get( cell );
-					if (plant != null){
-						plant.wither();
-					}
-
-					if (Dungeon.level.flamable[cell]){
-						Dungeon.level.destroy( cell );
-
-						GameScene.updateMap( cell );
-					}*/
-
-					if (Dungeon.level.heroFOV[cell]){
+					if (Dungeon.level.heroFOV[cell]) {
 						CellEmitter.get(cell).start(ElmoParticle.FACTORY, 0.02f, 10);
 						playSfx = true;
 					}
+
 					off[cell] = cur[cell] - 1;
 					volume += off[cell];
 				} else {

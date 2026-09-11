@@ -19,46 +19,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package com.shatteredpixel.shatteredpixeldungeon.actors.mobs;
+package com.shatteredpixel.shatteredpixeldungeon.items.quest;
 
-import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
-import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
-import com.shatteredpixel.shatteredpixeldungeon.sprites.RatSprite;
-import com.watabou.utils.Random;
+import com.shatteredpixel.shatteredpixeldungeon.items.Item;
+import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSpriteSheet;
 
-public class VaultRat extends VaultMob {
+public class ImpStatue extends Item {
 
 	{
-		spriteClass = RatSprite.class;
+		image = ItemSpriteSheet.STATUE;
 
-		HP = HT = 8;
-		defenseSkill = 2;
-
-		maxLvl = -2;
+		stackable = true;
+		unique = true;
 	}
 
 	@Override
-	public int damageRoll() {
-		return 0;
+	public boolean isUpgradable() {
+		return false;
 	}
 
 	@Override
-	public int attackSkill(Char target) {
-		return 8;
-	}
-
-	@Override
-	public int drRoll() {
-		return super.drRoll() + Random.NormalIntRange(0, 1);
-	}
-
-	@Override
-	public String name() {
-		return Messages.get(Rat.class, "name");
-	}
-
-	@Override
-	public String description() {
-		return Messages.get(Rat.class, "desc") + "\n\n" + super.description();
+	public boolean isIdentified() {
+		return true;
 	}
 }

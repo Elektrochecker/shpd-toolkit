@@ -70,13 +70,68 @@ public class TerrainFeaturesTilemap extends DungeonTilemap {
 		if (Dungeon.depth == 21 && Dungeon.level instanceof LastShopLevel) stage--;
 		stage = Math.min(stage, 4);
 		if (tile == Terrain.HIGH_GRASS){
-			return 9 + 16*stage + (DungeonTileSheet.tileVariance[pos] >= 50 ? 1 : 0);
+			if (DungeonTileSheet.getVisualWithAlts(DungeonTileSheet.RAISED_HIGH_GRASS, pos) == DungeonTileSheet.RAISED_HIGH_GRASS_ALT){
+				return 128 + 16*stage + 1;
+			} else {
+				return 128 + 16*stage;
+			}
 		} else if (tile == Terrain.FURROWED_GRASS){
-			return 11 + 16*stage + (DungeonTileSheet.tileVariance[pos] >= 50 ? 1 : 0);
+			if (DungeonTileSheet.getVisualWithAlts(DungeonTileSheet.RAISED_FURROWED_GRASS, pos) == DungeonTileSheet.RAISED_FURROWED_ALT){
+				return 130 + 16*stage + 1;
+			} else {
+				return 130 + 16*stage;
+			}
 		} else if (tile == Terrain.GRASS) {
-			return 13 + 16*stage + (DungeonTileSheet.tileVariance[pos] >= 50 ? 1 : 0);
+			if (DungeonTileSheet.getVisualWithAlts(DungeonTileSheet.GRASS, pos) == DungeonTileSheet.GRASS_ALT){
+				return 132 + 16*stage + 1;
+			} else {
+				return 132 + 16*stage;
+			}
+		} else if (tile == Terrain.BARRICADE) {
+			return 134 + 16*stage;
+
+		} else if (tile == Terrain.ALCHEMY) {
+			return 135 + 16*stage;
+
+		} else if (tile == Terrain.STATUE || tile == Terrain.STATUE_SP) {
+			return 136 + 16*stage;
+
+		} else if (tile == Terrain.REGION_DECO) {
+			return 137 + 16 * stage;
+
+		} else if (tile == Terrain.REGION_DECO_ALT) {
+			return 138 + 16 * stage;
+
 		} else if (tile == Terrain.EMBERS) {
-			return 9 + (16*5) + (DungeonTileSheet.tileVariance[pos] >= 50 ? 1 : 0);
+			if (DungeonTileSheet.getVisualWithAlts(DungeonTileSheet.EMBERS, pos) == DungeonTileSheet.EMBERS_ALT){
+				return 208 + 1;
+			} else {
+				return 208;
+			}
+		} else if (tile == Terrain.MINE_CRYSTAL){
+			int vis = DungeonTileSheet.getVisualWithAlts(DungeonTileSheet.RAISED_MINE_CRYSTAL_BLUE_1, pos);
+			if (vis == DungeonTileSheet.RAISED_MINE_CRYSTAL_RED_2){
+				return 210 + 5;
+			} else if (vis == DungeonTileSheet.RAISED_MINE_CRYSTAL_RED_1){
+				return 210 + 4;
+			} else if (vis == DungeonTileSheet.RAISED_MINE_CRYSTAL_GREEN_2){
+				return 210 + 3;
+			} else if (vis == DungeonTileSheet.RAISED_MINE_CRYSTAL_GREEN_1){
+				return 210 + 2;
+			} else if (vis == DungeonTileSheet.RAISED_MINE_CRYSTAL_BLUE_2){
+				return 210 + 1;
+			} else {
+				return 210 + 0;
+			}
+		} else if (tile == Terrain.MINE_BOULDER){
+			int vis = DungeonTileSheet.getVisualWithAlts(DungeonTileSheet.RAISED_MINE_BOULDER, pos);
+			if (vis == DungeonTileSheet.RAISED_MINE_BOULDER_ALT_2){
+				return 216 + 2;
+			} else if (vis == DungeonTileSheet.RAISED_MINE_BOULDER_ALT){
+				return 216 + 1;
+			} else {
+				return 216;
+			}
 		}
 
 		return -1;

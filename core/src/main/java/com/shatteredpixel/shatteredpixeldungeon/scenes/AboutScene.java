@@ -28,9 +28,9 @@ import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSpriteSheet;
 import com.shatteredpixel.shatteredpixeldungeon.ui.Archs;
 import com.shatteredpixel.shatteredpixeldungeon.ui.ExitButton;
 import com.shatteredpixel.shatteredpixeldungeon.ui.Icons;
-import com.shatteredpixel.shatteredpixeldungeon.ui.TitleBackground;
 import com.shatteredpixel.shatteredpixeldungeon.ui.RenderedTextBlock;
 import com.shatteredpixel.shatteredpixeldungeon.ui.ScrollPane;
+import com.shatteredpixel.shatteredpixeldungeon.ui.TitleBackground;
 import com.shatteredpixel.shatteredpixeldungeon.ui.Window;
 import com.watabou.input.PointerEvent;
 import com.watabou.noosa.Camera;
@@ -47,7 +47,7 @@ public class AboutScene extends PixelScene {
 	public void create() {
 		super.create();
 
-		final float colWidth = 120;
+		final float colWidth = landscape() ? 120 : 130;
 		final float fullWidth = colWidth * (landscape() ? 2 : 1);
 
 		int w = Camera.main.width;
@@ -117,19 +117,38 @@ public class AboutScene extends PixelScene {
 		}
 		content.add(shpx);
 
-		CreditsBlock alex = new CreditsBlock(false, Window.SHPX_COLOR,
-				"Splash Art & Design:",
+		CreditsBlock aleks = new CreditsBlock(false, Window.SHPX_COLOR,
+				"Splash & Dungeon Art:",
 				Icons.ALEKS.get(),
 				"Aleksandar Komitov",
 				"alekskomitov.com",
 				"https://www.alekskomitov.com/");
-		alex.setSize(colWidth/2f, 0);
+		aleks.setSize(colWidth/2f, 0);
 		if (landscape()){
-			alex.setPos(shpx.right(), shpx.top() + (shpx.height() - alex.height()*2)/2f);
+			aleks.setPos(shpx.right(), insets.top+6);
 		} else {
-			alex.setPos(w/2f - colWidth/2f, shpx.bottom()+5);
+			aleks.setPos(w/2f - colWidth/2f, shpx.bottom()+6);
 		}
-		content.add(alex);
+		content.add(aleks);
+
+		CreditsBlock lumine = new CreditsBlock(false, Window.SHPX_COLOR,
+				"Composer:",
+				Icons.LUMINE.get(),
+				"Lumine Haaristo",
+				"youtube.com/@Lumine...",
+				"https://www.youtube.com/@LumineThomasHaaristo");
+		lumine.setRect(aleks.right(), aleks.top(), colWidth/2f, 0);
+		content.add(lumine);
+
+		CreditsBlock pumpkin = new CreditsBlock(false, Window.SHPX_COLOR,
+				"Item Pixel Art:",
+				Icons.PUMPKINVOLT.get(),
+				"PumpkinVolt",
+				null,
+				null);
+		pumpkin.setSize(colWidth/2f, 0);
+		pumpkin.setRect(aleks.left(), aleks.bottom()+6, colWidth/2f, 0);
+		content.add(pumpkin);
 
 		CreditsBlock celesti = new CreditsBlock(false, Window.SHPX_COLOR,
 				"Sound Effects:",
@@ -137,17 +156,18 @@ public class AboutScene extends PixelScene {
 				"Celesti",
 				"celesti-whispers.itch.io",
 				"https://celesti-whispers.itch.io/");
-		celesti.setRect(alex.right(), alex.top(), colWidth/2f, 0);
+		celesti.setRect(pumpkin.right(), pumpkin.top(), colWidth/2f, 0);
 		content.add(celesti);
 
-		CreditsBlock lumine = new CreditsBlock(false, Window.SHPX_COLOR,
-				"Music:",
-				Icons.LUMINE.get(),
-				"Lumine Haaristo",
-				"youtube.com/@Lumine...",
-				"https://www.youtube.com/@LumineThomasHaaristo");
-		lumine.setRect(alex.right() - colWidth/4f, alex.bottom() + 5, colWidth/2f, 0);
-		content.add(lumine);
+		CreditsBlock alastair = new CreditsBlock(false, Window.SHPX_COLOR,
+				"Additional Pixel Art:",
+				Icons.ALASTAIR.get(),
+				"Alastair Braun",
+				null,
+				null);
+		alastair.setSize(colWidth/2f, 0);
+		alastair.setRect(pumpkin.left(), celesti.bottom()+6, colWidth/2f, 0);
+		content.add(alastair);
 
 		//*** Pixel Dungeon Credits ***
 
@@ -159,9 +179,9 @@ public class AboutScene extends PixelScene {
 				"watabou.itch.io",
 				"https://watabou.itch.io/");
 		if (landscape()){
-			wata.setRect(shpx.left(), lumine.bottom() + 8, colWidth, 0);
+			wata.setRect(shpx.left(), alastair.bottom() + 8, colWidth, 0);
 		} else {
-			wata.setRect(shpx.left(), lumine.bottom() + 8, colWidth, 0);
+			wata.setRect(shpx.left(), alastair.bottom() + 8, colWidth, 0);
 		}
 		content.add(wata);
 
@@ -177,7 +197,7 @@ public class AboutScene extends PixelScene {
 		if (landscape()){
 			cube.setPos(wata.right() + colWidth/4f, wata.top() + (wata.height() - cube.height())/2f);
 		} else {
-			cube.setPos(alex.left() + colWidth/4f, wata.bottom()+5);
+			cube.setPos(aleks.left() + colWidth/4f, wata.bottom()+6);
 		}
 		content.add(cube);
 
@@ -210,7 +230,7 @@ public class AboutScene extends PixelScene {
 		if (landscape()){
 			arcnor.setPos(gdx.right(), gdx.top() + (gdx.height() - arcnor.height())/2f);
 		} else {
-			arcnor.setPos(alex.left(), gdx.bottom()+5);
+			arcnor.setPos(aleks.left(), gdx.bottom()+6);
 		}
 		content.add(arcnor);
 

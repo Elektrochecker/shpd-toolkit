@@ -33,7 +33,7 @@ public class VialOfBlood extends Trinket {
 
 	@Override
 	protected int upgradeEnergyCost() {
-		//6 -> 8(14) -> 10(24) -> 12(36)
+		//6 -> 6(12) -> 8(20) -> 10(30)
 		return 6+2*level();
 	}
 
@@ -54,6 +54,10 @@ public class VialOfBlood extends Trinket {
 
 	public static boolean delayBurstHealing(){
 		return trinketLevel(VialOfBlood.class) != -1;
+	}
+
+	public static int bloodVialLevel(){
+		return trinketLevel(VialOfBlood.class);
 	}
 
 	public static float totalHealMultiplier(){

@@ -342,6 +342,21 @@ public abstract class YogFist extends Mob {
 		}
 
 		@Override
+		public int incomingDOT() {
+			if (!needsIncomingDOTUpdate){
+				return cachedIncomingDOT;
+			}
+			int total = super.incomingDOT();
+			//we have special immunity rules to burning, so account for that here
+			Burning b = buff(Burning.class);
+			if (b != null){
+				total -= b.totalIncomingDMG();
+			}
+			cachedIncomingDOT = total;
+			return total;
+		}
+
+		@Override
 		protected void zap() {
 			spend( 1f );
 
@@ -416,8 +431,8 @@ public abstract class YogFist extends Mob {
 					b = new Bleeding();
 				}
 				b.announced = false;
-				b.set(dmg*.6f);
 				b.attachTo(this);
+				b.set(dmg*.6f);
 				sprite.showStatus(CharSprite.WARNING, Messages.titleCase(b.name()) + " " + (int)b.level());
 			} else{
 				super.damage(dmg, src);

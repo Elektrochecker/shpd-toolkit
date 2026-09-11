@@ -21,29 +21,34 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.levels.rooms.quest.vault;
 
-import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.VaultRat;
+import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob;
+import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.quest.vault.VaultRat;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
 import com.shatteredpixel.shatteredpixeldungeon.levels.Level;
 import com.shatteredpixel.shatteredpixeldungeon.levels.Terrain;
-import com.shatteredpixel.shatteredpixeldungeon.levels.features.Maze;
+import com.shatteredpixel.shatteredpixeldungeon.levels.VaultLevel;
 import com.shatteredpixel.shatteredpixeldungeon.levels.painters.Painter;
 import com.shatteredpixel.shatteredpixeldungeon.levels.rooms.Room;
 import com.shatteredpixel.shatteredpixeldungeon.levels.rooms.standard.StandardRoom;
 import com.watabou.utils.Point;
 import com.watabou.utils.Random;
 
-public class VaultLongRoom extends StandardRoom {
+public abstract class VaultLongRoom extends VaultRoom {
 
+	//just used during init, afterward we refer to the width and height themselves
 	private boolean wide = Random.Int(2) == 0;
 
-	@Override
-	public float[] sizeCatProbs() {
-		return new float[]{0, 0, 1};
+	protected boolean wide(){
+		if (width() == height()){
+			return wide;
+		} else {
+			return width() > height();
+		}
 	}
 
 	@Override
 	public int minWidth() {
-		return wide ? 21 : 11;
+		return wide() ? 21 : 11;
 	}
 
 	@Override
@@ -53,7 +58,7 @@ public class VaultLongRoom extends StandardRoom {
 
 	@Override
 	public int minHeight() {
-		return wide ? 11: 21;
+		return wide() ? 11: 21;
 	}
 
 	@Override
@@ -62,53 +67,8 @@ public class VaultLongRoom extends StandardRoom {
 	}
 
 	@Override
-	public void paint(Level level) {
-		Painter.fill( level, this, Terrain.WALL );
-		Painter.fill( level, this, 1 , Terrain.EMPTY );
-
-		Painter.fill(level, this, 4, Terrain.WALL);
-
-		if (wide){
-			Painter.fill(level, this, 8, 4, 8, 4, Terrain.EMPTY);
-		} else {
-			Painter.fill(level, this, 4, 8, 4, 8, Terrain.EMPTY);
-		}
-
-		Point c = center();
-		Item i = level.findPrizeItem();
-		if (i != null){
-			level.drop(i, level.pointToCell(c));
-		}
-
-		VaultRat rat = new VaultRat();
-		rat.pos = randomWander(level);
-		rat.wanderPositions = new int[]{
-				randomWander(level), randomWander(level), randomWander(level),
-				randomWander(level), randomWander(level), randomWander(level),
-				randomWander(level), randomWander(level), randomWander(level),
-				randomWander(level), randomWander(level), randomWander(level),
-				randomWander(level), randomWander(level), randomWander(level),
-				randomWander(level), randomWander(level), randomWander(level),
-		};
-		rat.state = rat.WANDERING;
-		level.mobs.add(rat);
-
-		for (Door door : connected.values()) {
-			door.set( Door.Type.REGULAR );
-		}
-	}
-
-	private int randomWander(Level level){
-		int pos;
-		do {
-			pos = level.pointToCell(random(1));
-		} while (level.map[pos] == Terrain.WALL);
-		return pos;
-	}
-
-	@Override
-	public boolean canMerge(Level l, Room other, Point p, int mergeTerrain) {
-		return false;
+	public int sizeFactor() {
+		return 2;
 	}
 
 }

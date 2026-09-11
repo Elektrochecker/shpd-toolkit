@@ -22,6 +22,7 @@
 package com.shatteredpixel.shatteredpixeldungeon.tiles;
 
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
+import com.shatteredpixel.shatteredpixeldungeon.levels.MiningLevel;
 import com.shatteredpixel.shatteredpixeldungeon.levels.Terrain;
 import com.watabou.noosa.Image;
 import com.watabou.utils.PathFinder;
@@ -41,7 +42,17 @@ public class DungeonTerrainTilemap extends DungeonTilemap {
 	@Override
 	protected int getTileVisual(int pos, int tile, boolean flat) {
 		int visual = DungeonTileSheet.directVisuals.get(tile, -1);
-		if (visual != -1) return DungeonTileSheet.getVisualWithAlts(visual, pos);
+		if (visual != -1) {
+			if (visual == DungeonTileSheet.FLOOR_DECO && Dungeon.level instanceof MiningLevel) {
+				for (int i : PathFinder.NEIGHBOURS4) {
+					if (map[pos + i] == Terrain.MINE_BOULDER) {
+						visual = DungeonTileSheet.MINE_FLOOR_DECO_HEAVY;
+						break;
+					}
+				}
+			}
+			return DungeonTileSheet.getVisualWithAlts(visual, pos);
+		}
 
 		if (tile == Terrain.WATER) {
 			return DungeonTileSheet.stitchWaterTile(
@@ -76,7 +87,7 @@ public class DungeonTerrainTilemap extends DungeonTilemap {
 				return DungeonTileSheet.RAISED_REGION_DECO_ALT;
 			} else if (tile == Terrain.MINE_CRYSTAL) {
 				return DungeonTileSheet.getVisualWithAlts(
-						DungeonTileSheet.RAISED_MINE_CRYSTAL,
+						DungeonTileSheet.RAISED_MINE_CRYSTAL_BLUE_1,
 						pos);
 			} else if (tile == Terrain.MINE_BOULDER) {
 				return DungeonTileSheet.getVisualWithAlts(

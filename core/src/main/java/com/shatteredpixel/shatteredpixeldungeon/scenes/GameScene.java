@@ -46,11 +46,13 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Snake;
 import com.shatteredpixel.shatteredpixeldungeon.effects.BannerSprites;
 import com.shatteredpixel.shatteredpixeldungeon.effects.BlobEmitter;
+import com.shatteredpixel.shatteredpixeldungeon.effects.CheckedCell;
 import com.shatteredpixel.shatteredpixeldungeon.effects.EmoIcon;
 import com.shatteredpixel.shatteredpixeldungeon.effects.Flare;
 import com.shatteredpixel.shatteredpixeldungeon.effects.FloatingText;
 import com.shatteredpixel.shatteredpixeldungeon.effects.Ripple;
 import com.shatteredpixel.shatteredpixeldungeon.effects.SpellSprite;
+import com.shatteredpixel.shatteredpixeldungeon.effects.TargetedCell;
 import com.shatteredpixel.shatteredpixeldungeon.items.Ankh;
 import com.shatteredpixel.shatteredpixeldungeon.items.Heap;
 import com.shatteredpixel.shatteredpixeldungeon.items.Honeypot;
@@ -89,6 +91,7 @@ import com.shatteredpixel.shatteredpixeldungeon.tiles.GridTileMap;
 import com.shatteredpixel.shatteredpixeldungeon.tiles.RaisedTerrainTilemap;
 import com.shatteredpixel.shatteredpixeldungeon.tiles.TerrainFeaturesTilemap;
 import com.shatteredpixel.shatteredpixeldungeon.tiles.WallBlockingTilemap;
+import com.shatteredpixel.shatteredpixeldungeon.tiles.WallOcclusionTilemap;
 import com.shatteredpixel.shatteredpixeldungeon.ui.ActionIndicator;
 import com.shatteredpixel.shatteredpixeldungeon.ui.AttackIndicator;
 import com.shatteredpixel.shatteredpixeldungeon.ui.Banner;
@@ -161,6 +164,7 @@ public class GameScene extends PixelScene {
 	private SkinnedBlock water;
 	private DungeonTerrainTilemap tiles;
 	private GridTileMap visualGrid;
+	private WallOcclusionTilemap occlusion;
 	private TerrainFeaturesTilemap terrainFeatures;
 	private RaisedTerrainTilemap raisedTerrain;
 	private DungeonWallsTilemap walls;
@@ -180,6 +184,7 @@ public class GameScene extends PixelScene {
 	private Group terrain;
 	private Group customTiles;
 	private Group levelVisuals;
+	private Group customTerrain;
 	private Group levelWallVisuals;
 	private Group customWalls;
 	private Group ripples;
@@ -195,6 +200,8 @@ public class GameScene extends PixelScene {
 	private Group statuses;
 	private Group emoicons;
 	private Group overFogEffects;
+	private Group checkedCells;
+	private Group targetedCells;
 	private Group healthIndicators;
 
 	private InventoryPane inventory;
@@ -276,16 +283,18 @@ public class GameScene extends PixelScene {
 		customTiles = new Group();
 		terrain.add(customTiles);
 
-		for( CustomTilemap visual : Dungeon.level.customTiles){
-			addCustomTile(visual);
-		}
-
 		visualGrid = new GridTileMap();
 		terrain.add( visualGrid );
 
+		occlusion = new WallOcclusionTilemap();
+		terrain.add( occlusion );
+
 		terrainFeatures = new TerrainFeaturesTilemap(Dungeon.level.plants, Dungeon.level.traps);
 		terrain.add(terrainFeatures);
-		
+
+		customTerrain = new Group();
+		terrain.add(customTerrain);
+
 		levelVisuals = Dungeon.level.addVisuals();
 		add(levelVisuals);
 
@@ -326,10 +335,6 @@ public class GameScene extends PixelScene {
 		customWalls = new Group();
 		add(customWalls);
 
-		for( CustomTilemap visual : Dungeon.level.customWalls){
-			addCustomWall(visual);
-		}
-
 		levelWallVisuals = Dungeon.level.addWallVisuals();
 		add( levelWallVisuals );
 
@@ -355,6 +360,29 @@ public class GameScene extends PixelScene {
 		add( spells );
 
 		add(overFogEffects);
+
+		checkedCells = new Group();
+		add(checkedCells);
+
+		targetedCells = new Group();
+		add(targetedCells);
+		for (TargetedCell cell : TargetedCell.cells.valueList()){
+			cell.reset(cell.pos, cell.time);
+			targetedCells.add(cell);
+		}
+
+		//set these up later so that they can influence previous tilemaps if needed
+		for( CustomTilemap visual : Dungeon.level.customTiles){
+			addCustomTile(visual);
+		}
+
+		for( CustomTilemap visual : Dungeon.level.customTerrain){
+			addCustomTerrain(visual);
+		}
+
+		for( CustomTilemap visual : Dungeon.level.customWalls){
+			addCustomWall(visual);
+		}
 		
 		statuses = new Group();
 		add( statuses );
@@ -614,6 +642,7 @@ public class GameScene extends PixelScene {
 					}
 
 					if (spawnersAbove > 0) {
+						GLog.newLine();
 						if (Dungeon.bossLevel()) {
 							GLog.n(Messages.get(this, "spawner_warn_final"));
 						} else {
@@ -1027,6 +1056,10 @@ public class GameScene extends PixelScene {
 		customTiles.add( visual.create() );
 	}
 
+	public void addCustomTerrain(CustomTilemap visual){
+		customTerrain.add( visual.create() );
+	}
+
 	public void addCustomWall( CustomTilemap visual){
 		customWalls.add( visual.create() );
 	}
@@ -1053,7 +1086,7 @@ public class GameScene extends PixelScene {
 	
 	private synchronized void addMobSprite( Mob mob ) {
 		CharSprite sprite = mob.sprite();
-		sprite.visible = Dungeon.level.heroFOV[mob.pos];
+		sprite.visible = sprite.visibleOutOfFFOV || Dungeon.level.heroFOV[mob.pos];
 		mobs.add( sprite );
 		sprite.link( mob );
 		sortMobSprites();
@@ -1183,9 +1216,41 @@ public class GameScene extends PixelScene {
 	}
 
 	public static void effectOverFog( Visual effect ) {
-		scene.overFogEffects.add( effect );
+		if (scene != null) scene.overFogEffects.add( effect );
 	}
 	
+	public static CheckedCell checkedCell( int pos, int source ){
+		if (scene != null) {
+			CheckedCell check = (CheckedCell) scene.checkedCells.recycle(CheckedCell.class);
+			check.reset(pos, source);
+			return check;
+		} else {
+			return null;
+		}
+	}
+
+	public static TargetedCell targetedCell(int pos, int color, float delay){
+		return targetedCell(pos, delay);
+	}
+
+	public static TargetedCell targetedCell(int pos, float delay){
+		if (scene != null) {
+			TargetedCell cell;
+			synchronized (TargetedCell.cells) {
+				if (TargetedCell.cells.containsKey(pos)) {
+					cell = TargetedCell.cells.get(pos);
+					cell.reset(pos, Actor.now()+delay);
+					return cell;
+				}
+			}
+			cell = (TargetedCell) scene.targetedCells.recycle(TargetedCell.class);
+			cell.reset(pos, Actor.now()+delay);
+			return cell;
+		} else {
+			return null;
+		}
+	}
+
 	public static Ripple ripple( int pos ) {
 		if (scene != null) {
 			Ripple ripple = (Ripple) scene.ripples.recycle(Ripple.class);
@@ -1305,6 +1370,7 @@ public class GameScene extends PixelScene {
 	public static void resetMap() {
 		if (scene != null) {
 			scene.tiles.map(Dungeon.level.map, Dungeon.level.width() );
+			scene.occlusion.map(Dungeon.level.map, Dungeon.level.width() );
 			scene.visualGrid.map(Dungeon.level.map, Dungeon.level.width() );
 			scene.terrainFeatures.map(Dungeon.level.map, Dungeon.level.width() );
 			scene.raisedTerrain.map(Dungeon.level.map, Dungeon.level.width() );
@@ -1317,6 +1383,7 @@ public class GameScene extends PixelScene {
 	public static void updateMap() {
 		if (scene != null) {
 			scene.tiles.updateMap();
+			scene.occlusion.updateMap();
 			scene.visualGrid.updateMap();
 			scene.terrainFeatures.updateMap();
 			scene.raisedTerrain.updateMap();
@@ -1328,6 +1395,7 @@ public class GameScene extends PixelScene {
 	public static void updateMap( int cell ) {
 		if (scene != null) {
 			scene.tiles.updateMapCell( cell );
+			scene.occlusion.updateMapCell( cell );
 			scene.visualGrid.updateMapCell( cell );
 			scene.terrainFeatures.updateMapCell( cell );
 			scene.raisedTerrain.updateMapCell( cell );
@@ -1415,6 +1483,12 @@ public class GameScene extends PixelScene {
 		}
 	}
 
+	public static void nextWndOffset(Point ofs){
+		if (scene != null){
+			lastOffset = ofs;
+		}
+	}
+
 	public static void updateFog(){
 		if (scene != null) {
 			scene.fog.updateFog();
@@ -1442,9 +1516,10 @@ public class GameScene extends PixelScene {
 				if (mob.sprite != null) {
 					if (mob instanceof Mimic && mob.state == mob.PASSIVE && ((Mimic) mob).stealthy() && Dungeon.level.visited[mob.pos]){
 						//mimics stay visible in fog of war after being first seen
+						//TODO can probably migrate this to Charsprite.visibleOutOfFFOV
 						mob.sprite.visible = true;
 					} else {
-						mob.sprite.visible = Dungeon.level.heroFOV[mob.pos];
+						mob.sprite.visible = mob.sprite.visibleOutOfFFOV || Dungeon.level.heroFOV[mob.pos];
 					}
 				}
 				if (mob instanceof Ghoul){
@@ -1691,12 +1766,11 @@ public class GameScene extends PixelScene {
 	private static ArrayList<Object> getObjectsAtCell( int cell ){
 		ArrayList<Object> objects = new ArrayList<>();
 
-		if (cell == Dungeon.hero.pos) {
-			objects.add(Dungeon.hero);
-
-		} else if (Dungeon.level.heroFOV[cell]) {
-			Mob mob = (Mob) Actor.findChar(cell);
-			if (mob != null) objects.add(mob);
+		Char ch = Actor.findChar(cell);
+		if (ch != null && ch != Dungeon.hero){
+			if (Dungeon.level.heroFOV[cell] || Char.hasProp(ch, Char.Property.OBJECT)){
+				objects.add(ch);
+			}
 		}
 
 		Heap heap = Dungeon.level.heaps.get(cell);
@@ -1704,6 +1778,10 @@ public class GameScene extends PixelScene {
 
 		Plant plant = Dungeon.level.plants.get( cell );
 		if (plant != null) objects.add(plant);
+
+		if (cell == Dungeon.hero.pos) {
+			objects.add(Dungeon.hero);
+		}
 
 		Trap trap = Dungeon.level.traps.get( cell );
 		if (trap != null && trap.visible) objects.add(trap);
@@ -1797,7 +1875,7 @@ public class GameScene extends PixelScene {
 			if (objects.isEmpty()) {
 				textLines.add(0, Messages.get(GameScene.class, "go_here"));
 			} else if (objects.get(0) instanceof Hero) {
-				textLines.add(0, Messages.get(GameScene.class, "go_here"));
+				textLines.add(0, Messages.get(GameScene.class, "cancel"));
 			} else if (objects.get(0) instanceof Mob) {
 				if (((Mob) objects.get(0)).alignment != Char.Alignment.ENEMY) {
 					textLines.add(0, Messages.get(GameScene.class, "interact"));

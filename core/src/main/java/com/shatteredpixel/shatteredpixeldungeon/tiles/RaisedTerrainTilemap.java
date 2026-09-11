@@ -21,33 +21,46 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.tiles;
 
+import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.levels.Terrain;
+
+import java.util.HashSet;
 
 public class RaisedTerrainTilemap extends DungeonTilemap {
 	
 	public RaisedTerrainTilemap() {
-		super(Dungeon.level.tilesTex());
+		super(Assets.Environment.RAISED_TERRAIN);
+		skipCells.clear();
 		map( Dungeon.level.map, Dungeon.level.width() );
 	}
-	
+
+	public static HashSet<Integer> skipCells = new HashSet<>();
+
 	@Override
 	protected int getTileVisual(int pos, int tile, boolean flat) {
 		
 		if (flat) return -1;
 
-		if (DungeonWallsTilemap.skipCells.contains(pos)){
+		if (skipCells.contains(pos)){
 			return -1;
 		}
 
+		int region = (Dungeon.depth-1)/5;
+		int regionOffset = region*4;
+
 		if (tile == Terrain.HIGH_GRASS){
-			return DungeonTileSheet.getVisualWithAlts(
-					DungeonTileSheet.HIGH_GRASS_UNDERHANG,
-					pos);
+			if (DungeonTileSheet.getVisualWithAlts(DungeonTileSheet.RAISED_HIGH_GRASS, pos) == DungeonTileSheet.RAISED_HIGH_GRASS_ALT){
+				return regionOffset + 2;
+			} else {
+				return regionOffset;
+			}
 		} else if (tile == Terrain.FURROWED_GRASS){
-			return DungeonTileSheet.getVisualWithAlts(
-					DungeonTileSheet.FURROWED_UNDERHANG,
-					pos);
+			if (DungeonTileSheet.getVisualWithAlts(DungeonTileSheet.RAISED_FURROWED_GRASS, pos) == DungeonTileSheet.RAISED_FURROWED_ALT){
+				return regionOffset + 1 + 2;
+			} else {
+				return regionOffset + 1;
+			}
 		}
 		
 		return -1;

@@ -33,7 +33,7 @@ import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
 import com.watabou.noosa.Image;
 import com.watabou.utils.Bundle;
 
-public class Poison extends Buff implements Hero.Doom {
+public class Poison extends Buff implements Hero.Doom, Buff.DOTbuff {
 	
 	protected float left;
 	
@@ -59,10 +59,16 @@ public class Poison extends Buff implements Hero.Doom {
 	
 	public void set( float duration ) {
 		this.left = Math.max(duration, left);
+		if (target != null) target.needsIncomingDOTUpdate = true;
 	}
 
 	public void extend( float duration ) {
 		this.left += duration;
+		if (target != null) target.needsIncomingDOTUpdate = true;
+	}
+
+	public void delay( float turns ){
+		spend(turns);
 	}
 	
 	@Override
@@ -94,6 +100,12 @@ public class Poison extends Buff implements Hero.Doom {
 	}
 
 	@Override
+	public void detach() {
+		target.needsIncomingDOTUpdate = true;
+		super.detach();
+	}
+
+	@Override
 	public boolean act() {
 		if (target.isAlive()) {
 			
@@ -103,6 +115,7 @@ public class Poison extends Buff implements Hero.Doom {
 			if ((left -= TICK) <= 0) {
 				detach();
 			}
+			target.needsIncomingDOTUpdate = true;
 			
 		} else {
 			
@@ -111,6 +124,15 @@ public class Poison extends Buff implements Hero.Doom {
 		}
 		
 		return true;
+	}
+
+	@Override
+	public int totalIncomingDMG() {
+		int total = 0;
+		for (int i = (int)Math.ceil(left); i > 0; i--){
+			total += i/3 + 1;
+		}
+		return total;
 	}
 
 	@Override

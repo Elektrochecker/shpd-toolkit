@@ -22,6 +22,7 @@
 package com.shatteredpixel.shatteredpixeldungeon.actors.mobs;
 
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
+import com.shatteredpixel.shatteredpixeldungeon.Badges;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.Statistics;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
@@ -320,14 +321,16 @@ public abstract class Elemental extends Mob {
 				if (!candidates.isEmpty()){
 					targetingPos = Random.element(candidates);
 
+					float delay = GameMath.gate(attackDelay(), (int)Math.ceil(Dungeon.hero.cooldown()), 3*attackDelay());
+
 					for (int i : PathFinder.NEIGHBOURS9){
 						if (!Dungeon.level.solid[targetingPos + i]) {
-							sprite.parent.addToBack(new TargetedCell(targetingPos + i, 0xFF0000));
+							GameScene.targetedCell(targetingPos + i, delay);
 						}
 					}
 
 					GLog.n(Messages.get(this, "charging"));
-					spend(GameMath.gate(attackDelay(), (int)Math.ceil(Dungeon.hero.cooldown()), 3*attackDelay()));
+					spend(delay);
 					Dungeon.hero.interrupt();
 					return true;
 				} else {
@@ -526,6 +529,7 @@ public abstract class Elemental extends Mob {
 			for (Char ch : affected) {
 				ch.damage( Math.round( damage * 0.4f ), new Shocking() );
 				if (ch == Dungeon.hero && !ch.isAlive()){
+					Badges.validateDeathFromEnemyMagic();
 					Dungeon.fail(this);
 					GLog.n( Messages.capitalize(Messages.get(Char.class, "kill", name())) );
 				}

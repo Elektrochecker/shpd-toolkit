@@ -32,7 +32,7 @@ public class ExoticCrystals extends Trinket {
 
 	@Override
 	protected int upgradeEnergyCost() {
-		//6 -> 8(14) -> 10(24) -> 12(36)
+		//6 -> 6(12) -> 8(20) -> 10(30)
 		return 6+2*level();
 	}
 
@@ -53,7 +53,7 @@ public class ExoticCrystals extends Trinket {
 		if (level == -1){
 			return 0f;
 		} else {
-			return 0.125f + 0.125f*level;
+			return 0.2f + 0.2f*level;
 		}
 	}
 

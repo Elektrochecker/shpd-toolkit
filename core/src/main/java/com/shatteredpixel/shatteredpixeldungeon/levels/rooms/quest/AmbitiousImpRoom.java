@@ -31,6 +31,7 @@ import com.shatteredpixel.shatteredpixeldungeon.levels.painters.Painter;
 import com.shatteredpixel.shatteredpixeldungeon.levels.rooms.special.SpecialRoom;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.tiles.CustomTilemap;
+import com.shatteredpixel.shatteredpixeldungeon.tiles.custom.Carpet;
 import com.watabou.noosa.Game;
 import com.watabou.noosa.Image;
 import com.watabou.noosa.NoosaScript;
@@ -69,7 +70,6 @@ public class AmbitiousImpRoom extends SpecialRoom {
 		Imp npc = new Imp();
 		npc.pos = level.pointToCell(c);
 
-		//TODO we have imp in front for now, do we want to put him in the back?
 		if (entrance.x == left || entrance.x == right){
 			npc.pos += Random.IntRange(-1, 1)*level.width();
 			npc.pos += entrance.x == left ? -2 : 2;
@@ -80,9 +80,19 @@ public class AmbitiousImpRoom extends SpecialRoom {
 		level.mobs.add( npc );
 
 		Painter.drawInside(level, this, entrance, 1, Terrain.EMPTY);
-		entrance.set( Door.Type.REGULAR ); //TODO maybe lock?
+		entrance.set( Door.Type.REGULAR );
 
-		//TODO finalize quest entrance visuals
+		Painter.fill( level, left+1, top+3, 7, 3, Terrain.CUSTOM_DECO_EMPTY);
+		Painter.fill( level, left+3, top+1, 3, 7, Terrain.CUSTOM_DECO_EMPTY);
+
+		Carpet carpet = new Carpet();
+		carpet.setRect(left+1, top+3, 7, 3);
+		level.customTiles.add(carpet);
+
+		carpet = new Carpet();
+		carpet.setRect(left+3, top+1, 3, 7);
+		level.customTiles.add(carpet);
+
 		QuestEntrance vis = new QuestEntrance();
 		vis.pos(c.x - 2, c.y - 2);
 		level.customTiles.add(vis);
@@ -90,6 +100,10 @@ public class AmbitiousImpRoom extends SpecialRoom {
 		EntranceBarrier vis2 = new EntranceBarrier();
 		vis2.pos(c.x - 1, c.y - 1);
 		level.customTiles.add(vis2);
+
+		WallBanners vis3 = new WallBanners();
+		vis3.pos(left+1, top);
+		level.customTerrain.add(vis3);
 
 		int entrancePos = level.pointToCell(c);
 
@@ -120,12 +134,12 @@ public class AmbitiousImpRoom extends SpecialRoom {
 
 	@Override
 	public boolean canPlaceGrass(Point p) {
-		return Point.distance(p, center()) >= 3;
+		return Point.distance(p, center()) >= 5;
 	}
 
 	@Override
 	public boolean canPlaceWater(Point p) {
-		return Point.distance(p, center()) >= 3;
+		return Point.distance(p, center()) >= 5;
 	}
 
 	public static class QuestEntrance extends CustomTilemap {
@@ -136,7 +150,7 @@ public class AmbitiousImpRoom extends SpecialRoom {
 			tileW = tileH = 5;
 		}
 
-		final int TEX_WIDTH = 128;
+		final int TEX_WIDTH = 256;
 
 		@Override
 		public Tilemap create() {
@@ -157,12 +171,76 @@ public class AmbitiousImpRoom extends SpecialRoom {
 
 		@Override
 		public Image image(int tileX, int tileY) {
-			//only center 3x3 gives custom image/message
-			if (tileX >= 1 && tileX < 4 && tileY >= 1 && tileY < 4){
-				return super.image(tileX, tileY);
-			} else {
+			//no custom image-msg for corner tiles
+			if ((tileX == 0 || tileX == tileW-1)
+					&& (tileY == 0 || tileY == tileH-1)){
 				return null;
+			} else {
+				return super.image(tileX, tileY);
 			}
+		}
+	}
+
+	public static class WallBanners extends CustomTilemap {
+		{
+			texture = Assets.Environment.CITY_QUEST;
+
+			tileW = 7;
+			tileH = 3;
+		}
+
+		private final int BANNER_1 = 80;
+		private final int BANNER_2 = 81;
+		private final int BANNER__BOTTOM = 82;
+
+		@Override
+		public void pos(int pos) {
+			super.pos(pos);
+		}
+
+		@Override
+		public Tilemap create() {
+			Tilemap v = super.create();
+			int[] data = new int[tileW*tileH];
+			//up to five banners, which we place unless there's a door
+			int cell = tileX + Dungeon.level.width()*tileY;
+
+			if (!Dungeon.level.passable[cell+1]){
+				data[1] = BANNER_1 + Random.Int(2);
+				data[1+tileW] = BANNER__BOTTOM;
+			}
+
+			if (!Dungeon.level.passable[cell+3]) {
+				data[3] = BANNER_1 + Random.Int(2);
+				if (Dungeon.level.map[cell+3+Dungeon.level.width()] != Terrain.PEDESTAL) {
+					data[3 + tileW] = BANNER__BOTTOM;
+				}
+			}
+
+			if (!Dungeon.level.passable[cell+5]) {
+				data[5] = BANNER_1 + Random.Int(2);
+				data[5 + tileW] = BANNER__BOTTOM;
+			}
+
+			cell += Dungeon.level.width();
+
+			if (!Dungeon.level.passable[cell]) {
+				data[7] = BANNER_1 + Random.Int(2);
+				data[7 + tileW] = BANNER__BOTTOM;
+			}
+
+			if (!Dungeon.level.passable[cell+6]) {
+				data[13] = BANNER_1 + Random.Int(2);
+				data[13 + tileW] = BANNER__BOTTOM;
+			}
+
+			v.map( data, tileW );
+			return v;
+		}
+
+		@Override
+		public Image image(int tileX, int tileY) {
+			return null;
 		}
 	}
 
@@ -173,7 +251,7 @@ public class AmbitiousImpRoom extends SpecialRoom {
 			tileW = tileH = 3;
 		}
 
-		final int TEX_WIDTH = 128;
+		final int TEX_WIDTH = 256;
 
 		@Override
 		public Tilemap create() {
