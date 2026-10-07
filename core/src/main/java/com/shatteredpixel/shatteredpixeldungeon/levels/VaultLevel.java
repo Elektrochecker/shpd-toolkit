@@ -210,8 +210,8 @@ public class VaultLevel extends CityLevel {
 
 	//only occurs in levelgen, no need to bundle these
 	// use arrays here as we want to be able to track and access indices
-	// this lets us garuntee an even distribution of loot
-	// more specifically, every 6 items generated from T2/3 and T0/1 are garunteed to be:
+	// this lets us guarantee an even distribution of loot
+	// more specifically, every 6 items generated from T2/3 and T0/1 are guaranteed to be:
 	// 2x melee weapon, 1x armor, 1x thrown weapon, 1x wand, 1x ring
 	Item[][] equipmentLoot = new Item[4][];
 	int higherTierIdx = 0;
@@ -622,6 +622,21 @@ public class VaultLevel extends CityLevel {
 				}
 			}
 			Random.popGenerator();
+		}
+
+		//generate one extra healing potion that is (almost)guaranteed to be in a room adjacent to the entrance
+		int tries = 1000;
+		int cell;
+		Room r;
+		do {
+			cell = randomDropCell();
+			r = room(cell);
+			tries--;
+		} while (!r.connected.containsKey(roomEntrance) && tries > 0);
+		drop( new PotionOfHealing(), cell ).type = Heap.Type.HEAP;
+		if (map[cell] == Terrain.HIGH_GRASS || map[cell] == Terrain.FURROWED_GRASS) {
+			map[cell] = Terrain.GRASS;
+			losBlocking[cell] = false;
 		}
 
 	}

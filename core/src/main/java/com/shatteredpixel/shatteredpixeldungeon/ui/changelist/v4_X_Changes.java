@@ -49,7 +49,7 @@ public class v4_X_Changes {
 		changes.addButton( new ChangeButton( ChangeIcons.V074_SHPX, "Overview and ETA",
 				"The next major update to Shattered will be v4.1.0! I expect this will be a quite small update, focusing mainly on being a followup to v4.0.0.\n" +
 				"\n" +
-				"To be honest I'm pretty whiped after v4.0 ended up taking almost 9 dang months to release after v3.3 (6 if you want to start from the last v3.3 patch), so I'm going to be taking things a bit easy for a while and don't have a specific ETA to provide.\n" +
+				"To be honest I'm pretty wiped after v4.0 ended up taking almost 9 dang months to release after v3.3 (6 if you want to start from the last v3.3 patch), so I'm going to be taking things a bit easy for a while and don't have a specific ETA to provide.\n" +
 				"\n" +
 				"However, I would like to do another update in 2026, so you'll probably hear from me in another blog post with more details in the coming months."));
 
@@ -59,16 +59,16 @@ public class v4_X_Changes {
 				"I've been inclined to do this since the success of the Skeleton Key, and realizing it was the first artifact I added in about 10 years!"));
 
 		changes.addButton( new ChangeButton( new ItemSprite(ItemSpriteSheet.SCIMITAR), "More New Visuals",
-				"Now that the in-game art overhaul project has started that will also be a focus moving forward. I can't give any garuntees, especially as the work is dependant on artists who have other projects too, but v4.1 will definitely include various new artwork. In particular I'd like to focus on general environment art, treasure rooms, and various equipment item sprites."));
+				"Now that the in-game art overhaul project has started that will also be a focus moving forward. I can't give any guarantees, especially as the work is dependant on artists who have other projects too, but v4.1 will definitely include various new artwork. In particular I'd like to focus on general environment art, treasure rooms, and various equipment item sprites."));
 
 		changes.addButton( new ChangeButton( ChangeIcons.V081_MISC, "Misc. Changes",
 				"And of course, I expect v4.1 will include lots of little fixes an adjustments. All of the new content in v4.0 will likely get some adjustments in patches, but there will be larger changes to it that will need to be done in v4.1 instead."));
 
-		if (DeviceCompat.isiOS() && DeviceCompat.getPlatformVersion() <= 12) {
-			changes.addButton(new ChangeButton(Icons.WARNING.get(), "iOS 12 end of support",
-					"Unfortunately, due to an impending requirement by Apple, v4.0.0 and any immediate patches will be the last versions of Shattered compatible with iOS 12.\n" +
+		if (DeviceCompat.isiOS() && DeviceCompat.getPlatformVersion() <= 14) {
+			changes.addButton(new ChangeButton(Icons.WARNING.get(), "iOS 13 & 14 end of support",
+					"Unfortunately, due to a new requirement by Apple, v4.0.0 was the the last version of Shattered compatible with iOS 12.\n" +
 					"\n" +
-					"iOS 13 and 14 support will also have to be dropped around this time next year due to the same requirements."));
+					"iOS 13 and 14 support will also have to be dropped soon due to the same requirements, likely v4.1 and any immediate patches will be the last update for those devices."));
 		}
 	}
 
@@ -77,6 +77,83 @@ public class v4_X_Changes {
 		ChangeInfo changes = new ChangeInfo("v4.0", true, "");
 		changes.hardlight(Window.TITLE_COLOR);
 		changeInfos.add(changes);
+
+		changes = new ChangeInfo("v4.0.2", false, null);
+		changes.hardlight(Window.TITLE_COLOR);
+		changeInfos.add(changes);
+
+		changes.addButton( new ChangeButton( ChangeIcons.V061_BUGFIX, Messages.get(ChangesScene.class, "bugfixes"),
+				"Fixed the following bugs:\n" +
+				"**Caused by v4.0.1:**\n" +
+				"**-** Crystal enchantment having lower durability than intended at melee weapon levels above +6\n" +
+				"(it got VERY low around +10 and higher, it should now correctly cap at 30 avg uses at +6, sorry!)\n" +
+				"\n" +
+				"**Caused by v4.0.0:**\n" +
+				"**-** Traps appearing over carpet in rare cases\n" +
+				"**-** Further crashes when loading during vault boss fight\n" +
+				"**-** Various rare crash bugs\n" +
+				"\n" +
+				"**Existed Prior to v4.0:**\n" +
+				"**-** Metamorphed weapon recharging talent not applying its bonus damage correctly\n" +
+				"**-** Kunai and Knives not benefitting from projectile momentum when surprise attacking\n" +
+				"**-** Cursed wands of warding being limited by ward spawning rules, despite not spawning wards"));
+
+		changes = new ChangeInfo("v4.0.1", false, null);
+		changes.hardlight(Window.TITLE_COLOR);
+		changeInfos.add(changes);
+
+		changes.addButton( new ChangeButton( ChangeIcons.V40_GREATSWORD_CRYSTAL, "Enchantment Balance Changes",
+				"**Crystal** weapons are weak overall currently, so I'm giving them some major buffs, especially at lower levels:\n" +
+				"**-** Crystal damage bonus up to +33% from +25%\n" +
+				"**-** Avg uses until breaking up to 50 at +0, from 33\n" +
+				"**-** Uses until breaking steadily scale down with level, capping at 30 at +6\n" +
+				"**-** The crystal bow specifically always has 50 avg uses\n" +
+				"\n" +
+				"Crystal thrown weapons specifically are also getting a nerf:\n" +
+				"**-** Max uses until breaking for crystal thrown weapons down to 30, from 50.\n" +
+				"\n" +
+				"Also, three other enchantments are getting smaller boosts:\n" +
+				"**- Eldritch** base proc chance up to 25% from 20%\n" +
+				"**- Blooming** base avg grass created up to 1.5 from 1\n" +
+				"**- Corrupting** base proc chance up to 25% from 20%"));
+
+		changes.addButton( new ChangeButton( ChangeIcons.V33_IMP, "Vault Balance Changes",
+				"I'm making some changes aimed at improving clarity and giving players a little more space to get their bearings as the quest starts:\n" +
+				"\n" +
+				"**-** Overhauled visuals for 'hearing' enemies outside of your view in the vault. These visuals are now much clearer, show the type of enemy, and reveal unseen tiles.\n" +
+				"**-** Added an extra potion of healing to the vault that spawns near the entrance.\n" +
+				"**-** Rooms near the entrance now cannot contain caves+ enemies that are awake.\n" +
+				"\n" +
+				"I've also softened up three standard hazard rooms:\n" +
+				"**-** Slowed down the scanning speed of the sentry in the circular scan room.\n" +
+				"**-** Reduced the frequency of zaps in the room with many semi-random laser sentries.\n" +
+				"**-** Room of alternating fire traps now has a 1-tile safe border.\n"));
+
+		changes.addButton( new ChangeButton( ChangeIcons.V081_MISC, Messages.get(ChangesScene.class, "misc"),
+				"**-** Added new visuals for the doors in the final vault room\n" +
+				"**-** Vault boss now plays sfx when swapping forms\n" +
+				"**-** Darkened new 'investigating' thought bubble to make it more distinct from 'hunting'\n" +
+				"\n" +
+				"**-** Slightly darkened the highlights on new runestone visuals\n" +
+				"**-** Improved visuals on crystal spire when it becomes damaged\n" +
+				"**-** Traps which cannot spawn in hallways now also can't spawn adjacent to each other\n" +
+				"**-** Removed (hopefully) unnecessary permissions from the Android version"));
+
+		changes.addButton( new ChangeButton( ChangeIcons.V061_BUGFIX, Messages.get(ChangesScene.class, "bugfixes"),
+				"Fixed the following bugs:\n" +
+				"**Caused by v4.0:**\n" +
+				"**-** Incoming DOT display not showing correctly in specific cases\n" +
+				"**-** Vault boss being able to spawn on top of characters\n" +
+				"**-** Vault boss shocking form using direct attack more often than intended, and environment attack less often than intended\n" +
+				"**-** Beacon of Returning being usable to return to the vault in specific cases\n" +
+				"**-** Various rare crash bugs\n" +
+				"**-** Various minor visual & textual errors\n" +
+				"\n" +
+				"**Existed Prior to v4.0:**\n" +
+				"**-** Left stick controller inputs being eaten in various cases\n" +
+				"**-** Chalice death chance display being slightly incorrect in some cases\n" +
+				"**-** Scroll of retribution from unstable spellbook not triggering artifact-effects (such as priest illuminate trigger) on enemies\n" +
+				"**-** Rat skull affecting levelgen in very specific cases"));
 
 		changes = new ChangeInfo(Messages.get(ChangesScene.class, "new"), false, null);
 		changes.hardlight(Window.TITLE_COLOR);
@@ -114,7 +191,7 @@ public class v4_X_Changes {
 				"**-** Overhauled Mass Grave and Ritual rooms from the prison quest.\n" +
 				"**-** Improvements to sewer barrels, barricades, and city flaming pedestals.\n" +
 				"\n" +
-				"I expect to continue releasing waves of new art and tweaks each major update for the forseeable future, **please let me know what you think!**"));
+				"I expect to continue releasing waves of new art and tweaks each major update for the foreseeable future, **please let me know what you think!**"));
 
 		changes.addButton( new ChangeButton( ChangeIcons.V40_POTION_CRIMSON, "New Consumable Item Sprites!",
 				"**After almost two years since I initially teased it, the first wave of visual improvements to Shattered's in-game pixel art are finally here!**\n" +
@@ -128,7 +205,7 @@ public class v4_X_Changes {
 				"**-** Energy crystals & exotic crystals (related to spells)\n" +
 				"**-** Dwarf Tokens & other new quest items\n" +
 				"\n" +
-				"I expect to continue releasing waves of new art and tweaks each major update for the forseeable future, **please let me know what you think!**"));
+				"I expect to continue releasing waves of new art and tweaks each major update for the foreseeable future, **please let me know what you think!**"));
 
 		changes.addButton( new ChangeButton( ChangeIcons.V40_GREATSWORD_CRYSTAL, "New Enchantments!",
 				"**Four new enchantments and two new curses** have been added for weapons! Long-time players will recognize several of these as reworked enchantments that were previously removed years ago.\n" +
@@ -165,9 +242,9 @@ public class v4_X_Changes {
 		changeInfos.add(changes);
 
 		changes.addButton( new ChangeButton( ChangeIcons.V075_LONGSWORD_CORRUPTING, "Existing Enchant Changes",
-				"With new enchantments being added, I've also taken the oppourtunity to improve on some quirks relating to existing enchants:\n" +
+				"With new enchantments being added, I've also taken the opportunity to improve on some quirks relating to existing enchants:\n" +
 				"\n" +
-				"**- Kinetic** conserved damage is no longer lost (but still isn't increased) if the hit from kinetic is cancelled due to the enemy first dieing to another on-hit effect (e.g. smite)\n" +
+				"**- Kinetic** conserved damage is no longer lost (but still isn't increased) if the hit from kinetic is cancelled due to the enemy first dying to another on-hit effect (e.g. smite)\n" +
 				"**- Corrupting** can now apply if ANY part of the corrupting hit kills (e.g. smite), not just the hit from the corrupting weapon itself.\n" +
 				"**- Grim** now triggers more consistently if extra damage (e.g. smite, holy weapon) applies before the hit from the grim weapon itself."));
 
@@ -194,7 +271,7 @@ public class v4_X_Changes {
 				"**-** Items are now pushed out of doors that become locked by bosses\n" +
 				"**-** Dropped support for savegames prior to v3.1.1 \n" +
 				"**-** Performance improvements to blue 'checked cell' visuals, red targeted cell indicators, and skeleton key spectral walls.\n" +
-				"**-** Updated various code dependancies"));
+				"**-** Updated various code dependencies"));
 
 		changes.addButton( new ChangeButton( ChangeIcons.V061_BUGFIX, Messages.get(ChangesScene.class, "bugfixes"),
 				"Fixed the following bugs:\n" +
@@ -277,7 +354,7 @@ public class v4_X_Changes {
 		changes.addButton( new ChangeButton( ChangeIcons.V40_STONE_AGGRESSION, "Item Nerfs",
 				"A few items were also showing as quite strong and are getting scaled back a bit.\n" +
 				"\n" +
-				"Most notably, I'm returning runestones of aggression back to their pre-v1.0 behaviour vs. bosses. In retrospect, while I do want them to be usable to redirect aggression during boss fights, letting them apply directly to bosses was a mistake. You can still use aggro stones on boss minions to take aggression off yourself during boss fights, and everthing ganging up on one minion is a more suitable scaled-back version of the scroll of rage effect.\n" +
+				"Most notably, I'm returning runestones of aggression back to their pre-v1.0 behaviour vs. bosses. In retrospect, while I do want them to be usable to redirect aggression during boss fights, letting them apply directly to bosses was a mistake. You can still use aggro stones on boss minions to take aggression off yourself during boss fights, and everything ganging up on one minion is a more suitable scaled-back version of the scroll of rage effect.\n" +
 				"\n" +
 				"**- Stone of Aggression** can no longer be directly applied to bosses\n" +
 				"**- Ring of Haste** speed boost per level down to +15%, from +17.5%\n" +
